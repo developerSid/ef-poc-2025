@@ -1,0 +1,33 @@
+# Build results
+bin/
+obj/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / VS Code
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# Test results
+TestResults/
+coverage/
+
+# NuGet
+packages/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets / local config
+*.secret
+*.key
+appsettings.Development.json

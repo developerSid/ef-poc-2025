@@ -1,0 +1,22 @@
+<Solution>
+  <Folder Name="/docs/">
+    <File Path="docs/CODING_STANDARDS.md" />
+    <File Path="docs/DB_MIGRATIONS.md" />
+    <File Path="docs/README.md" />
+    <File Path="docs/STATEMENT_OF_WORK.md" />
+  </Folder>
+  <Folder Name="/samples/">
+    <File Path="samples/837-sample.edi" />
+    <File Path="samples/837i-sample.edi" />
+    <File Path="samples/837p-sample.edi" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/PayerEdi.EdiFabric.Console/PayerEdi.EdiFabric.Console.csproj" />
+    <Project Path="src/PayerEdi.Ingestion/PayerEdi.Ingestion.csproj" />
+    <Project Path="src/PayerEdi.Pharmacy.Data/PayerEdi.Pharmacy.Data.csproj" />
+    <Project Path="src/PayerEdi.Pharmacy/PayerEdi.Pharmacy.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PayerEdi.Pharmacy.Tests/PayerEdi.Pharmacy.Tests.csproj" />
+  </Folder>
+</Solution>
