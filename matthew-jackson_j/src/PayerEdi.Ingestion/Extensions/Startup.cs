@@ -1,5 +1,9 @@
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using PayerEdi.Ingestion.Reader;
+using PayerEdi.Ingestion.S3;
+using PayerEdi.Ingestion.Sniffing;
+using PayerEdi.Ingestion.Tokens;
 
 namespace PayerEdi.Ingestion.Extensions;
 
@@ -20,6 +24,23 @@ public static class Startup
         {
             services.AddSingleton<Func<Stream, IEdiReader>>(sp => stream =>
                 sp.GetRequiredService<IEdiReaderFactory>().Create(stream));
+        }
+    }
+
+    public static void AddS3Consumer(this IServiceCollection services, Action<S3ConsumerOptions>? configure = null)
+    {
+        if (!services.Any(d => d.ServiceType == typeof(IS3Consumer)))
+        {
+            if (configure is null)
+            {
+                services.Configure<S3ConsumerOptions>(_ => { });
+            }
+            else
+            {
+                services.Configure(configure);
+            }
+
+            services.AddSingleton<IS3Consumer, S3Consumer>();
         }
     }
 }

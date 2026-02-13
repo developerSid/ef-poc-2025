@@ -1,12 +1,9 @@
 using EdiFabric.Templates.Hipaa5010;
 
-namespace PayerEdi.Pharmacy.Tests.Tests.Infrastructure;
+namespace PayerEdi.Pharmacy.Tests.Infrastructure;
 
-public sealed class Hipaa837pDbContextCrudTests : DbTestBase
+public sealed class Hipaa837pDbContextCrudTests(DbFixture fixture) : DbTestBase(fixture)
 {
-    public Hipaa837pDbContextCrudTests(DbFixture fixture) : base(fixture)
-    {
-    }
 
     [Fact]
     public async Task CanSaveAndLoadTransaction()

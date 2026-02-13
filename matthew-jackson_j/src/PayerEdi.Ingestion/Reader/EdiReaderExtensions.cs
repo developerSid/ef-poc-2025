@@ -1,4 +1,4 @@
-﻿
+
 namespace PayerEdi.Ingestion.Reader;
 
 public static class EdiReaderExtensions

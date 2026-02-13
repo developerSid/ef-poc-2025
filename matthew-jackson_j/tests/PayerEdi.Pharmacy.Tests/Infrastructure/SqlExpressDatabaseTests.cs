@@ -1,10 +1,7 @@
-namespace PayerEdi.Pharmacy.Tests.Tests.Infrastructure;
+namespace PayerEdi.Pharmacy.Tests.Infrastructure;
 
-public sealed class SqlExpressDatabaseTests : DbTestBase
+public sealed class SqlExpressDatabaseTests(DbFixture fixture) : DbTestBase(fixture)
 {
-    public SqlExpressDatabaseTests(DbFixture fixture) : base(fixture)
-    {
-    }
 
     [Fact]
     public async Task DatabaseIsReachableWithNoPendingMigrations()

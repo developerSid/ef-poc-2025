@@ -1,17 +1,14 @@
 using EdiFabric.Core.Model.Edi.X12;
 using EdiFabric.Templates.Hipaa5010;
 
-namespace PayerEdi.Pharmacy.Tests.Tests.Ingestion;
+namespace PayerEdi.Pharmacy.Tests.Ingestion;
 
-public sealed class Hipaa837pIngestionPersistenceTests : DbTestBase
+public sealed class Hipaa837pIngestionPersistenceTests(DbFixture fixture) : DbTestBase(fixture)
 {
-    public Hipaa837pIngestionPersistenceTests(DbFixture fixture) : base(fixture)
-    {
-    }
 
     [Theory]
     [InlineData("837p-sample.edi")]
-    public async Task TS8737PIngestionFinishes(string resourceName)
+    public async Task TS837PIngestionFinishes(string resourceName)
     {
         using var stream = SampleFile.Open(resourceName);
 
@@ -55,6 +52,20 @@ public sealed class Hipaa837pIngestionPersistenceTests : DbTestBase
         Assert.Equal(
             expected.BHT_BeginningOfHierarchicalTransaction.SubmitterTransactionIdentifier_03,
             actual.BHT_BeginningOfHierarchicalTransaction.SubmitterTransactionIdentifier_03);
+    }
+
+    [Fact]
+    public async Task IngestWhenInputIsNotEdiThrowsAndPersistsNothing()
+    {
+        using var stream = new MemoryStream("not-an-edi-payload"u8.ToArray());
+
+        var ingestion = GetService<IHipaa837pIngestionService>();
+
+        await Assert.ThrowsAsync<NotSupportedException>(() => ingestion.IngestAsync(stream, CancellationToken));
+
+        using var reloadContext = GetService<Hipaa837pDbContext>();
+        var persistedTransactions = await reloadContext.Set<TS837P>().CountAsync(CancellationToken);
+        Assert.Equal(0, persistedTransactions);
     }
 
     [Theory]

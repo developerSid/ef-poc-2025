@@ -1,6 +1,7 @@
 using System.Text;
+using PayerEdi.Ingestion.Reader;
 
-namespace PayerEdi.Ingestion;
+namespace PayerEdi.Ingestion.Sniffing;
 
 public sealed class EdiReaderSniffer : IEdiReaderSniffer
 {
@@ -9,8 +10,7 @@ public sealed class EdiReaderSniffer : IEdiReaderSniffer
 
     public EdiStandard DetectStandard(Stream stream, out Stream readableStream)
     {
-        if (stream is null)
-            throw new ArgumentNullException(nameof(stream));
+        ArgumentNullException.ThrowIfNull(stream);
 
         if (!stream.CanRead)
             throw new ArgumentException("Stream must be readable.", nameof(stream));
@@ -52,7 +52,7 @@ public sealed class EdiReaderSniffer : IEdiReaderSniffer
         var read = stream.Read(buffer, 0, length);
 
         if (read <= 0)
-            return Array.Empty<byte>();
+            return [];
 
         if (read == buffer.Length)
             return buffer;
@@ -140,17 +140,9 @@ public sealed class EdiReaderSniffer : IEdiReaderSniffer
         return new string(chars);
     }
 
-    private sealed class PrefixedStream : Stream
+    private sealed class PrefixedStream(byte[] prefix, Stream inner) : Stream
     {
-        private readonly byte[] _prefix;
         private int _prefixOffset;
-        private readonly Stream _inner;
-
-        public PrefixedStream(byte[] prefix, Stream inner)
-        {
-            _prefix = prefix ?? Array.Empty<byte>();
-            _inner = inner ?? throw new ArgumentNullException(nameof(inner));
-        }
 
         public override bool CanRead => true;
         public override bool CanSeek => false;
@@ -164,16 +156,16 @@ public sealed class EdiReaderSniffer : IEdiReaderSniffer
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            if (_prefixOffset < _prefix.Length)
+            if (_prefixOffset < prefix.Length)
             {
-                var remaining = _prefix.Length - _prefixOffset;
+                var remaining = prefix.Length - _prefixOffset;
                 var toCopy = Math.Min(remaining, count);
-                Buffer.BlockCopy(_prefix, _prefixOffset, buffer, offset, toCopy);
+                Buffer.BlockCopy(prefix, _prefixOffset, buffer, offset, toCopy);
                 _prefixOffset += toCopy;
                 return toCopy;
             }
 
-            return _inner.Read(buffer, offset, count);
+            return inner.Read(buffer, offset, count);
         }
 
         public override void Flush() { }
@@ -190,7 +182,7 @@ public sealed class EdiReaderSniffer : IEdiReaderSniffer
         protected override void Dispose(bool disposing)
         {
             if (disposing)
-                _inner.Dispose();
+                inner.Dispose();
 
             base.Dispose(disposing);
         }

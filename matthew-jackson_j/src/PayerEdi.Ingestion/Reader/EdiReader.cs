@@ -1,22 +1,13 @@
-namespace PayerEdi.Ingestion;
+namespace PayerEdi.Ingestion.Reader;
 
-public sealed class EdiReader : IEdiReader
+public sealed class EdiReader(Stream stream, BaseReader reader) : IEdiReader
 {
-    private readonly Stream _stream;
-    private readonly BaseReader _reader;
-
-    public EdiReader(Stream stream, BaseReader reader)
-    {
-        _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
-    }
-
     public IEdiItem? Read() => 
-        _reader.Read() ? _reader.Item : null;
+        reader.Read() ? reader.Item : null;
 
     public void Dispose()
     {
-        _reader.Dispose();
-        _stream.Dispose();
+        reader.Dispose();
+        stream.Dispose();
     }
 }

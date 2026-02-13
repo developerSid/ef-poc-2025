@@ -1,4 +1,4 @@
-namespace PayerEdi.Ingestion;
+namespace PayerEdi.Ingestion.Tokens;
 
 public interface IEdiTokenProvider
 {

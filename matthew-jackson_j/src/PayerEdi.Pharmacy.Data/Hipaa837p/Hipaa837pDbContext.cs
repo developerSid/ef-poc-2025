@@ -1,13 +1,10 @@
-﻿using EdiFabric.Templates.Hipaa5010;
+using EdiFabric.Templates.Hipaa5010;
 using EdiFabric.Core.Model.Edi.X12;
 
 namespace PayerEdi.Pharmacy.Data.Hipaa837p;
 
-public class Hipaa837pDbContext : DbContext
+public class Hipaa837pDbContext(DbContextOptions<Hipaa837pDbContext> options) : DbContext(options)
 {
-    public Hipaa837pDbContext(DbContextOptions<Hipaa837pDbContext> options) : base(options)
-    {
-    }
 
     public DbSet<All_AMT_837P> All_AMT_837P { get; set; }
     public DbSet<AMT_SalesTaxAmount> AMT_SalesTaxAmount { get; set; }

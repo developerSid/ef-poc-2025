@@ -12,7 +12,7 @@ namespace PayerEdi.EdiFabric.Console;
 
 internal static class Program
 {
-    static async Task<int> Main(string[] args)
+    static async Task<int> Main(string[] _)
     {
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Information()

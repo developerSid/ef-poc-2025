@@ -1,23 +1,17 @@
-namespace PayerEdi.Ingestion;
+using PayerEdi.Ingestion.Sniffing;
 
-public sealed class EdiReaderFactory : IEdiReaderFactory
+namespace PayerEdi.Ingestion.Reader;
+
+public sealed class EdiReaderFactory(IEdiReaderSniffer sniffer) : IEdiReaderFactory
 {
-    private readonly IEdiReaderSniffer _sniffer;
-
-    public EdiReaderFactory(IEdiReaderSniffer sniffer)
-    {
-        _sniffer = sniffer ?? throw new ArgumentNullException(nameof(sniffer));
-    }
-
     public IEdiReader Create(Stream stream)
     {
-        var readerStream = stream ?? throw new ArgumentNullException(nameof(stream));
-        var standard = _sniffer.DetectStandard(stream, out var readableStream);
-        readerStream = readableStream;
+        ArgumentNullException.ThrowIfNull(stream);
+        var standard = sniffer.DetectStandard(stream, out var readableStream);
 
-        var settings = CreateSettings(readerStream, standard);
-        var reader = CreateReader(readerStream, standard, settings);
-        return new EdiReader(readerStream, reader);
+        var settings = CreateSettings(readableStream, standard);
+        var reader = CreateReader(readableStream, standard, settings);
+        return new EdiReader(readableStream, reader);
     }
 
     public ReaderSettings? CreateSettings(Stream stream, EdiStandard standard) =>

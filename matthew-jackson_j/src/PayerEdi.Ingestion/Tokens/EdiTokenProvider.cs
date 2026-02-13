@@ -1,8 +1,8 @@
-namespace PayerEdi.Ingestion;
+namespace PayerEdi.Ingestion.Tokens;
 
 public sealed class EdiTokenProvider : IEdiTokenProvider
 {
-    private readonly object _locker = new();
+    private static readonly Lock _globalLock = new();
     private string? _cachedToken;
     private DateTimeOffset? _cachedAt;
     private const string EnvVarName = "EDIFABRIC_SERIAL_KEY";
@@ -12,7 +12,7 @@ public sealed class EdiTokenProvider : IEdiTokenProvider
 
     public string GetToken()
     {
-        lock (_locker)
+        lock (_globalLock)
         {
             if (!string.IsNullOrWhiteSpace(_cachedToken) && _cachedAt.HasValue)
             {

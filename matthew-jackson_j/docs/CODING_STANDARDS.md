@@ -10,7 +10,7 @@
 ## Documentation Comments
 - Use `/// <inheritdoc />` for overrides and interface implementations.
 - Add one-line XML summaries only for public types/methods that are not self-explanatory.
-- Avoid param/returns docs unless there’s nuance.
+- Avoid param/returns docs unless there's nuance.
 
 ## Decision Logging
 - Add short, actionable decisions to `docs/README.md` under **Phase 1 Decisions**.

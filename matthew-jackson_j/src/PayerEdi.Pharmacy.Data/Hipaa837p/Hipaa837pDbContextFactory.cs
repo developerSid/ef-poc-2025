@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace PayerEdi.Pharmacy.Data.Hipaa837p;
 

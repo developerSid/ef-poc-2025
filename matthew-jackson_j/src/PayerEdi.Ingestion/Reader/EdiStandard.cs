@@ -1,4 +1,4 @@
-namespace PayerEdi.Ingestion;
+namespace PayerEdi.Ingestion.Reader;
 
 public enum EdiStandard
 {

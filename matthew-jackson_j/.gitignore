@@ -27,6 +27,13 @@ packages/
 .DS_Store
 Thumbs.db
 
+# Python
+**/.venv/
+**/.tmp/
+**/.runtime-temp/
+**/__pycache__/
+*.pyc
+
 # Secrets / local config
 *.secret
 *.key

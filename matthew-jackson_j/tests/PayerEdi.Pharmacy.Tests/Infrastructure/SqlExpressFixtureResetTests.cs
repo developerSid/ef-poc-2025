@@ -1,29 +1,22 @@
-namespace PayerEdi.Pharmacy.Tests.Tests.Infrastructure;
+namespace PayerEdi.Pharmacy.Tests.Infrastructure;
 
 [Collection("db")]
-public sealed class SqlExpressFixtureResetTests
+public sealed class SqlExpressFixtureResetTests(DbFixture fixture)
 {
-    private readonly DbFixture _fixture;
-
-    public SqlExpressFixtureResetTests(DbFixture fixture)
-    {
-        _fixture = fixture;
-    }
-
     [Fact]
     public async Task ResetAsyncCreatesANewDatabase()
     {
         string firstDatabase;
 
-        using (var scope = _fixture.CreateScope())
+        using (var scope = fixture.CreateScope())
         {
             var context = scope.ServiceProvider.GetRequiredService<Hipaa837pDbContext>();
             firstDatabase = context.Database.GetDbConnection().Database;
         }
 
-        await _fixture.ResetAsync();
+        await fixture.ResetAsync();
 
-        using var newScope = _fixture.CreateScope();
+        using var newScope = fixture.CreateScope();
         var newContext = newScope.ServiceProvider.GetRequiredService<Hipaa837pDbContext>();
         var secondDatabase = newContext.Database.GetDbConnection().Database;
 

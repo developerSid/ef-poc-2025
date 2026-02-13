@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace PayerEdi.Pharmacy.Tests.TestBase;
+namespace PayerEdi.Pharmacy.Tests.Infrastructure;
 
 public static class SampleFile
 {
@@ -9,13 +9,8 @@ public static class SampleFile
     public static Stream Open(string fileName)
     {
         var resourceName = FindResourceName(fileName);
-        var stream = Assembly.GetManifestResourceStream(resourceName);
-        if (stream is null)
-        {
-            throw new InvalidOperationException($"Embedded sample '{fileName}' resolved to '{resourceName}', but the stream could not be opened.");
-        }
-
-        return stream;
+        return Assembly.GetManifestResourceStream(resourceName)
+            ?? throw new InvalidOperationException($"Embedded sample '{fileName}' resolved to '{resourceName}', but the stream could not be opened.");
     }
 
     private static string FindResourceName(string fileName)

@@ -1,21 +1,14 @@
 using EdiFabric.Framework.Readers;
 using System.Text;
 
-namespace PayerEdi.Pharmacy.Ingestion.Tests;
+namespace PayerEdi.Pharmacy.Tests.Ingestion;
 
-public class EdiReaderFactoryTests : IClassFixture<IngestionFixture>
+public class EdiReaderFactoryTests(IngestionFixture fixture) : IClassFixture<IngestionFixture>
 {
-    private readonly IngestionFixture _fixture;
-
-    public EdiReaderFactoryTests(IngestionFixture fixture)
-    {
-        _fixture = fixture;
-    }
-
     [Fact]
     public void CreateSettingsWhenX12ReturnsX12ReaderSettings()
     {
-        using var scope = _fixture.CreateScope();
+        using var scope = fixture.CreateScope();
         var factory = scope.ServiceProvider.GetRequiredService<IEdiReaderFactory>();
 
         var settings = factory.CreateSettings(Stream.Null, EdiStandard.X12);
@@ -31,7 +24,7 @@ public class EdiReaderFactoryTests : IClassFixture<IngestionFixture>
     [InlineData(EdiStandard.Unknown)]
     public void CreateSettingsWhenNotX12ThrowsNotSupported(EdiStandard standard)
     {
-        using var scope = _fixture.CreateScope();
+        using var scope = fixture.CreateScope();
         var factory = scope.ServiceProvider.GetRequiredService<IEdiReaderFactory>();
 
         Assert.Throws<NotSupportedException>(() => factory.CreateSettings(Stream.Null, standard));
@@ -40,7 +33,7 @@ public class EdiReaderFactoryTests : IClassFixture<IngestionFixture>
     [Fact]
     public void CreateWhenX12DetectedReturnsX12Reader()
     {
-        using var scope = _fixture.CreateScope();
+        using var scope = fixture.CreateScope();
         var tokenProvider = scope.ServiceProvider.GetRequiredService<IEdiTokenProvider>();
         tokenProvider.InitToken();
 
