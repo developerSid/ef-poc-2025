@@ -66,6 +66,7 @@ public sealed class MotoS3Fixture : IAsyncLifetime
             options.SecretKey = "test";
             options.ForcePathStyle = true;
         });
+        services.AddIngestionServices();
 
         _provider = services.BuildServiceProvider();
     }
