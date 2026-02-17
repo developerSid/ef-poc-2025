@@ -91,3 +91,28 @@ To run your own processor per file, pass `--command` directly:
 ```
 
 The service appends the local downloaded file path as the final argument.
+
+## Run with MotoConsole (POC)
+Decision for Phase 2 POC: start/stop moto outside the .NET console app. `PayerEdi.EdiFabric.MotoConsole` assumes moto is reachable and performs ingestion + DB validation only.
+
+Open terminal A (moto host):
+
+```powershell
+cd src/PayerEdi.S3Service
+.\start_moto.ps1
+```
+
+Open terminal B (ingestion app):
+
+```powershell
+dotnet run --project src/PayerEdi.EdiFabric.MotoConsole
+```
+
+Expected outcome:
+- `MotoConsole` uploads `837p-sample.edi` to `inbound/`
+- downloads and ingests the same file
+- validates `TS837P` persistence in SQL Server
+
+Notes:
+- `MotoConsole` currently includes a short startup wait to reduce race conditions while moto begins listening.
+- If moto uses a non-default endpoint, pass `--endpoint` to `MotoConsole`.

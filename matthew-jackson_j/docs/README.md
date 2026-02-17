@@ -50,6 +50,7 @@ setx HIPAA_DB_CONNECTION "Server=.\SQLEXPRESS;Database=PayerEdiPharmacy;Trusted_
 
 ## Phase 2 S3 Integration
 - Python service docs: `docs/S3_SERVICE.md`
+- POC decision: moto lifecycle is managed externally (fixture/script/manual), and `PayerEdi.EdiFabric.MotoConsole` only performs S3 ingest + SQL validation work.
 - Quick start:
   1. `cd src/PayerEdi.S3Service`
   2. `.\run_phase2_once.ps1`
@@ -58,6 +59,10 @@ setx HIPAA_DB_CONNECTION "Server=.\SQLEXPRESS;Database=PayerEdiPharmacy;Trusted_
      - sample `.edi` files are uploaded to `inbound/`
      - files are asynchronously processed
      - files are moved to `processed/`
+- Run `PayerEdi.EdiFabric.MotoConsole` with externally started moto:
+  1. Start moto (`src/PayerEdi.S3Service/start_moto.ps1`) and keep it running.
+  2. Run `dotnet run --project src/PayerEdi.EdiFabric.MotoConsole` from repo root.
+  3. `MotoConsole` uploads `837p-sample.edi` to `inbound/`, ingests it, and validates persistence in SQL.
 
 
 ## EdiFabric Serial Key Authentication

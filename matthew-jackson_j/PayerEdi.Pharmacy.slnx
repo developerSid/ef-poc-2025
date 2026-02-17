@@ -13,6 +13,7 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/PayerEdi.EdiFabric.Console/PayerEdi.EdiFabric.Console.csproj" />
+    <Project Path="src/PayerEdi.EdiFabric.MotoConsole/PayerEdi.EdiFabric.MotoConsole.csproj" />
     <Project Path="src/PayerEdi.Ingestion/PayerEdi.Ingestion.csproj" />
     <Project Path="src/PayerEdi.Pharmacy.Data/PayerEdi.Pharmacy.Data.csproj" />
     <Project Path="src/PayerEdi.Pharmacy/PayerEdi.Pharmacy.csproj" />
