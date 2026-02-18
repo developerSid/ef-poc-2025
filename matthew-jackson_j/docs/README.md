@@ -8,6 +8,7 @@ Scope `docs/STATEMENT_OF_WORK.md`
 Test report format `docs/testing.md`
 Decision log `docs/DECISIONS.md`
 Phase 3 planning notes `docs/PHASE3_NOTES.md`
+Phase 3 ingestion validation findings `docs/PHASE3_INGESTION_VALIDATION_FINDINGS.md`
 
 ## Setup Prerequisites
 1. Install `.NET SDK 10.x`.
