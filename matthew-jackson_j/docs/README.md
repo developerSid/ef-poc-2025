@@ -8,7 +8,6 @@ Scope `docs/STATEMENT_OF_WORK.md`
 Test report format `docs/testing.md`
 Decision log `docs/DECISIONS.md`
 Phase 3 planning notes `docs/PHASE3_NOTES.md`
-Phase 3 ingestion validation findings `docs/PHASE3_INGESTION_VALIDATION_FINDINGS.md`
 
 ## Setup Prerequisites
 1. Install `.NET SDK 10.x`.
@@ -64,7 +63,7 @@ Follow EdiFabric's Serial Key Authentication guide to obtain a serial key and ap
 https://support.edifabric.com/hc/en-us/articles/10993195863709-Serial-Key-Authentication
 
 ## Phase 3 Planning Notes
-- See `docs/PHASE3_NOTES.md` for current SNIP validation direction, scoped assumptions, and open questions.
+- See `docs/PHASE3_NOTES.md` for consolidated Phase 3 direction, findings, decisions, and open questions.
 
 ## Decisions
 - See `docs/DECISIONS.md` for phase-specific architectural decisions and rationale.
