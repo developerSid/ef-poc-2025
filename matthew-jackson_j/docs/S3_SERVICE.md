@@ -39,7 +39,9 @@ winget install -e --id Python.Python.3.12
 
 Then rerun `./setup.ps1`.
 
-## Run it end-to-end (local)
+## Phase 2 Run Modes
+
+### Mode A: Python service only (end-to-end local)
 Fast path (single command):
 
 ```powershell
@@ -49,26 +51,16 @@ cd src/PayerEdi.S3Service
 
 This starts moto in the background, seeds sample `.edi` files, runs the async service once, then stops moto.
 
-## Moto-only run (recommended for C# unit tests)
-Start only the moto S3 service:
+Manual path (two terminals):
+
+Open terminal A (moto):
 
 ```powershell
 cd src/PayerEdi.S3Service
 .\start_moto.ps1
 ```
 
-or press Run in Visual Studio (startup file `launch.py`).
-
-Manual path:
-
-Open terminal A:
-
-```powershell
-cd src/PayerEdi.S3Service
-.\start_moto.ps1
-```
-
-Open terminal B:
+Open terminal B (seed + process once):
 
 ```powershell
 cd src/PayerEdi.S3Service
@@ -80,6 +72,25 @@ Expected result:
 - `.edi` files are picked up from `inbound/`
 - service logs each file as processed
 - files are moved to `processed/` by default
+- Visual Studio alternative: press Run on `PayerEdi.S3Service` to start moto only (`launch.py`).
+
+### Mode B: Visual Studio integration run (`PayerEdi.S3Service` + `PayerEdi.EdiFabric.MotoConsole`)
+Use this mode when you want Phase 2 S3 ingestion and .NET SQL persistence validation in the same run.
+
+Visual Studio project setup:
+- Open solution `PayerEdi.Pharmacy.slnx`.
+- Set startup projects to `Multiple startup projects`.
+- Set `PayerEdi.S3Service` to `Start`.
+- Set `PayerEdi.EdiFabric.MotoConsole` to `Start`.
+
+Expected outcome:
+- `PayerEdi.EdiFabric.MotoConsole` uploads `837p-sample.edi` to `inbound/`
+- the file is downloaded and ingested
+- `TS837P` persistence is validated in SQL Server
+
+Notes:
+- `PayerEdi.EdiFabric.MotoConsole` includes a short startup wait to reduce race conditions while moto starts listening.
+- If moto uses a non-default endpoint, pass `--endpoint` to `MotoConsole`.
 
 ## Optional downstream processor
 By default, the service uses a built-in validation processor (checks file is readable).
@@ -91,28 +102,3 @@ To run your own processor per file, pass `--command` directly:
 ```
 
 The service appends the local downloaded file path as the final argument.
-
-## Run with MotoConsole (POC)
-Decision for Phase 2 POC: start/stop moto outside the .NET console app. `PayerEdi.EdiFabric.MotoConsole` assumes moto is reachable and performs ingestion + DB validation only.
-
-Open terminal A (moto host):
-
-```powershell
-cd src/PayerEdi.S3Service
-.\start_moto.ps1
-```
-
-Open terminal B (ingestion app):
-
-```powershell
-dotnet run --project src/PayerEdi.EdiFabric.MotoConsole
-```
-
-Expected outcome:
-- `MotoConsole` uploads `837p-sample.edi` to `inbound/`
-- downloads and ingests the same file
-- validates `TS837P` persistence in SQL Server
-
-Notes:
-- `MotoConsole` currently includes a short startup wait to reduce race conditions while moto begins listening.
-- If moto uses a non-default endpoint, pass `--endpoint` to `MotoConsole`.

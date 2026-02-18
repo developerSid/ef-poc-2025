@@ -5,6 +5,8 @@ Coding standards `docs/CODING_STANDARDS.md`
 Database migrations `docs/DB_MIGRATIONS.md` 
 Scope `docs/STATEMENT_OF_WORK.md`
 Test report format `docs/testing.md`
+Decision log `docs/DECISIONS.md`
+Phase 3 planning notes `docs/PHASE3_NOTES.md`
 
 ## Setup Prerequisites
 1. Install `.NET SDK 10.x`.
@@ -50,32 +52,20 @@ setx HIPAA_DB_CONNECTION "Server=.\SQLEXPRESS;Database=PayerEdiPharmacy;Trusted_
 
 ## Phase 2 S3 Integration
 - Python service docs: `docs/S3_SERVICE.md`
-- POC decision: moto lifecycle is managed externally (fixture/script/manual), and `PayerEdi.EdiFabric.MotoConsole` only performs S3 ingest + SQL validation work.
-- Quick start:
-  1. `cd src/PayerEdi.S3Service`
-  2. `.\run_phase2_once.ps1`
-  3. Expected outcome:
-     - moto S3 starts
-     - sample `.edi` files are uploaded to `inbound/`
-     - files are asynchronously processed
-     - files are moved to `processed/`
-- Run `PayerEdi.EdiFabric.MotoConsole` with externally started moto:
-  1. Start moto (`src/PayerEdi.S3Service/start_moto.ps1`) and keep it running.
-  2. Run `dotnet run --project src/PayerEdi.EdiFabric.MotoConsole` from repo root.
-  3. `MotoConsole` uploads `837p-sample.edi` to `inbound/`, ingests it, and validates persistence in SQL.
+- Mode A (`PayerEdi.S3Service` only): run Python end-to-end processing (moto + seed + async processing).
+- Mode B (`PayerEdi.S3Service` + `PayerEdi.EdiFabric.MotoConsole`): run the mock S3 service and .NET ingestion validation together.
+- See `docs/S3_SERVICE.md` for detailed steps for both modes.
 
 
 ## EdiFabric Serial Key Authentication
 Follow EdiFabric's Serial Key Authentication guide to obtain a serial key and apply it in code:
 https://support.edifabric.com/hc/en-us/articles/10993195863709-Serial-Key-Authentication
 
-## Phase 1 Decisions
-- We chose .NET 10 as a design decision for this POC.
-- EDI reader settings detection/configuration is intentionally deferred for the Phase 1 POC (no current requirements).
-- EDI reader factory remains X12-only with minimal surface area (avoid premature multi-standard strategy until needed).
-- During ingestion, model types not mapped in `Hipaa837pDbContext` are skipped to allow persistence of supported entities without failing the entire transaction.
-- Console logging uses Serilog with the console sink to provide structured runtime diagnostics for the ingestion flow.
-- ISA/GS envelope segments are required for interchange parsing but are intentionally not persisted; Phase 1 persistence focuses on claim transaction records (for example, `TS837P`) and related claim data.
+## Phase 3 Planning Notes
+- See `docs/PHASE3_NOTES.md` for current SNIP validation direction, scoped assumptions, and open questions.
+
+## Decisions
+- See `docs/DECISIONS.md` for phase-specific architectural decisions and rationale.
 
 ## Known Limitations (Phase 1 POC)
 - Runtime target is `.NET 10` rather than `.NET 8` from the original SOW.
