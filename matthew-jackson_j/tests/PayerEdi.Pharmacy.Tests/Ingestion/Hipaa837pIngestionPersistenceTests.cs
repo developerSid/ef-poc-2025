@@ -78,7 +78,7 @@ public sealed class Hipaa837pIngestionPersistenceTests(DbFixture fixture) : DbTe
         var expectedItems = await ingestion.IngestAsync(stream, CancellationToken);
         Assert.Equal(5, expectedItems.Count);
         var expected = Assert.Single(expectedItems.OfType<TS837I>());
-        Assert.Equal(0, expected.Id);
+        Assert.True(expected.Id > 0);
     }
 
     [Theory]
@@ -91,6 +91,6 @@ public sealed class Hipaa837pIngestionPersistenceTests(DbFixture fixture) : DbTe
         var expectedItems = await ingestion.IngestAsync(stream, CancellationToken);
         Assert.Equal(5, expectedItems.Count);
         var expected = Assert.Single(expectedItems.OfType<TS837D>());
-        Assert.Equal(0, expected.Id);
+        Assert.True(expected.Id > 0);
     }
 }

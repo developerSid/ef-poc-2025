@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PayerEdi.Pharmacy.Data.Hipaa837p;
 
@@ -10,9 +11,11 @@ using PayerEdi.Pharmacy.Data.Hipaa837p;
 namespace PayerEdi.Pharmacy.Data.Migrations
 {
     [DbContext(typeof(Hipaa837pDbContext))]
-    partial class Hipaa837pDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260218133500_AdditionalClaims")]
+    partial class AdditionalClaims
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

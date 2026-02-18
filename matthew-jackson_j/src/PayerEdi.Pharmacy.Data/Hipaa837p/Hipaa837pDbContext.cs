@@ -277,6 +277,8 @@ public class Hipaa837pDbContext(DbContextOptions<Hipaa837pDbContext> options) : 
     public DbSet<LQ> LQ { get; set; }
     public DbSet<FRM_SupportingDocumentation> FRM_SupportingDocumentation { get; set; }
     public DbSet<FRM> FRM { get; set; }
+    public DbSet<TS837D> TS837D { get; set; }
+    public DbSet<TS837I> TS837I { get; set; }
     public DbSet<TS837P> TS837P { get; set; }
     public DbSet<ST> ST { get; set; }
     public DbSet<BHT_BeginningOfHierarchicalTransaction_8> BHT_BeginningOfHierarchicalTransaction_8 { get; set; }
