@@ -3,6 +3,7 @@
 ### Index
 Coding standards `docs/CODING_STANDARDS.md`
 Database migrations `docs/DB_MIGRATIONS.md` 
+DbContext metadata reporter `docs/DBCONTEXT_METADATA_REPORTER.md`
 Scope `docs/STATEMENT_OF_WORK.md`
 Test report format `docs/testing.md`
 Decision log `docs/DECISIONS.md`
