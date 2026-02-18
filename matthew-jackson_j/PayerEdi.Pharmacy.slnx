@@ -1,12 +1,14 @@
 <Solution>
   <Folder Name="/docs/">
-    <File Path="docs/DBCONTEXT_METADATA_REPORT.md" />
-    <File Path="docs/DBCONTEXT_METADATA_REPORTER.md" />
-    <File Path="docs/CODING_STANDARDS.md" />
-    <File Path="docs/DB_MIGRATIONS.md" />
-    <File Path="docs/README.md" />
-    <File Path="docs/S3_SERVICE.md" />
-    <File Path="docs/STATEMENT_OF_WORK.md" />
+	<File Path="CODING_STANDARDS.md" />
+	<File Path="DB_MIGRATIONS.md" />
+	<File Path="DBCONTEXT_METADATA_REPORT.md" />
+	<File Path="DBCONTEXT_METADATA_REPORTER.md" />
+	<File Path="DECISIONS.md" />
+	<File Path="PHASES_NOTES.md" />
+	<File Path="README.md" />
+	<File Path="S3_SERVICE.md" />
+	<File Path="STATEMENT_OF_WORK.md" />
   </Folder>
   <Folder Name="/samples/">
     <File Path="samples/837-sample.edi" />
