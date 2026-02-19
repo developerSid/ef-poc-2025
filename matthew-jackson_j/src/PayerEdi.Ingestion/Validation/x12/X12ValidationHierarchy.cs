@@ -6,7 +6,7 @@ namespace PayerEdi.Ingestion.Validation.x12;
 
 public class X12ValidationHierarchy : ValidationHierarchy
 {
-    protected override string GetCanonicalKey()
+    public override string GetCanonicalKey()
     {
         var builder = new StringBuilder();
 

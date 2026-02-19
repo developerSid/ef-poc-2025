@@ -2,7 +2,7 @@ using System.Text;
 
 namespace PayerEdi.Ingestion.Validation;
 
-public abstract class ValidationHierarchy : List<IEdiItem?>
+public abstract class ValidationHierarchy : List<object>
 {
     public virtual RuleTier Tier { get; set; } = RuleTier.None;
 
@@ -21,7 +21,7 @@ public abstract class ValidationHierarchy : List<IEdiItem?>
         return string.Compare(GetCanonicalKey(), target.GetCanonicalKey(), StringComparison.OrdinalIgnoreCase) == 0;
     }
 
-    protected virtual string GetCanonicalKey()
+    public virtual string GetCanonicalKey()
     {
         var builder = new StringBuilder();
 
@@ -36,5 +36,5 @@ public abstract class ValidationHierarchy : List<IEdiItem?>
 
     public override int GetHashCode() => StringComparer.OrdinalIgnoreCase.GetHashCode(GetCanonicalKey());
 
-    public static implicit operator ValidationHierarchyKey(ValidationHierarchy vh) => new(vh.Tier, vh.Scope, vh.GetCanonicalKey());
+    //public static implicit operator X12ValidationHierarchyKey(ValidationHierarchy vh) => ///new(vh.Tier, vh.Scope, vh.GetCanonicalKey());
 }
