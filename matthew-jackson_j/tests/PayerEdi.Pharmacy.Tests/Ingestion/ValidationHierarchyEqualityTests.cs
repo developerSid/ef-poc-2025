@@ -118,6 +118,24 @@ public sealed class ValidationHierarchyEqualityTests
     }
 
     [Fact]
+    public void HashSetLookupFailsAfterMutatingIndexedHierarchy()
+    {
+        var hierarchy = new TwoPartValidationHierarchy
+        {
+            new FakeEdiItem("payerA", "claim001")
+        };
+
+        var set = new HashSet<ValidationHierarchy>
+        {
+            hierarchy
+        };
+
+        hierarchy[0] = new FakeEdiItem("payerA", "claimXYZ");
+
+        Assert.False(set.Contains(hierarchy));
+    }
+
+    [Fact]
     public void EqualsReturnsFalseForDifferentType()
     {
         var left = new TwoPartValidationHierarchy

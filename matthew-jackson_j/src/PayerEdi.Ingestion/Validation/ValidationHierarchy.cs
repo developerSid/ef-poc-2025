@@ -4,6 +4,10 @@ namespace PayerEdi.Ingestion.Validation;
 
 public abstract class ValidationHierarchy : List<IEdiItem?>
 {
+    public virtual RuleScope Scope { get; set; } = RuleScope.None;
+
+    public virtual RuleTier Tier { get; set; } = RuleTier.None;
+
     protected virtual string GetKey(int index) => (0 <= index && index < Count) ? $"{this[index]?.ToString()}".Trim() : string.Empty;
 
     public override bool Equals(object? obj)
@@ -17,7 +21,7 @@ public abstract class ValidationHierarchy : List<IEdiItem?>
         return string.Compare(GetCanonicalKey(), target.GetCanonicalKey(), StringComparison.OrdinalIgnoreCase) == 0;
     }
 
-    private string GetCanonicalKey()
+    protected virtual string GetCanonicalKey()
     {
         var builder = new StringBuilder();
 
