@@ -22,6 +22,7 @@ This log tracks phase-scoped architecture and implementation decisions for the P
 - Use a hybrid approach: EdiFabric built-in validation for baseline standards compliance plus project-defined typed rules for partner/business constraints.
 - Treat `ValidationHierarchy` as a build-time mutable object and avoid using it directly as a hash key after mutation; use a derived immutable lookup key or canonical key snapshot for in-memory rule indexing.
 - Use `ValidationHierarchyKey` as the canonical key type for all rule lookup/indexing; treat `ValidationHierarchy` as construction context only.
+- Within each `ValidationHierarchyKey` grouping, execute validation rules in the order returned by the configured rule source.
 - Decouple rule lookup from transaction traversal: transactional processing owns construction of the exact lookup context/key for the current ISA/GS/ST, and lookup consumes that preconstructed context without implicitly selecting segments.
 - Defer `ValidationHierarchy` key-generation optimization (for example, caching) until rules-engine key construction and ownership are finalized; optimize only with profiling evidence.
 - Treat `Scope` and `Tier` as first-class validation selectors for X12 processing modes; rules-engine lookup and execution design must preserve both dimensions intentionally.

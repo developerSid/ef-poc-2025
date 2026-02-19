@@ -2,7 +2,7 @@ using System.Text;
 
 using EdiFabric.Core.Model.Edi.X12;
 
-namespace PayerEdi.Ingestion.Validation;
+namespace PayerEdi.Ingestion.Validation.x12;
 
 public class X12ValidationHierarchy : ValidationHierarchy
 {
