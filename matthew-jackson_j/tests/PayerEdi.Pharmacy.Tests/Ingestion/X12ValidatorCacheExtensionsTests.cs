@@ -1,6 +1,8 @@
 using EdiFabric.Core.Model.Edi.X12;
+using EdiFabric.Templates.Hipaa5010;
 using PayerEdi.Ingestion.Validation;
 using PayerEdi.Ingestion.Validation.x12;
+using PayerEdi.Ingestion.Validation.x12._837p;
 
 namespace PayerEdi.Pharmacy.Tests.Ingestion;
 
@@ -120,6 +122,22 @@ public sealed class X12ValidatorCacheExtensionsTests
         var validators = X12ValidatorCacheExtensions.GetValidators<TestModel>(cache, RuleTier.Tier3, isa, gs, st);
         Assert.Single(validators);
         Assert.Same(validator, validators[0]);
+    }
+
+    [Theory]
+    [InlineData(RuleTier.SNIP1, typeof(TS837PSnip1Validator))]
+    [InlineData(RuleTier.SNIP2, typeof(TS837PSnip2Validator))]
+    [InlineData(RuleTier.SNIP3, typeof(TS837PSnip3Validator))]
+    [InlineData(RuleTier.SNIP4, typeof(TS837PSnip4Validator))]
+    public void AddTS837PSnipValidatorsRegistersExpectedTypePerTier(RuleTier tier, Type validatorType)
+    {
+        IX12ValidatorCache cache = new X12ValidatorCache();
+
+        cache.AddTS837PSnipValidators();
+
+        var validators = X12ValidatorCacheExtensions.GetValidators<TS837P>(cache, tier);
+        Assert.Single(validators);
+        Assert.IsType(validatorType, validators[0]);
     }
 
     private static ISA CreateIsa() => new()

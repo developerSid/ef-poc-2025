@@ -12,5 +12,5 @@ public interface IX12Validator<TModel> where TModel : class
     /// Validates the model within ISA/GS/ST envelope context.
     /// </summary>
     /// <returns>A tuple of validation success and optional error message.</returns>
-    (bool, string?) Validate(ISA isa, GS gs, ST st, TModel item);
+    (bool, string?) Validate(ISA isa, GS? gs, ST st, TModel item);
 }

@@ -10,15 +10,16 @@ public class X12ValidatorCache : IX12ValidatorCache
 {
     private readonly ConcurrentDictionary<X12ValidationHierarchyKey, object> _items = new();
 
-    private static X12ValidationHierarchyKey GetKey<TModel>(RuleTier tier, ISA isa, GS? gs, ST? st) where TModel : class
+    private static X12ValidationHierarchyKey GetKey<TModel>(RuleTier tier, ISA? isa, GS? gs, ST? st) where TModel : class
     {
         X12ValidationHierarchy hierarchy = new()
         {
             Tier = tier,
-            Scope = RuleScope.Partner | (gs is null ? RuleScope.None : RuleScope.Application) | (st is null ? RuleScope.None : RuleScope.Schema)
+            Scope = (isa is null ? RuleScope.None : RuleScope.Partner) | (gs is null ? RuleScope.None : RuleScope.Application) | (st is null ? RuleScope.None : RuleScope.Schema)
         };
 
-        hierarchy.Add(isa);
+        if (isa is not null)
+            hierarchy.Add(isa);
 
         if (gs is not null)
             hierarchy.Add(gs);
@@ -30,7 +31,7 @@ public class X12ValidatorCache : IX12ValidatorCache
     }
 
     /// <inheritdoc />
-    public void AddValidator<TModel>(RuleTier tier, ISA isa, GS? gs, ST? st, IX12Validator<TModel> validator) where TModel : class
+    public void AddValidator<TModel>(RuleTier tier, ISA? isa, GS? gs, ST? st, IX12Validator<TModel> validator) where TModel : class
     {
         var key = GetKey<TModel>(tier, isa, gs, st);
         var collection = _items.GetOrAdd(key, _ => new BlockingCollection<IX12Validator<TModel>>()) as BlockingCollection<IX12Validator<TModel>>;
@@ -38,7 +39,7 @@ public class X12ValidatorCache : IX12ValidatorCache
     }
 
     /// <inheritdoc />
-    public IReadOnlyList<IX12Validator<TModel>> GetValidators<TModel>(RuleTier tier, ISA isa, GS? gs = null, ST? st = null) where TModel : class
+    public IReadOnlyList<IX12Validator<TModel>> GetValidators<TModel>(RuleTier tier, ISA? isa, GS? gs = null, ST? st = null) where TModel : class
     {
         var key = GetKey<TModel>(tier, isa, gs, st);
         _items.TryGetValue(key, out var validators);
