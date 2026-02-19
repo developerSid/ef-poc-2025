@@ -4,9 +4,9 @@ namespace PayerEdi.Ingestion.Validation;
 
 public abstract class ValidationHierarchy : List<IEdiItem?>
 {
-    public virtual RuleScope Scope { get; set; } = RuleScope.None;
-
     public virtual RuleTier Tier { get; set; } = RuleTier.None;
+
+    public virtual RuleScope Scope { get; set; } = RuleScope.None;
 
     protected virtual string GetKey(int index) => (0 <= index && index < Count) ? $"{this[index]?.ToString()}".Trim() : string.Empty;
 
@@ -35,4 +35,6 @@ public abstract class ValidationHierarchy : List<IEdiItem?>
     }
 
     public override int GetHashCode() => StringComparer.OrdinalIgnoreCase.GetHashCode(GetCanonicalKey());
+
+    public static implicit operator ValidationHierarchyKey(ValidationHierarchy vh) => new(vh.Tier, vh.Scope, vh.GetCanonicalKey());
 }
