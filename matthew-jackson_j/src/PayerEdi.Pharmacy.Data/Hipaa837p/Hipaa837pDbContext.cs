@@ -3,9 +3,12 @@ using EdiFabric.Core.Model.Edi.X12;
 
 namespace PayerEdi.Pharmacy.Data.Hipaa837p;
 
+/// <summary>
+/// EF Core context for HIPAA 837P template-backed entities generated from EdiFabric types.
+/// </summary>
 public class Hipaa837pDbContext(DbContextOptions<Hipaa837pDbContext> options) : DbContext(options)
 {
-
+    // Template-mapped DbSets are intentionally explicit so EF creates the full schema for known segment models.
     public DbSet<All_AMT_837P> All_AMT_837P { get; set; }
     public DbSet<AMT_SalesTaxAmount> AMT_SalesTaxAmount { get; set; }
     public DbSet<AMT> AMT { get; set; }

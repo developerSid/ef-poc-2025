@@ -7,8 +7,14 @@ using PayerEdi.Ingestion.Tokens;
 
 namespace PayerEdi.Ingestion.Extensions;
 
+/// <summary>
+/// Registers ingestion-layer services and optional S3 integration components.
+/// </summary>
 public static class Startup
 {
+    /// <summary>
+    /// Adds core ingestion services used for stream sniffing, reader creation, and token setup.
+    /// </summary>
     public static void AddIngestionServices(this IServiceCollection services)
     {
         if (!services.Any(d => d.ServiceType == typeof(IEdiReaderSniffer)))
@@ -27,6 +33,9 @@ public static class Startup
         }
     }
 
+    /// <summary>
+    /// Adds the S3 consumer and applies optional configuration overrides.
+    /// </summary>
     public static void AddS3Consumer(this IServiceCollection services, Action<S3ConsumerOptions>? configure = null)
     {
         if (!services.Any(d => d.ServiceType == typeof(IS3Consumer)))

@@ -2,6 +2,9 @@ using EdiFabric.Core.Model.Edi.X12;
 
 namespace PayerEdi.Ingestion.Validation.x12;
 
+/// <summary>
+/// Overloads for adding and resolving validators with common X12 scope combinations.
+/// </summary>
 public static class X12ValidatorCacheExtensions
 {
     public static void AddValidator<TModel>(this IX12ValidatorCache cache, RuleTier tier, ISA isa, IX12Validator<TModel> validator) where TModel : class

@@ -10,8 +10,14 @@ using DataStartup = PayerEdi.Pharmacy.Data.Extensions.Startup;
 
 namespace PayerEdi.EdiFabric.Console;
 
+/// <summary>
+/// Console entry point for local 837P sample ingestion into SQL Server Express.
+/// </summary>
 internal static class Program
 {
+    /// <summary>
+    /// Runs migration + sample ingestion workflow and returns process exit code.
+    /// </summary>
     static async Task<int> Main(string[] _)
     {
         Log.Logger = new LoggerConfiguration()

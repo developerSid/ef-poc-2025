@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using PayerEdi.Pharmacy.Data.Hipaa837p;
 
+// Generates a compact, deterministic EF metadata snapshot for docs/DBCONTEXT_METADATA_REPORT.md.
 var outputPath = ResolveOutputPath(args);
 var lines = BuildReport();
 
@@ -16,6 +17,7 @@ Console.WriteLine($"Rows: {Math.Max(lines.Count - 7, 0)}");
 
 return;
 
+// Enumerates DbSet-backed entity properties and emits normalized metadata columns.
 static List<string> BuildReport()
 {
     using var context = new Hipaa837pDbContextFactory().CreateDbContext(Array.Empty<string>());
@@ -103,6 +105,7 @@ static string DisplayInt(int? value) => value?.ToString() ?? "-";
 
 static string DisplayText(string? value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
 
+// Parses SQL type declarations such as nvarchar(50), nvarchar(max), decimal(18,2).
 static SqlTypeDefinition? ParseSqlTypeDefinition(string? definition)
 {
     if (string.IsNullOrWhiteSpace(definition))
@@ -145,6 +148,7 @@ static SqlTypeDefinition? ParseSqlTypeDefinition(string? definition)
 static bool IsLengthBasedType(string typeName) =>
     typeName is "char" or "nchar" or "varchar" or "nvarchar" or "binary" or "varbinary";
 
+// Resolves docs output path by walking up from build output to repository root.
 static string ResolveOutputPath(string[] appArgs)
 {
     var explicitPath = appArgs.FirstOrDefault();

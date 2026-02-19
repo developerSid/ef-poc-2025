@@ -1,5 +1,8 @@
 namespace PayerEdi.Ingestion.Tokens;
 
+/// <summary>
+/// Resolves and caches the EdiFabric serial token used for parsing operations.
+/// </summary>
 public sealed class EdiTokenProvider : IEdiTokenProvider
 {
     private static readonly Lock _globalLock = new();
@@ -8,8 +11,10 @@ public sealed class EdiTokenProvider : IEdiTokenProvider
     private const string EnvVarName = "EDIFABRIC_SERIAL_KEY";
     private static readonly TimeSpan TokenLifetime = TimeSpan.FromHours(24);
 
+    /// <inheritdoc />
     public void InitToken() => GetToken();
 
+    /// <inheritdoc />
     public string GetToken()
     {
         lock (_globalLock)

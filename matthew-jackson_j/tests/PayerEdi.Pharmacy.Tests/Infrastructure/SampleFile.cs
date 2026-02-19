@@ -2,10 +2,16 @@ using System.Reflection;
 
 namespace PayerEdi.Pharmacy.Tests.Infrastructure;
 
+/// <summary>
+/// Accessor for embedded EDI sample resources used by tests.
+/// </summary>
 public static class SampleFile
 {
     private static readonly Assembly Assembly = typeof(SampleFile).Assembly;
 
+    /// <summary>
+    /// Opens an embedded sample file stream by filename suffix.
+    /// </summary>
     public static Stream Open(string fileName)
     {
         var resourceName = FindResourceName(fileName);

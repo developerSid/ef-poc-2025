@@ -5,6 +5,9 @@ using PayerEdi.Pharmacy.Data.Hipaa837p;
 
 namespace PayerEdi.Pharmacy.Services;
 
+/// <summary>
+/// Parses 837P content and persists EF-mapped parsed items in a single database transaction.
+/// </summary>
 public sealed class Hipaa837pIngestionService(
     IEdiReaderFactory readerFactory,
     IEdiTokenProvider tokenProvider,
@@ -24,6 +27,7 @@ public sealed class Hipaa837pIngestionService(
 
         foreach(var item in items)
         {
+            // Skip parsed artifacts that are not modeled in the current DbContext.
             if (dbContext.Model.FindEntityType(item.GetType()) == null)
                 continue;
 

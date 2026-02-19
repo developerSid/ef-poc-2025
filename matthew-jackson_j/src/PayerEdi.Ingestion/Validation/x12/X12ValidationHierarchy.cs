@@ -4,8 +4,14 @@ using EdiFabric.Core.Model.Edi.X12;
 
 namespace PayerEdi.Ingestion.Validation.x12;
 
+/// <summary>
+/// X12-specific hierarchy that builds canonical lookup keys from ISA/GS/ST context.
+/// </summary>
 public class X12ValidationHierarchy : ValidationHierarchy
 {
+    /// <summary>
+    /// Builds a deterministic key string based on active scope dimensions.
+    /// </summary>
     public override string GetCanonicalKey()
     {
         var builder = new StringBuilder();

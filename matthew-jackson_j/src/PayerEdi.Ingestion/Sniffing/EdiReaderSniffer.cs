@@ -3,11 +3,16 @@ using PayerEdi.Ingestion.Reader;
 
 namespace PayerEdi.Ingestion.Sniffing;
 
+/// <summary>
+/// Detects likely EDI standard from stream prefix bytes and returns a readable stream for parsing.
+/// </summary>
 public sealed class EdiReaderSniffer : IEdiReaderSniffer
 {
+    /// <inheritdoc />
     public EdiStandard DetectStandard(Stream stream)
         => DetectStandard(stream, out _);
 
+    /// <inheritdoc />
     public EdiStandard DetectStandard(Stream stream, out Stream readableStream)
     {
         ArgumentNullException.ThrowIfNull(stream);
@@ -140,6 +145,7 @@ public sealed class EdiReaderSniffer : IEdiReaderSniffer
         return new string(chars);
     }
 
+    // Replays already-read prefix bytes for non-seekable streams.
     private sealed class PrefixedStream(byte[] prefix, Stream inner) : Stream
     {
         private int _prefixOffset;

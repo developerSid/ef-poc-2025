@@ -2,8 +2,14 @@ using PayerEdi.Ingestion.Sniffing;
 
 namespace PayerEdi.Ingestion.Reader;
 
+/// <summary>
+/// Creates EDI readers by sniffing the incoming stream and selecting standard-specific settings.
+/// </summary>
 public sealed class EdiReaderFactory(IEdiReaderSniffer sniffer) : IEdiReaderFactory
 {
+    /// <summary>
+    /// Builds a reader for the supplied stream using detected standard and reader settings.
+    /// </summary>
     public IEdiReader Create(Stream stream)
     {
         ArgumentNullException.ThrowIfNull(stream);
@@ -14,6 +20,9 @@ public sealed class EdiReaderFactory(IEdiReaderSniffer sniffer) : IEdiReaderFact
         return new EdiReader(readableStream, reader);
     }
 
+    /// <summary>
+    /// Creates reader settings for the specified EDI standard.
+    /// </summary>
     public ReaderSettings? CreateSettings(Stream stream, EdiStandard standard) =>
         standard switch
         {
@@ -21,6 +30,9 @@ public sealed class EdiReaderFactory(IEdiReaderSniffer sniffer) : IEdiReaderFact
             _ => throw new NotSupportedException("Unable to determine reader settings for the provided EDI standard.")
         };
 
+    /// <summary>
+    /// Creates a concrete EdiFabric reader for the specified EDI standard.
+    /// </summary>
     public BaseReader CreateReader(Stream stream, EdiStandard standard, ReaderSettings? readerSettings) =>
         standard switch
         {

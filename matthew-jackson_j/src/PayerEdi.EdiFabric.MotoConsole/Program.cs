@@ -16,8 +16,14 @@ using DataStartup = PayerEdi.Pharmacy.Data.Extensions.Startup;
 
 namespace PayerEdi.EdiFabric.MotoConsole;
 
+/// <summary>
+/// Entry point for local moto-backed S3 ingestion and SQL persistence validation.
+/// </summary>
 internal static class Program
 {
+    /// <summary>
+    /// Boots service dependencies, runs ingestion, and returns process exit code.
+    /// </summary>
     static async Task<int> Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
@@ -88,6 +94,9 @@ internal static class Program
     }
 }
 
+/// <summary>
+/// Coordinates S3 upload/download and ingestion assertions for the sample transaction.
+/// </summary>
 internal sealed class MotoConsoleRunner(
     ILogger<MotoConsoleRunner> logger,
     IServiceProvider provider,
@@ -95,6 +104,9 @@ internal sealed class MotoConsoleRunner(
 {
     private const string SampleFileName = "837p-sample.edi";
 
+    /// <summary>
+    /// Executes the end-to-end moto ingestion workflow and verifies SQL persistence.
+    /// </summary>
     public async Task<int> RunAsync()
     {
         logger.LogInformation("Starting moto ingestion for bucket '{Bucket}'", options.Bucket);
@@ -140,6 +152,9 @@ internal sealed class MotoConsoleRunner(
     }
 }
 
+/// <summary>
+/// Runtime options for moto endpoint, bucket naming, and moto lifecycle control.
+/// </summary>
 internal sealed class MotoOptions
 {
     public string EndpointUrl { get; init; } = "http://127.0.0.1:5000";
@@ -152,6 +167,9 @@ internal sealed class MotoOptions
     public bool KillExistingMoto { get; init; } = false;
     public bool KillMotoOnExit { get; init; } = false;
 
+    /// <summary>
+    /// Parses CLI flags into strongly typed options.
+    /// </summary>
     public static MotoOptions FromArgs(string[] args)
     {
         var values = ParseArgs(args);
@@ -200,6 +218,9 @@ internal sealed class MotoOptions
     }
 }
 
+/// <summary>
+/// Manages optional moto process startup/shutdown and local port cleanup.
+/// </summary>
 internal sealed class MotoProcess(MotoOptions options) : IAsyncDisposable
 {
     private Process? _process;
@@ -207,6 +228,9 @@ internal sealed class MotoProcess(MotoOptions options) : IAsyncDisposable
     private string _host = string.Empty;
     private int _port;
 
+    /// <summary>
+    /// Starts moto when configured and waits for endpoint availability.
+    /// </summary>
     public async Task StartAsync()
     {
         if (!TryGetLocalEndpoint(options.EndpointUrl, out _host, out _port))
@@ -251,6 +275,9 @@ internal sealed class MotoProcess(MotoOptions options) : IAsyncDisposable
         Log.Information("Started moto process (PID: {Pid}) at {Endpoint}.", _process.Id, options.EndpointUrl);
     }
 
+    /// <summary>
+    /// Stops moto started by this process or performs configured cleanup on exit.
+    /// </summary>
     public async ValueTask DisposeAsync()
     {
         if (_startedByThisProcess && _process is not null)

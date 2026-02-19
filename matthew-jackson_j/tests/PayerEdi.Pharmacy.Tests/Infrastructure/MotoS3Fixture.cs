@@ -5,6 +5,9 @@ using PayerEdi.Ingestion.S3;
 
 namespace PayerEdi.Pharmacy.Tests.Infrastructure;
 
+/// <summary>
+/// Starts a local moto S3 endpoint and exposes configured ingestion/S3 services for tests.
+/// </summary>
 public sealed class MotoS3Fixture : IAsyncLifetime
 {
     private Process? _motoProcess;
@@ -14,6 +17,9 @@ public sealed class MotoS3Fixture : IAsyncLifetime
     public int Port { get; private set; }
     public string EndpointUrl => $"http://127.0.0.1:{Port}";
 
+    /// <summary>
+    /// Resolves a service from the fixture provider.
+    /// </summary>
     public TService GetService<TService>() where TService : notnull
     {
         if (_provider is null)
@@ -22,6 +28,7 @@ public sealed class MotoS3Fixture : IAsyncLifetime
         return _provider.GetRequiredService<TService>();
     }
 
+    /// <inheritdoc />
     public async ValueTask InitializeAsync()
     {
         _baseDirectory = ResolveRepositoryRoot();
@@ -71,6 +78,7 @@ public sealed class MotoS3Fixture : IAsyncLifetime
         _provider = services.BuildServiceProvider();
     }
 
+    /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
         if (_provider is not null)

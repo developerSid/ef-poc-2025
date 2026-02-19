@@ -5,20 +5,30 @@ using Microsoft.Extensions.Options;
 
 namespace PayerEdi.Ingestion.S3;
 
+/// <summary>
+/// AWS S3 implementation of <see cref="IS3Consumer"/> used by local moto and real S3 endpoints.
+/// </summary>
 public sealed class S3Consumer : IS3Consumer, IDisposable
 {
     private readonly IAmazonS3 _s3Client;
 
+    /// <summary>
+    /// Creates a consumer from configured <see cref="S3ConsumerOptions"/>.
+    /// </summary>
     public S3Consumer(IOptions<S3ConsumerOptions> options)
         : this(CreateClient(options.Value))
     {
     }
 
+    /// <summary>
+    /// Creates a consumer from an existing S3 client instance.
+    /// </summary>
     public S3Consumer(IAmazonS3 s3Client)
     {
         _s3Client = s3Client ?? throw new ArgumentNullException(nameof(s3Client));
     }
 
+    /// <inheritdoc />
     public async Task EnsureBucketExistsAsync(string bucketName, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(bucketName);
@@ -32,6 +42,7 @@ public sealed class S3Consumer : IS3Consumer, IDisposable
         }, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task UploadAsync(string bucketName, string key, Stream content, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(bucketName);
@@ -51,6 +62,7 @@ public sealed class S3Consumer : IS3Consumer, IDisposable
         }, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<byte[]> DownloadAsync(string bucketName, string key, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(bucketName);
@@ -68,6 +80,7 @@ public sealed class S3Consumer : IS3Consumer, IDisposable
         return memoryStream.ToArray();
     }
 
+    /// <inheritdoc />
     public async Task MoveAsync(string bucketName, string sourceKey, string destinationKey, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(bucketName);
@@ -89,6 +102,7 @@ public sealed class S3Consumer : IS3Consumer, IDisposable
         }, cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<string>> ListKeysAsync(string bucketName, string prefix, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(bucketName);
@@ -114,6 +128,9 @@ public sealed class S3Consumer : IS3Consumer, IDisposable
         return keys;
     }
 
+    /// <summary>
+    /// Disposes the underlying S3 client.
+    /// </summary>
     public void Dispose()
     {
         _s3Client.Dispose();
