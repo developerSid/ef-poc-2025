@@ -7,8 +7,14 @@ using System.Text;
 
 namespace PayerEdi.Pharmacy.Tests.Ingestion;
 
+/// <summary>
+/// Verifies SNIP validator behavior for direct failures and chained execution order.
+/// </summary>
 public sealed class TS837PSnipValidatorsTests(IngestionFixture fixture) : IClassFixture<IngestionFixture>
 {
+    /// <summary>
+    /// Uses an intentionally incomplete transaction to assert SNIP1 syntax validation failure messaging.
+    /// </summary>
     [Fact]
     public void ValidateWhenTransactionIsInvalidForSnip1ReturnsFailure()
     {
@@ -22,6 +28,9 @@ public sealed class TS837PSnipValidatorsTests(IngestionFixture fixture) : IClass
         Assert.Contains($"{RuleTier.SNIP1} validation failed:", error);
     }
 
+    /// <summary>
+    /// Uses a missing required Loop 1000A field to assert SNIP2 failure detection.
+    /// </summary>
     [Fact]
     public void ValidateWhenTransactionIsInvalidForSnip2ReturnsFailure()
     {
@@ -35,6 +44,9 @@ public sealed class TS837PSnipValidatorsTests(IngestionFixture fixture) : IClass
         Assert.Contains($"{RuleTier.SNIP2} validation failed:", error);
     }
 
+    /// <summary>
+    /// Mutates a balanced amount to force a SNIP3 balancing failure on realistic sample input.
+    /// </summary>
     [Fact]
     public void ValidateWhenTransactionIsInvalidForSnip3ReturnsFailure()
     {
@@ -49,6 +61,9 @@ public sealed class TS837PSnipValidatorsTests(IngestionFixture fixture) : IClass
         Assert.DoesNotContain("RequiredSegmentMissing", error);
     }
 
+    /// <summary>
+    /// Mutates date-format qualifiers to force an inter-segment SNIP4 failure.
+    /// </summary>
     [Fact]
     public void ValidateWhenTransactionIsInvalidForSnip4ReturnsFailure()
     {
@@ -63,6 +78,9 @@ public sealed class TS837PSnipValidatorsTests(IngestionFixture fixture) : IClass
         Assert.DoesNotContain("RequiredSegmentMissing", error);
     }
 
+    /// <summary>
+    /// Ensures a chained pipeline short-circuits at SNIP5 after SNIP1-4 pass.
+    /// </summary>
     [Fact]
     public void ValidateSnip5ChainRunsSnip1ToSnip4ThenFailsAtSnip5()
     {
@@ -83,6 +101,9 @@ public sealed class TS837PSnipValidatorsTests(IngestionFixture fixture) : IClass
         Assert.Equal("SNIP5 stub failure for tests.", result.Error);
     }
 
+    /// <summary>
+    /// Ensures a chained pipeline short-circuits at SNIP6 after prior validators pass.
+    /// </summary>
     [Fact]
     public void ValidateSnip6ChainRunsThroughSnip5ThenFailsAtSnip6()
     {
@@ -104,6 +125,9 @@ public sealed class TS837PSnipValidatorsTests(IngestionFixture fixture) : IClass
         Assert.Equal("SNIP6 stub failure for tests.", result.Error);
     }
 
+    /// <summary>
+    /// Ensures a chained pipeline short-circuits at SNIP7 after prior validators pass.
+    /// </summary>
     [Fact]
     public void ValidateSnip7ChainRunsThroughSnip6ThenFailsAtSnip7()
     {
@@ -126,6 +150,9 @@ public sealed class TS837PSnipValidatorsTests(IngestionFixture fixture) : IClass
         Assert.Equal("SNIP7 stub failure for tests.", result.Error);
     }
 
+    /// <summary>
+    /// Creates the concrete validator used for SNIP1-SNIP4 tests.
+    /// </summary>
     private static IX12Validator<TS837P> CreateValidator(RuleTier tier) => tier switch
     {
         RuleTier.SNIP1 => new TS837PSnip1Validator(),
@@ -188,6 +215,9 @@ public sealed class TS837PSnipValidatorsTests(IngestionFixture fixture) : IClass
         }
     };
 
+    /// <summary>
+    /// Reads the sample payload, applies a mutation, then rehydrates a transaction object via the standard reader pipeline.
+    /// </summary>
     private TS837P CreateTransactionFromMutatedSample(Func<string, string> mutation)
     {
         var original = ReadSample("837p-sample.edi");
@@ -218,6 +248,9 @@ public sealed class TS837PSnipValidatorsTests(IngestionFixture fixture) : IClass
     private static string CreateSnip4InterSegmentFailurePayload(string edi) =>
         ReplaceFirst(edi, "DTP*472*D8*20151124~", "DTP*472*RD8*20151124~");
 
+    /// <summary>
+    /// Replaces the first matching segment text to produce deterministic invalid sample variants.
+    /// </summary>
     private static string ReplaceFirst(string input, string oldValue, string newValue)
     {
         var index = input.IndexOf(oldValue, StringComparison.Ordinal);
@@ -230,6 +263,9 @@ public sealed class TS837PSnipValidatorsTests(IngestionFixture fixture) : IClass
             input.AsSpan(index + oldValue.Length));
     }
 
+    /// <summary>
+    /// Runs validators in order and returns the first failure plus the execution count.
+    /// </summary>
     private static ValidationChainResult ValidateChain(IReadOnlyList<IX12Validator<TS837P>> validators, TS837P transaction)
     {
         var isa = CreateIsa();

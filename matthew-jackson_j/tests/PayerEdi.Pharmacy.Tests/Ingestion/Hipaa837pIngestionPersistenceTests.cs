@@ -3,9 +3,14 @@ using EdiFabric.Templates.Hipaa5010;
 
 namespace PayerEdi.Pharmacy.Tests.Ingestion;
 
+/// <summary>
+/// Validates ingestion behavior and persistence outcomes for HIPAA claim samples.
+/// </summary>
 public sealed class Hipaa837pIngestionPersistenceTests(DbFixture fixture) : DbTestBase(fixture)
 {
-
+    /// <summary>
+    /// Runs full 837P ingestion and asserts key header segments and transaction persistence match expectations.
+    /// </summary>
     [Theory]
     [InlineData("837p-sample.edi")]
     public async Task TS837PIngestionFinishes(string resourceName)
@@ -54,6 +59,9 @@ public sealed class Hipaa837pIngestionPersistenceTests(DbFixture fixture) : DbTe
             actual.BHT_BeginningOfHierarchicalTransaction.SubmitterTransactionIdentifier_03);
     }
 
+    /// <summary>
+    /// Ensures non-EDI payloads fail fast and do not persist partial transaction rows.
+    /// </summary>
     [Fact]
     public async Task IngestWhenInputIsNotEdiThrowsAndPersistsNothing()
     {
@@ -68,6 +76,9 @@ public sealed class Hipaa837pIngestionPersistenceTests(DbFixture fixture) : DbTe
         Assert.Equal(0, persistedTransactions);
     }
 
+    /// <summary>
+    /// Confirms 837I payloads can be parsed and returned without failing the ingestion pipeline.
+    /// </summary>
     [Theory]
     [InlineData("837i-sample.edi")]
     public async Task TS837IReadFinishes(string resourceName)
@@ -81,6 +92,9 @@ public sealed class Hipaa837pIngestionPersistenceTests(DbFixture fixture) : DbTe
         Assert.True(expected.Id > 0);
     }
 
+    /// <summary>
+    /// Confirms 837D payloads can be parsed and returned without failing the ingestion pipeline.
+    /// </summary>
     [Theory]
     [InlineData("837-sample.edi")]
     public async Task TS837DReadFinishes(string resourceName)

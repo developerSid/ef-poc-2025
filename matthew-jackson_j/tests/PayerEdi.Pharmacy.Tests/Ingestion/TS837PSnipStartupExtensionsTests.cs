@@ -6,8 +6,14 @@ using PayerEdi.Ingestion.Validation.x12._837p;
 
 namespace PayerEdi.Pharmacy.Tests.Ingestion;
 
+/// <summary>
+/// Verifies DI registration helpers seed expected TS837P SNIP validators.
+/// </summary>
 public sealed class TS837PSnipStartupExtensionsTests
 {
+    /// <summary>
+    /// Ensures base startup registration resolves exactly one validator per SNIP tier (1-4).
+    /// </summary>
     [Theory]
     [InlineData(RuleTier.SNIP1, typeof(TS837PSnip1Validator))]
     [InlineData(RuleTier.SNIP2, typeof(TS837PSnip2Validator))]
@@ -31,6 +37,9 @@ public sealed class TS837PSnipStartupExtensionsTests
         Assert.IsType(validatorType, validators[0]);
     }
 
+    /// <summary>
+    /// Ensures additional validator registrations compose with defaults instead of replacing them.
+    /// </summary>
     [Fact]
     public void AddTS837PSnipValidationComposesWithAdditionalRegistration()
     {
@@ -49,6 +58,9 @@ public sealed class TS837PSnipStartupExtensionsTests
         Assert.Equal(2, validators.Count);
     }
 
+    /// <summary>
+    /// Extra validator used to verify additive registration semantics.
+    /// </summary>
     private sealed class ExtraSnip1Validator : IX12Validator<TS837P>
     {
         public (bool, string?) Validate(ISA isa, GS? gs, ST st, TS837P item) => (true, null);

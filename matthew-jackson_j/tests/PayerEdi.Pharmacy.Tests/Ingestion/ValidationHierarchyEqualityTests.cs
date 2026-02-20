@@ -3,8 +3,14 @@ using PayerEdi.Ingestion.Validation;
 
 namespace PayerEdi.Pharmacy.Tests.Ingestion;
 
+/// <summary>
+/// Captures equality and hash-code expectations for mutable validation hierarchy keys.
+/// </summary>
 public sealed class ValidationHierarchyEqualityTests
 {
+    /// <summary>
+    /// Equivalent key parts should compare equal regardless of letter casing.
+    /// </summary>
     [Fact]
     public void EqualsReturnsTrueForSameTwoPartKeysIgnoringCase()
     {
@@ -24,6 +30,9 @@ public sealed class ValidationHierarchyEqualityTests
         Assert.Equal(left.GetHashCode(), right.GetHashCode());
     }
 
+    /// <summary>
+    /// Leading/trailing whitespace is normalized by canonical key generation.
+    /// </summary>
     [Fact]
     public void EqualsReturnsTrueWhenKeysNeedTrimming()
     {
@@ -41,6 +50,9 @@ public sealed class ValidationHierarchyEqualityTests
         Assert.Equal(left.GetHashCode(), right.GetHashCode());
     }
 
+    /// <summary>
+    /// Any differing normalized key part should break equality.
+    /// </summary>
     [Fact]
     public void EqualsReturnsFalseWhenSecondPartDiffers()
     {
@@ -57,6 +69,9 @@ public sealed class ValidationHierarchyEqualityTests
         Assert.False(left.Equals(right));
     }
 
+    /// <summary>
+    /// Hierarchies with different item counts are not equivalent.
+    /// </summary>
     [Fact]
     public void EqualsReturnsFalseWhenCountsDiffer()
     {
@@ -74,6 +89,9 @@ public sealed class ValidationHierarchyEqualityTests
         Assert.False(left.Equals(right));
     }
 
+    /// <summary>
+    /// Equality against null must return false.
+    /// </summary>
     [Fact]
     public void EqualsReturnsFalseForNull()
     {
@@ -85,6 +103,9 @@ public sealed class ValidationHierarchyEqualityTests
         Assert.False(left.Equals(null));
     }
 
+    /// <summary>
+    /// Reference equality should always return true.
+    /// </summary>
     [Fact]
     public void EqualsReturnsTrueForSameReference()
     {
@@ -96,6 +117,9 @@ public sealed class ValidationHierarchyEqualityTests
         Assert.True(left.Equals(left));
     }
 
+    /// <summary>
+    /// Hash-based collections should honor the same canonical equality contract.
+    /// </summary>
     [Fact]
     public void HashSetUsesEqualityContractForEquivalentHierarchies()
     {
@@ -117,6 +141,9 @@ public sealed class ValidationHierarchyEqualityTests
         Assert.True(set.Contains(second));
     }
 
+    /// <summary>
+    /// Demonstrates hash instability risk when mutating keys after collection insertion.
+    /// </summary>
     [Fact]
     public void HashSetLookupFailsAfterMutatingIndexedHierarchy()
     {
@@ -135,6 +162,9 @@ public sealed class ValidationHierarchyEqualityTests
         Assert.False(set.Contains(hierarchy));
     }
 
+    /// <summary>
+    /// Different runtime types are not considered equal.
+    /// </summary>
     [Fact]
     public void EqualsReturnsFalseForDifferentType()
     {
@@ -146,6 +176,9 @@ public sealed class ValidationHierarchyEqualityTests
         Assert.False(left.Equals("not-a-hierarchy"));
     }
 
+    /// <summary>
+    /// Key part ordering is significant in canonical key comparisons.
+    /// </summary>
     [Fact]
     public void EqualsReturnsFalseWhenPartsAreReordered()
     {
@@ -164,10 +197,16 @@ public sealed class ValidationHierarchyEqualityTests
         Assert.False(left.Equals(right));
     }
 
+    /// <summary>
+    /// Concrete hierarchy used to expose base comparison behavior in tests.
+    /// </summary>
     private sealed class TwoPartValidationHierarchy : ValidationHierarchy
     {
     }
 
+    /// <summary>
+    /// Minimal EDI item stub that controls key material through ToString().
+    /// </summary>
     private sealed class FakeEdiItem(string part1, string part2) : IEdiItem
     {
         private readonly string _part1 = part1;

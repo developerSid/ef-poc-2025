@@ -10,6 +10,7 @@ public class X12ValidatorCache : IX12ValidatorCache
 {
     private readonly ConcurrentDictionary<X12ValidationHierarchyKey, object> _items = new();
 
+    // Builds the canonical cache key from tier + envelope scope + model type.
     private static X12ValidationHierarchyKey GetKey<TModel>(RuleTier tier, ISA? isa, GS? gs, ST? st) where TModel : class
     {
         X12ValidationHierarchy hierarchy = new()

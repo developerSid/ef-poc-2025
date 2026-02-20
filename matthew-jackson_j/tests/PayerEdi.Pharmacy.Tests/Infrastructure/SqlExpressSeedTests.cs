@@ -1,3 +1,4 @@
+// Intentionally kept commented out as an optional seed-style persistence example for future reactivation.
 //using PayerEdi.Pharmacy.Data.Hipaa837p;
 
 //namespace PayerEdi.Pharmacy.Tests.Infrastructure;

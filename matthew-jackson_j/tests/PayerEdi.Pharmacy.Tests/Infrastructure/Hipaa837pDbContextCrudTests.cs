@@ -2,9 +2,14 @@ using EdiFabric.Templates.Hipaa5010;
 
 namespace PayerEdi.Pharmacy.Tests.Infrastructure;
 
+/// <summary>
+/// Verifies minimal EF CRUD behavior for HIPAA 837P transaction entities.
+/// </summary>
 public sealed class Hipaa837pDbContextCrudTests(DbFixture fixture) : DbTestBase(fixture)
 {
-
+    /// <summary>
+    /// Confirms a new TS837P record can be saved and reloaded with an assigned identity key.
+    /// </summary>
     [Fact]
     public async Task CanSaveAndLoadTransaction()
     {

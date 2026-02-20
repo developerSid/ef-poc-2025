@@ -8,6 +8,9 @@ namespace PayerEdi.Ingestion.Validation.x12;
 /// </summary>
 public static class X12ValidatorCacheExtensions
 {
+    /// <summary>
+    /// Registers the default built-in SNIP 1-4 validator chain for TS837P transactions.
+    /// </summary>
     public static void AddTS837PSnipValidators(this IX12ValidatorCache cache)
     {
         ArgumentNullException.ThrowIfNull(cache);

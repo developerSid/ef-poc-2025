@@ -6,8 +6,14 @@ using PayerEdi.Ingestion.Validation.x12._837p;
 
 namespace PayerEdi.Pharmacy.Tests.Ingestion;
 
+/// <summary>
+/// Verifies cache extension overloads map to the expected hierarchy key scopes.
+/// </summary>
 public sealed class X12ValidatorCacheExtensionsTests
 {
+    /// <summary>
+    /// Stores and resolves a validator keyed only by ISA scope.
+    /// </summary>
     [Fact]
     public void AddValidatorWithIsaOnlyStoresValidator()
     {
@@ -22,6 +28,9 @@ public sealed class X12ValidatorCacheExtensionsTests
         Assert.Same(validator, validators[0]);
     }
 
+    /// <summary>
+    /// Stores and resolves a validator keyed by ISA + GS scope.
+    /// </summary>
     [Fact]
     public void AddValidatorWithIsaAndGsStoresValidator()
     {
@@ -37,6 +46,9 @@ public sealed class X12ValidatorCacheExtensionsTests
         Assert.Same(validator, validators[0]);
     }
 
+    /// <summary>
+    /// Stores and resolves a validator keyed by ISA + ST scope.
+    /// </summary>
     [Fact]
     public void AddValidatorWithIsaAndStStoresValidator()
     {
@@ -52,6 +64,9 @@ public sealed class X12ValidatorCacheExtensionsTests
         Assert.Same(validator, validators[0]);
     }
 
+    /// <summary>
+    /// Stores and resolves a validator keyed by ISA + GS + ST scope.
+    /// </summary>
     [Fact]
     public void AddValidatorWithIsaGsStStoresValidator()
     {
@@ -68,6 +83,9 @@ public sealed class X12ValidatorCacheExtensionsTests
         Assert.Same(validator, validators[0]);
     }
 
+    /// <summary>
+    /// Validates ISA-only retrieval overload delegates to the same underlying key.
+    /// </summary>
     [Fact]
     public void GetValidatorsIsaOnlyReturnsStoredValidator()
     {
@@ -81,6 +99,9 @@ public sealed class X12ValidatorCacheExtensionsTests
         Assert.Same(validator, validators[0]);
     }
 
+    /// <summary>
+    /// Validates ISA + GS retrieval overload delegates to the same underlying key.
+    /// </summary>
     [Fact]
     public void GetValidatorsIsaAndGsReturnsStoredValidator()
     {
@@ -95,6 +116,9 @@ public sealed class X12ValidatorCacheExtensionsTests
         Assert.Same(validator, validators[0]);
     }
 
+    /// <summary>
+    /// Validates ISA + ST retrieval overload delegates to the same underlying key.
+    /// </summary>
     [Fact]
     public void GetValidatorsIsaAndStReturnsStoredValidator()
     {
@@ -109,6 +133,9 @@ public sealed class X12ValidatorCacheExtensionsTests
         Assert.Same(validator, validators[0]);
     }
 
+    /// <summary>
+    /// Validates ISA + GS + ST retrieval overload delegates to the same underlying key.
+    /// </summary>
     [Fact]
     public void GetValidatorsIsaGsStReturnsStoredValidator()
     {
@@ -124,6 +151,9 @@ public sealed class X12ValidatorCacheExtensionsTests
         Assert.Same(validator, validators[0]);
     }
 
+    /// <summary>
+    /// Ensures built-in TS837P SNIP registration seeds exactly one validator per tier.
+    /// </summary>
     [Theory]
     [InlineData(RuleTier.SNIP1, typeof(TS837PSnip1Validator))]
     [InlineData(RuleTier.SNIP2, typeof(TS837PSnip2Validator))]
@@ -161,8 +191,14 @@ public sealed class X12ValidatorCacheExtensionsTests
         ImplementationConventionPreference_03 = "005010X222A1"
     };
 
+    /// <summary>
+    /// Marker model used for generic cache-key testing.
+    /// </summary>
     private sealed class TestModel;
 
+    /// <summary>
+    /// Always-passing stub validator used to assert cache identity semantics.
+    /// </summary>
     private sealed class TestValidator : IX12Validator<TestModel>
     {
         public (bool, string?) Validate(ISA isa, GS gs, ST st, TestModel item) => (true, null);

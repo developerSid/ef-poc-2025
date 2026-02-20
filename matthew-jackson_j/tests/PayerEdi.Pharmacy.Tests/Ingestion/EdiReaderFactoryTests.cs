@@ -3,8 +3,14 @@ using System.Text;
 
 namespace PayerEdi.Pharmacy.Tests.Ingestion;
 
+/// <summary>
+/// Verifies reader-factory behavior for supported and unsupported EDI standards.
+/// </summary>
 public class EdiReaderFactoryTests(IngestionFixture fixture) : IClassFixture<IngestionFixture>
 {
+    /// <summary>
+    /// Confirms X12 standard maps to the expected EdiFabric reader settings type.
+    /// </summary>
     [Fact]
     public void CreateSettingsWhenX12ReturnsX12ReaderSettings()
     {
@@ -16,6 +22,9 @@ public class EdiReaderFactoryTests(IngestionFixture fixture) : IClassFixture<Ing
         Assert.IsType<X12ReaderSettings>(settings);
     }
 
+    /// <summary>
+    /// Confirms non-X12 standards are rejected by the current factory implementation.
+    /// </summary>
     [Theory]
     [InlineData(EdiStandard.Edifact)]
     [InlineData(EdiStandard.Hl7)]
@@ -30,6 +39,9 @@ public class EdiReaderFactoryTests(IngestionFixture fixture) : IClassFixture<Ing
         Assert.Throws<NotSupportedException>(() => factory.CreateSettings(Stream.Null, standard));
     }
 
+    /// <summary>
+    /// Verifies stream sniffing plus token initialization produces a concrete X12 reader wrapper.
+    /// </summary>
     [Fact]
     public void CreateWhenX12DetectedReturnsX12Reader()
     {

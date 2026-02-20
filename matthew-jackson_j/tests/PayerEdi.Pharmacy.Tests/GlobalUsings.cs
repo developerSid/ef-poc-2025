@@ -1,3 +1,4 @@
+// Shared imports used across unit and integration-style test files.
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.DependencyInjection;
 global using PayerEdi.Ingestion.Reader;

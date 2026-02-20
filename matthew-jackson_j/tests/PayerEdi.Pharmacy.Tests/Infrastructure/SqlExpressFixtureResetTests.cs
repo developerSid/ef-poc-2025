@@ -1,8 +1,14 @@
 namespace PayerEdi.Pharmacy.Tests.Infrastructure;
 
 [Collection("db")]
+/// <summary>
+/// Validates fixture reset semantics for isolated per-test SQL databases.
+/// </summary>
 public sealed class SqlExpressFixtureResetTests(DbFixture fixture)
 {
+    /// <summary>
+    /// Ensures reset re-points the fixture to a newly generated database name.
+    /// </summary>
     [Fact]
     public async Task ResetAsyncCreatesANewDatabase()
     {

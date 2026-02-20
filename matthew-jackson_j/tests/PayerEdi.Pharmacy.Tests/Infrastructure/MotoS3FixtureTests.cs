@@ -3,8 +3,14 @@ using PayerEdi.Ingestion.S3;
 
 namespace PayerEdi.Pharmacy.Tests.Infrastructure;
 
+/// <summary>
+/// Covers core S3 file operations against the local moto endpoint.
+/// </summary>
 public sealed class MotoS3FixtureTests(MotoS3Fixture fixture) : IClassFixture<MotoS3Fixture>
 {
+    /// <summary>
+    /// Ensures upload, download, and move preserve sample EDI payload content.
+    /// </summary>
     [Fact]
     public async Task UploadDownloadAndMoveSampleFileWorks()
     {
