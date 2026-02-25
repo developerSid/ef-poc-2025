@@ -1,0 +1,40 @@
+[
+  {
+    "Name": "Console",
+    "Projects": [
+      {
+        "Path": "src\\PayerEdi.EdiFabric.Console\\PayerEdi.EdiFabric.Console.csproj",
+        "Action": "Start",
+        "DebugTarget": "PayerEdi.EdiFabric.Console"
+      }
+    ]
+  },
+  {
+    "Name": "MotoConsole",
+    "Projects": [
+      {
+        "Path": "src\\PayerEdi.EdiFabric.MotoConsole\\PayerEdi.EdiFabric.MotoConsole.csproj",
+        "Action": "Start",
+        "DebugTarget": "PayerEdi.EdiFabric.MotoConsole"
+      },
+      {
+        "Path": "src\\PayerEdi.S3Service\\PayerEdi.S3Service.pyproj",
+        "Action": "Start"
+      }
+    ]
+  },
+  {
+    "Name": "ValidatedConsole",
+    "Projects": [
+      {
+        "Path": "src\\PayerEdi.EdiFabric.ValidatedConsole\\PayerEdi.EdiFabric.ValidatedConsole.csproj",
+        "Action": "Start",
+        "DebugTarget": "PayerEdi.EdiFabric.ValidatedConsole"
+      },
+      {
+        "Path": "src\\PayerEdi.S3Service\\PayerEdi.S3Service.pyproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

@@ -4,6 +4,7 @@ using PayerEdi.Ingestion.IO;
 using PayerEdi.Ingestion.Reader;
 using PayerEdi.Ingestion.Tokens;
 using PayerEdi.Pharmacy.Data.Hipaa837p;
+using System.Linq;
 
 namespace PayerEdi.Pharmacy.Services;
 
@@ -15,6 +16,7 @@ public sealed class Hipaa837pIngestionService(
     IFileService fileService,
     IEdiReaderFactory readerFactory,
     IEdiTokenProvider tokenProvider,
+    IEnumerable<IIngestionPreSaveHook> preSaveHooks,
     Hipaa837pDbContext dbContext) : IHipaa837pIngestionService
 {
     /// <inheritdoc />
@@ -32,6 +34,10 @@ public sealed class Hipaa837pIngestionService(
         using var reader = readerFactory.Create(stream);
         var items = reader.ReadAll();
         logger.LogInformation("Parsed {Count} EDI item(s) from bucket '{Bucket}' key '{Key}'.", items.Count, bucket, key);
+
+        var hooks = preSaveHooks as IIngestionPreSaveHook[] ?? [.. preSaveHooks];
+        foreach (var hook in hooks)
+            await hook.OnBeforeSaveAsync(items, cancellationToken);
 
         using var scope = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
