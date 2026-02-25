@@ -32,9 +32,11 @@ public sealed class X12SnipValidationPreSaveHook(
         if (transactions.Count == 0)
             return Task.CompletedTask;
 
+        // ISA/GS/ST provide lookup scope for validator cache selection.
         var isa = items.OfType<ISA>().FirstOrDefault()
             ?? throw new InvalidOperationException("Validation requires ISA envelope data, but none was parsed.");
         var gs = items.OfType<GS>().FirstOrDefault();
+        // Execute validation cumulatively from SNIP1 through configured SNIP level.
         var tiers = Enumerable.Range((int)RuleTier.SNIP1, (int)config.Level).Select(x => (RuleTier)x);
 
         foreach (var transaction in transactions)

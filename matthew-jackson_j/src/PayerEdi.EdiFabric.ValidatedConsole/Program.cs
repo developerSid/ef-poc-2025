@@ -23,6 +23,9 @@ namespace PayerEdi.EdiFabric.ValidatedConsole;
 /// </summary>
 internal static class Program
 {
+    /// <summary>
+    /// Boots service dependencies, runs validated ingestion, and returns process exit code.
+    /// </summary>
     static async Task<int> Main(string[] args)
     {
         var configuration = BuildConfiguration();
@@ -118,6 +121,9 @@ internal sealed class ValidatedConsoleRunner(
     IServiceProvider provider,
     ValidatedOptions options)
 {
+    /// <summary>
+    /// Executes end-to-end upload, validated ingestion, and persistence assertion workflow.
+    /// </summary>
     public async Task<int> RunAsync()
     {
         await provider.MigrateHipaa837pAsync();
@@ -170,6 +176,9 @@ internal sealed class ValidatedOptions
     public bool KillExistingMoto { get; init; }
     public bool KillMotoOnExit { get; init; }
 
+    /// <summary>
+    /// Loads options from configuration and applies CLI overrides.
+    /// </summary>
     public static ValidatedOptions FromConfiguration(IConfiguration configuration, string[] args)
     {
         var s3Section = configuration.GetSection("S3");
@@ -263,6 +272,9 @@ internal sealed class MotoProcess(ValidatedOptions options, ILogger<MotoProcess>
     private string _host = string.Empty;
     private int _port;
 
+    /// <summary>
+    /// Starts moto when configured and waits for endpoint availability.
+    /// </summary>
     public async Task StartAsync()
     {
         if (!TryGetLocalEndpoint(options.EndpointUrl, out _host, out _port))
@@ -304,6 +316,9 @@ internal sealed class MotoProcess(ValidatedOptions options, ILogger<MotoProcess>
         logger.LogInformation("Started moto process (PID: {Pid}) at {Endpoint}.", _process.Id, options.EndpointUrl);
     }
 
+    /// <summary>
+    /// Stops moto started by this process or performs configured cleanup on exit.
+    /// </summary>
     public async ValueTask DisposeAsync()
     {
         if (_startedByThisProcess && _process is not null)

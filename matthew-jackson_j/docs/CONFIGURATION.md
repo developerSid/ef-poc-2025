@@ -24,6 +24,13 @@ Use colon notation to reference keys.
 - `Ingestion:SampleFilePath`
   - Sample EDI file path used by console entry points (for example, `837p-sample.edi` in output directory).
 
+## SNIP Validation
+
+- `SnipValidation:Enabled`
+  - Enables/disables pre-save SNIP validation hook in validated ingestion composition.
+- `SnipValidation:Level`
+  - Single configured SNIP tier (`SNIP1` to `SNIP4`) executed cumulatively from SNIP1 up to the selected level.
+
 ## S3 Core
 
 - `S3:EndpointUrl`

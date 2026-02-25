@@ -91,6 +91,30 @@ Notes:
 - `PayerEdi.EdiFabric.MotoConsole` includes a short startup wait to reduce race conditions while moto starts listening.
 - If moto uses a non-default endpoint, pass `--endpoint` to `MotoConsole`.
 
+### Mode C: Visual Studio validated integration run (`PayerEdi.S3Service` + `PayerEdi.EdiFabric.ValidatedConsole`)
+Use this mode when you want S3 ingestion, SQL persistence, and SNIP pre-save validation in one run.
+
+Visual Studio project setup:
+- Open solution `PayerEdi.Pharmacy.slnx`.
+- Set startup projects to `Multiple startup projects`.
+- Set `PayerEdi.S3Service` to `Start`.
+- Set `PayerEdi.EdiFabric.ValidatedConsole` to `Start`.
+
+Expected outcome:
+- `PayerEdi.EdiFabric.ValidatedConsole` uploads `837p-sample.edi` to `inbound/`.
+- The file is downloaded and processed through configured SNIP validation (`SnipValidation:Level`).
+- Valid transactions persist to SQL Server.
+
+Notes:
+- Validated mode currently supports SNIP levels 1-4.
+- Validation is applied before persistence via the `IIngestionPreSaveHook` pipeline.
+
+## Solution Launch Profiles
+The repository includes `PayerEdi.Pharmacy.slnLaunch` with these named launch profiles:
+- `Console`
+- `MotoConsole`
+- `ValidatedConsole`
+
 ## Optional downstream processor
 By default, the service uses a built-in validation processor (checks file is readable).
 

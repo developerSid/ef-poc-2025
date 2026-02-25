@@ -3,8 +3,12 @@ using PayerEdi.Ingestion.IO;
 
 namespace PayerEdi.EdiFabric.Console;
 
+/// <summary>
+/// Local filesystem-backed <see cref="IFileService"/> used by the basic console ingestion flow.
+/// </summary>
 internal sealed class ConsoleFileService(ILogger<ConsoleFileService> logger) : IFileService
 {
+    /// <inheritdoc />
     public async Task PushAsync(string bucket, string key, byte[] payload, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(bucket);
@@ -19,6 +23,7 @@ internal sealed class ConsoleFileService(ILogger<ConsoleFileService> logger) : I
         logger.LogInformation("Pushed local file '{Key}' to bucket '{Bucket}'.", key, bucket);
     }
 
+    /// <inheritdoc />
     public Task<byte[]> PullAsync(string bucket, string key, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(bucket);
@@ -30,6 +35,7 @@ internal sealed class ConsoleFileService(ILogger<ConsoleFileService> logger) : I
         return File.ReadAllBytesAsync(path, cancellationToken);
     }
 
+    /// <inheritdoc />
     public Task<IReadOnlyList<string>> ListAsync(string bucket, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(bucket);
@@ -50,6 +56,7 @@ internal sealed class ConsoleFileService(ILogger<ConsoleFileService> logger) : I
         var bucketRoot = Path.GetFullPath(bucket);
         var normalizedKey = key.Replace('/', Path.DirectorySeparatorChar);
         var fullPath = Path.GetFullPath(Path.Combine(bucketRoot, normalizedKey));
+        // Reject path traversal so keys remain confined to the bucket root.
         if (!fullPath.StartsWith(bucketRoot, StringComparison.OrdinalIgnoreCase))
             throw new InvalidOperationException("Key resolves outside the bucket root.");
         return fullPath;

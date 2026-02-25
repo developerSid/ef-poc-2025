@@ -1,12 +1,26 @@
 # Phase 3 SNIP Validation Notes
 
-Single source of truth for Phase 3 planning, findings, and decisions.
+Single source of truth for Phase 3 implementation status, findings, and decisions.
 
 ## Scope
 - Phase 3 requirement in `docs/STATEMENT_OF_WORK.md` is high-level: add SNIP validation.
 - Initial implementation scope: `837P` only.
-- SNIP 1-6: configurable support.
-- SNIP 7: custom-rule extension point only (not full trading-partner logic).
+- Current implemented runtime support: configurable `SNIP1` through `SNIP4`.
+- SNIP 5-7 remain extension/customization work.
+
+## Current Implementation Status
+- `PayerEdi.EdiFabric.MotoConsole` and `PayerEdi.EdiFabric.ValidatedConsole` intentionally retain parallel flow structure to document transition over time (baseline flow vs validated flow).
+- Implemented pre-save validation hook:
+  - `src/PayerEdi.Pharmacy/Services/X12SnipValidationPreSaveHook.cs`
+- Implemented options binding:
+  - `src/PayerEdi.Pharmacy/Services/SnipValidationOptions.cs`
+  - `src/PayerEdi.Pharmacy/Extensions/Startup.cs`
+- Implemented TS837P validator registrations:
+  - `src/PayerEdi.Ingestion/Validation/x12/837p/*.cs`
+- Implemented validated runtime entry point:
+  - `src/PayerEdi.EdiFabric.ValidatedConsole/Program.cs`
+- Unit test coverage exists for hook behavior, cache registration, and composition:
+  - `tests/PayerEdi.Pharmacy.Tests/Ingestion/*Snip*Tests.cs`
 
 ## Current Ingestion Pattern
 - Reader setup and standard detection are clean for POC:
@@ -33,12 +47,9 @@ This keeps parsing, validation, and persistence concerns separated.
 - Behavior should be configurable, not hard-coded.
 - Configuration keys:
   - `SnipValidation:Enabled`
-  - `SnipValidation:Levels` (example: `1,2,3`)
-  - `SnipValidation:FailOnError`
-  - `SnipValidation:MaxErrors`
+  - `SnipValidation:Level` (`SNIP1`..`SNIP4`)
 - Processing semantics:
-  - `FailOnError=true`: block persistence on validation errors.
-  - `FailOnError=false`: allow persistence and capture validation output.
+  - Current behavior is blocking for validation failures (throws before persistence).
 
 ## API Findings
 - Use `IsValid(..., out MessageErrorContext, ValidationSettings)` for consuming validation results.
@@ -76,13 +87,11 @@ This keeps parsing, validation, and persistence concerns separated.
 - Valid `837P` file passes configured SNIP levels and persists.
 - Invalid `837P` file yields structured validation results.
 - Blocking mode prevents persistence on validation error.
-- Non-blocking mode allows persistence and records validation output.
+- Non-blocking mode is not implemented in current scope.
 
-## Open Questions
-- Which SNIP levels are mandatory for acceptance?
-- Minimum invalid-file scenarios required for tests?
-- Persist validation outcomes to SQL, logs, or both?
-- Warning vs error acceptance threshold?
+## Phase Closeout
+- Implemented and validated scope for this phase: configurable blocking SNIP pre-save validation for `TS837P` at levels `SNIP1` through `SNIP4`.
+- Deferred scope remains explicit: SNIP 5-7 extension work and non-blocking validation/reporting mode.
 
 ## External References
 - SNIP levels: https://support.edifabric.com/hc/en-us/articles/360000361352-How-to-validate-HIPAA-SNIP-levels
