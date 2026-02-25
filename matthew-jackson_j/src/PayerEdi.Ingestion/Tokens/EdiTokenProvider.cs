@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Options;
+
 namespace PayerEdi.Ingestion.Tokens;
 
 /// <summary>
@@ -6,10 +8,18 @@ namespace PayerEdi.Ingestion.Tokens;
 public sealed class EdiTokenProvider : IEdiTokenProvider
 {
     private static readonly Lock _globalLock = new();
+    private readonly EdiFabricOptions _options;
     private string? _cachedToken;
     private DateTimeOffset? _cachedAt;
-    private const string EnvVarName = "EDIFABRIC_SERIAL_KEY";
     private static readonly TimeSpan TokenLifetime = TimeSpan.FromHours(24);
+
+    /// <summary>
+    /// Creates a token provider from configured EdiFabric options.
+    /// </summary>
+    public EdiTokenProvider(IOptions<EdiFabricOptions> options)
+    {
+        _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+    }
 
     /// <inheritdoc />
     public void InitToken() => GetToken();
@@ -29,11 +39,13 @@ public sealed class EdiTokenProvider : IEdiTokenProvider
             _cachedAt = null;
 
             var now = DateTimeOffset.UtcNow;
+            var serialKey = _options.SerialKey;
+            if (string.IsNullOrWhiteSpace(serialKey))
+                throw new InvalidOperationException("Configuration key 'EdiFabric:SerialKey' is required.");
 
-            var serialKey = Environment.GetEnvironmentVariable(EnvVarName, EnvironmentVariableTarget.Machine);
             SerialKey.Set(serialKey, false);
 
-            var token = Environment.GetEnvironmentVariable(EnvVarName, EnvironmentVariableTarget.Machine);
+            var token = serialKey;
             if (string.IsNullOrWhiteSpace(token))
             {
                 token = SerialKey.GetToken(serialKey, true);

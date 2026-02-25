@@ -1,4 +1,5 @@
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using PayerEdi.Pharmacy.Tests.Extensions;
 using DataStartup = PayerEdi.Pharmacy.Data.Extensions.Startup;
 
@@ -9,7 +10,6 @@ namespace PayerEdi.Pharmacy.Tests.Infrastructure;
 /// </summary>
 public sealed class DbFixture : IAsyncLifetime
 {
-    private const string ConnectionEnvVarName = "HIPAA_DB_CONNECTION";
     private IServiceProvider _provider = default!;
     private string _databaseName = string.Empty;
     private string _connectionString = string.Empty;
@@ -57,11 +57,15 @@ public sealed class DbFixture : IAsyncLifetime
 
     private static string BuildConnectionString(string databaseName)
     {
-        var configuredConnection = Environment.GetEnvironmentVariable(ConnectionEnvVarName, EnvironmentVariableTarget.Process);
-        configuredConnection ??= Environment.GetEnvironmentVariable(ConnectionEnvVarName, EnvironmentVariableTarget.Machine);
+        var configuration = BuildConfiguration();
+        var configuredConnection = configuration.GetConnectionString("HipaaDb");
 
         if (string.IsNullOrWhiteSpace(configuredConnection))
-            return DataStartup.BuildSqlExpressConnectionString(databaseName);
+        {
+            configuredConnection = configuration.GetConnectionString("SqlServerFallbackDb");
+            if (string.IsNullOrWhiteSpace(configuredConnection))
+                throw new InvalidOperationException("Configuration key 'ConnectionStrings:SqlServerFallbackDb' is required.");
+        }
 
         var builder = new SqlConnectionStringBuilder(configuredConnection)
         {
@@ -70,5 +74,13 @@ public sealed class DbFixture : IAsyncLifetime
         };
 
         return builder.ConnectionString;
+    }
+
+    private static IConfiguration BuildConfiguration()
+    {
+        return new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+            .Build();
     }
 }

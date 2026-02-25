@@ -1,11 +1,22 @@
 param(
-    [string]$HostName = '127.0.0.1',
-    [int]$Port = 5000
+    [string]$HostName,
+    [int]$Port
 )
 
 $ErrorActionPreference = 'Stop'
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $scriptDir
+$repoRoot = Resolve-Path (Join-Path $scriptDir '..\..')
+$settingsPath = Join-Path $repoRoot 'appsettings.json'
+$settings = Get-Content -Raw $settingsPath | ConvertFrom-Json
+
+if (-not $PSBoundParameters.ContainsKey('HostName')) {
+    $HostName = [string]$settings.S3.Moto.Host
+}
+
+if (-not $PSBoundParameters.ContainsKey('Port')) {
+    $Port = [int]$settings.S3.Moto.Port
+}
 
 $venvPython = Join-Path $scriptDir '.venv\Scripts\python.exe'
 if (-not (Test-Path $venvPython)) {

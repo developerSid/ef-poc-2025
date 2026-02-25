@@ -1,7 +1,6 @@
 import argparse
 import asyncio
 import logging
-import os
 import shutil
 import subprocess
 import sys
@@ -11,31 +10,43 @@ from uuid import uuid4
 
 import boto3
 from botocore.exceptions import ClientError
+from config_loader import get_default_config_path, get_required, load_config
 
 LOGGER = logging.getLogger("payeredi.s3service")
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(config: dict) -> argparse.Namespace:
+    script_dir = Path(__file__).resolve().parent
+    working_dir_default = str((script_dir / get_required(config, "Service.WorkingDir")).resolve())
+    temp_dir_default = str((script_dir / get_required(config, "Service.TempDir")).resolve())
+
     parser = argparse.ArgumentParser(
         description="Read EDI files from S3 (moto-compatible) and process them asynchronously."
     )
     parser.add_argument(
+        "--config",
+        default=str(get_default_config_path()),
+        help="Path to JSON configuration file.",
+    )
+    parser.add_argument(
         "--endpoint-url",
-        default=os.environ.get("PAYEREDI_S3_ENDPOINT", "http://127.0.0.1:5000"),
+        default=get_required(config, "S3.EndpointUrl"),
         help="S3 endpoint URL.",
     )
-    parser.add_argument("--region", default="us-east-1", help="AWS region.")
+    parser.add_argument("--region", default=get_required(config, "S3.Region"), help="AWS region.")
+    parser.add_argument("--access-key", default=get_required(config, "S3.AccessKey"), help="S3 access key.")
+    parser.add_argument("--secret-key", default=get_required(config, "S3.SecretKey"), help="S3 secret key.")
     parser.add_argument(
         "--bucket",
-        default=os.environ.get("PAYEREDI_S3_BUCKET", "payeredi-edi"),
+        default=get_required(config, "S3.Bucket"),
         help="Source S3 bucket.",
     )
     parser.add_argument(
         "--prefix",
-        default=os.environ.get("PAYEREDI_S3_PREFIX", ""),
+        default=get_required(config, "S3.Prefix"),
         help="Optional S3 key prefix.",
     )
-    parser.add_argument("--suffix", default=".edi", help="Only process keys that end with this suffix.")
+    parser.add_argument("--suffix", default=get_required(config, "S3.Suffix"), help="Only process keys that end with this suffix.")
     parser.add_argument(
         "--command",
         nargs="+",
@@ -44,34 +55,44 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--working-dir",
-        default=str(Path(__file__).resolve().parents[1]),
+        default=working_dir_default,
         help="Working directory for the ingestion command.",
     )
     parser.add_argument(
         "--temp-dir",
-        default=str(Path(__file__).resolve().parent / ".runtime-temp"),
+        default=temp_dir_default,
         help="Directory used for local temporary downloads.",
     )
-    parser.add_argument("--max-concurrency", type=int, default=4, help="Maximum files to process concurrently.")
-    parser.add_argument("--poll-interval-seconds", type=float, default=5.0, help="Polling interval when not running once.")
+    parser.add_argument(
+        "--max-concurrency",
+        type=int,
+        default=get_required(config, "Service.MaxConcurrency"),
+        help="Maximum files to process concurrently.",
+    )
+    parser.add_argument(
+        "--poll-interval-seconds",
+        type=float,
+        default=get_required(config, "Service.PollIntervalSeconds"),
+        help="Polling interval when not running once.",
+    )
     parser.add_argument("--once", action="store_true", help="Process available files once and exit.")
     parser.add_argument("--delete-after-process", action="store_true", help="Delete object after successful processing.")
     parser.add_argument(
         "--move-to-prefix",
-        default="",
+        default=get_required(config, "S3.MoveToPrefix"),
         help="Move processed objects to this prefix after success. Cannot be combined with --delete-after-process.",
     )
-    parser.add_argument("--log-level", default="INFO", help="Log level (DEBUG, INFO, WARNING, ERROR).")
+    parser.add_argument("--log-level", default=get_required(config, "Service.LogLevel"), help="Log level (DEBUG, INFO, WARNING, ERROR).")
     return parser.parse_args()
 
 
-def build_s3_client(endpoint_url: str, region: str):
+def build_s3_client(endpoint_url: str, region: str, access_key: str, secret_key: str):
     return boto3.client(
         "s3",
         endpoint_url=endpoint_url,
         region_name=region,
-        aws_access_key_id="test",
-        aws_secret_access_key="test",
+        aws_access_key_id=access_key,
+        aws_secret_access_key=secret_key,
     )
 
 
@@ -203,7 +224,10 @@ async def process_batch(
 
 
 async def run() -> int:
-    args = parse_args()
+    initial_config = load_config()
+    bootstrap_args = parse_args(initial_config)
+    args_config = load_config(Path(bootstrap_args.config))
+    args = parse_args(args_config)
 
     logging.basicConfig(
         level=getattr(logging, args.log_level.upper(), logging.INFO),
@@ -223,7 +247,7 @@ async def run() -> int:
     temp_root = Path(args.temp_dir).resolve()
     temp_root.mkdir(parents=True, exist_ok=True)
 
-    s3_client = build_s3_client(args.endpoint_url, args.region)
+    s3_client = build_s3_client(args.endpoint_url, args.region, args.access_key, args.secret_key)
 
     try:
         s3_client.head_bucket(Bucket=args.bucket)

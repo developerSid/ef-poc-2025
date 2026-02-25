@@ -138,6 +138,15 @@ public sealed class S3Consumer : IS3Consumer, IDisposable
 
     private static IAmazonS3 CreateClient(S3ConsumerOptions options)
     {
+        if (string.IsNullOrWhiteSpace(options.EndpointUrl))
+            throw new InvalidOperationException("Configuration key for S3 endpoint URL is required.");
+        if (string.IsNullOrWhiteSpace(options.Region))
+            throw new InvalidOperationException("Configuration key for S3 region is required.");
+        if (string.IsNullOrWhiteSpace(options.AccessKey))
+            throw new InvalidOperationException("Configuration key for S3 access key is required.");
+        if (string.IsNullOrWhiteSpace(options.SecretKey))
+            throw new InvalidOperationException("Configuration key for S3 secret key is required.");
+
         var config = new AmazonS3Config
         {
             ServiceURL = options.EndpointUrl,

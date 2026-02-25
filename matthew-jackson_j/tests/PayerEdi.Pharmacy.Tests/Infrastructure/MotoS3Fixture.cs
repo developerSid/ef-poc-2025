@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Net.Sockets;
+using Microsoft.Extensions.Configuration;
 using PayerEdi.Ingestion.Extensions;
 using PayerEdi.Ingestion.S3;
 
@@ -13,9 +14,10 @@ public sealed class MotoS3Fixture : IAsyncLifetime
     private Process? _motoProcess;
     private string _baseDirectory = string.Empty;
     private ServiceProvider _provider = default!;
+    private string _host = string.Empty;
 
     public int Port { get; private set; }
-    public string EndpointUrl => $"http://127.0.0.1:{Port}";
+    public string EndpointUrl => $"http://{_host}:{Port}";
 
     /// <summary>
     /// Resolves a service from the fixture provider.
@@ -31,6 +33,22 @@ public sealed class MotoS3Fixture : IAsyncLifetime
     /// <inheritdoc />
     public async ValueTask InitializeAsync()
     {
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+            .Build();
+
+        _host = configuration["S3:Moto:Host"]
+            ?? throw new InvalidOperationException("Configuration key 'S3:Moto:Host' is required.");
+        var region = configuration["S3:Region"]
+            ?? throw new InvalidOperationException("Configuration key 'S3:Region' is required.");
+        var accessKey = configuration["S3:AccessKey"]
+            ?? throw new InvalidOperationException("Configuration key 'S3:AccessKey' is required.");
+        var secretKey = configuration["S3:SecretKey"]
+            ?? throw new InvalidOperationException("Configuration key 'S3:SecretKey' is required.");
+        var startupTimeoutSeconds = configuration.GetValue<int?>("S3:Moto:StartupTimeoutSeconds")
+            ?? throw new InvalidOperationException("Configuration key 'S3:Moto:StartupTimeoutSeconds' is required.");
+
         _baseDirectory = ResolveRepositoryRoot();
         Port = GetFreePort();
 
@@ -52,7 +70,7 @@ public sealed class MotoS3Fixture : IAsyncLifetime
         var startInfo = new ProcessStartInfo
         {
             FileName = pythonPath,
-            Arguments = $"\"{motoPath}\" --host 127.0.0.1 --port {Port}",
+            Arguments = $"\"{motoPath}\" --host {_host} --port {Port}",
             WorkingDirectory = Path.GetDirectoryName(motoPath)!,
             UseShellExecute = false,
             RedirectStandardError = true,
@@ -62,18 +80,18 @@ public sealed class MotoS3Fixture : IAsyncLifetime
         _motoProcess = Process.Start(startInfo)
             ?? throw new InvalidOperationException("Unable to start moto process.");
 
-        await WaitForPortAsync(Port, TimeSpan.FromSeconds(10));
+        await WaitForPortAsync(_host, Port, TimeSpan.FromSeconds(startupTimeoutSeconds));
 
         var services = new ServiceCollection();
         services.AddS3Consumer(options =>
         {
             options.EndpointUrl = EndpointUrl;
-            options.Region = "us-east-1";
-            options.AccessKey = "test";
-            options.SecretKey = "test";
+            options.Region = region;
+            options.AccessKey = accessKey;
+            options.SecretKey = secretKey;
             options.ForcePathStyle = true;
         });
-        services.AddIngestionServices();
+        services.AddIngestionServices(configuration);
 
         _provider = services.BuildServiceProvider();
     }
@@ -119,7 +137,7 @@ public sealed class MotoS3Fixture : IAsyncLifetime
         return port;
     }
 
-    private static async Task WaitForPortAsync(int port, TimeSpan timeout)
+    private static async Task WaitForPortAsync(string host, int port, TimeSpan timeout)
     {
         var deadline = DateTime.UtcNow.Add(timeout);
         while (DateTime.UtcNow < deadline)
@@ -127,7 +145,7 @@ public sealed class MotoS3Fixture : IAsyncLifetime
             using var client = new TcpClient();
             try
             {
-                await client.ConnectAsync("127.0.0.1", port);
+                await client.ConnectAsync(host, port);
                 return;
             }
             catch (SocketException)

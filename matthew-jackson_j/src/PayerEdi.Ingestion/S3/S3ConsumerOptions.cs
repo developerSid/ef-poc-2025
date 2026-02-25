@@ -6,13 +6,13 @@ namespace PayerEdi.Ingestion.S3;
 public sealed class S3ConsumerOptions
 {
     /// <summary>S3-compatible service endpoint URL.</summary>
-    public string EndpointUrl { get; set; } = "http://127.0.0.1:5000";
+    public string EndpointUrl { get; set; } = string.Empty;
     /// <summary>AWS region used by the client.</summary>
-    public string Region { get; set; } = "us-east-1";
+    public string Region { get; set; } = string.Empty;
     /// <summary>Access key credential.</summary>
-    public string AccessKey { get; set; } = "test";
+    public string AccessKey { get; set; } = string.Empty;
     /// <summary>Secret key credential.</summary>
-    public string SecretKey { get; set; } = "test";
+    public string SecretKey { get; set; } = string.Empty;
     /// <summary>When true, bucket name is encoded in the request path.</summary>
-    public bool ForcePathStyle { get; set; } = true;
+    public bool ForcePathStyle { get; set; }
 }

@@ -1,12 +1,12 @@
 using EdiFabric;
 using EdiFabric.Templates.Hipaa5010;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PayerEdi.Ingestion.Extensions;
 using PayerEdi.Pharmacy.Data.Extensions;
 using PayerEdi.Pharmacy.Extensions;
 using PayerEdi.Pharmacy.Services;
 using Serilog;
-using DataStartup = PayerEdi.Pharmacy.Data.Extensions.Startup;
 
 namespace PayerEdi.EdiFabric.Console;
 
@@ -29,22 +29,34 @@ internal static class Program
         {
             Log.Information("Starting EDI ingestion console application.");
 
-            var serialKey = Environment.GetEnvironmentVariable("EDIFABRIC_SERIAL_KEY", EnvironmentVariableTarget.Machine);
+            var configuration = BuildConfiguration();
+            var serialKey = configuration["EdiFabric:SerialKey"];
 
             if (string.IsNullOrWhiteSpace(serialKey))
             {
-                Log.Error("Set EDIFABRIC_SERIAL_KEY to your EdiFabric serial key.");
+                Log.Error("Set 'EdiFabric:SerialKey' in appsettings.json.");
                 return 1;
             }
 
             SerialKey.Set(serialKey, false);
             Log.Information("EdiFabric serial key is configured.");
 
-            var connectionString = Environment.GetEnvironmentVariable("HIPAA_DB_CONNECTION", EnvironmentVariableTarget.Machine)
-                ?? DataStartup.BuildSqlExpressConnectionString("PayerEdiPharmacy");
+            var connectionString = configuration.GetConnectionString("HipaaDb");
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                Log.Error("Set 'ConnectionStrings:HipaaDb' in appsettings.json.");
+                return 1;
+            }
+
+            var samplePath = configuration["Ingestion:SampleFilePath"];
+            if (string.IsNullOrWhiteSpace(samplePath))
+            {
+                Log.Error("Set 'Ingestion:SampleFilePath' in appsettings.json.");
+                return 1;
+            }
 
             IServiceCollection services = new ServiceCollection();
-            services.AddIngestionServices();
+            services.AddIngestionServices(configuration);
             services.AddHipaa837pDbContext(_ => connectionString);
             services.AddPharmacyServices();
 
@@ -57,19 +69,17 @@ internal static class Program
             Log.Information("Running HIPAA 837P database migration.");
             await provider.MigrateHipaa837pAsync();
 
-            const string SamplePath = "837p-sample.edi";
-
-            if (!File.Exists(SamplePath))
+            if (!File.Exists(samplePath))
             {
-                Log.Error("Sample file not found at {SamplePath}", SamplePath);
+                Log.Error("Sample file not found at {SamplePath}", samplePath);
                 return 1;
             }
 
             await using var scope = provider.CreateAsyncScope();
             var ingestion = scope.ServiceProvider.GetRequiredService<IHipaa837pIngestionService>();
 
-            Log.Information("Ingesting sample file {SamplePath}.", SamplePath);
-            await using var stream = File.OpenRead(SamplePath);
+            Log.Information("Ingesting sample file {SamplePath}.", samplePath);
+            await using var stream = File.OpenRead(samplePath);
             var transactions = await ingestion.IngestAsync(stream);
 
             if (!transactions.Any(x => x.GetType() == typeof(TS837P)))
@@ -78,7 +88,7 @@ internal static class Program
                 return 1;
             }
 
-            Log.Information("Sample file {SamplePath} ingested with TS837P data.", SamplePath);
+            Log.Information("Sample file {SamplePath} ingested with TS837P data.", samplePath);
             return 0;
         }
         catch (Exception exception)
@@ -90,5 +100,13 @@ internal static class Program
         {
             Log.CloseAndFlush();
         }
+    }
+
+    private static IConfiguration BuildConfiguration()
+    {
+        return new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+            .Build();
     }
 }

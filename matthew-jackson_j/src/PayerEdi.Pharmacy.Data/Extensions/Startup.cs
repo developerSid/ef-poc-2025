@@ -16,10 +16,8 @@ public static class Startup
     /// <summary>
     /// Builds a SQL Server Express connection string with sane local defaults.
     /// </summary>
-    public static string BuildSqlExpressConnectionString(string databaseName, string? dataSource = null)
+    public static string BuildSqlExpressConnectionString(string databaseName, string dataSource)
     {
-        dataSource ??= @".\SQLEXPRESS";
-
         var builder = new SqlConnectionStringBuilder
         {
             DataSource = dataSource,

@@ -2,6 +2,7 @@
 
 ### Index
 Coding standards `docs/CODING_STANDARDS.md`
+Configuration reference `docs/CONFIGURATION.md`
 Database migrations `docs/DB_MIGRATIONS.md` 
 DbContext metadata reporter `docs/DBCONTEXT_METADATA_REPORTER.md`
 Scope `docs/STATEMENT_OF_WORK.md`
@@ -16,18 +17,12 @@ EdiFabric SNIP levels `docs/EDIFABRIC_SNIP_LEVELS.md`
 3. Install `Python 3.12+` for Phase 2 S3 integration scripts.
 4. Obtain an EdiFabric serial key.
 
-## Required Environment Variables
-1. Set `EDIFABRIC_SERIAL_KEY` as a machine environment variable (required for ingestion).
-2. Optional: set `HIPAA_DB_CONNECTION` as a machine environment variable if you do not want default SQL settings.
-3. If `HIPAA_DB_CONNECTION` is not set, the app uses:
-   `Server=.\SQLEXPRESS;Database=PayerEdiPharmacy;Trusted_Connection=True;TrustServerCertificate=True;`
-
-PowerShell example:
-
-```powershell
-setx EDIFABRIC_SERIAL_KEY "<your-serial-key>" /M
-setx HIPAA_DB_CONNECTION "Server=.\SQLEXPRESS;Database=PayerEdiPharmacy;Trusted_Connection=True;TrustServerCertificate=True;" /M
-```
+## Configuration
+1. Configure application settings in the repository root `appsettings.json`.
+2. Required keys for local ingestion:
+   - `EdiFabric:SerialKey`
+   - `ConnectionStrings:HipaaDb`
+3. See `docs/CONFIGURATION.md` for the full key reference in colon notation.
 
 ## Phase 1 Run (SQL + Ingestion)
 1. `dotnet restore`
@@ -40,7 +35,7 @@ setx HIPAA_DB_CONNECTION "Server=.\SQLEXPRESS;Database=PayerEdiPharmacy;Trusted_
 ## Run Tests
 1. Ensure prerequisites are in place for the full test suite:
    - `SQL Server Express` is running.
-   - `EDIFABRIC_SERIAL_KEY` is set.
+   - `EdiFabric:SerialKey` is set in `appsettings.json`.
    - `src/PayerEdi.S3Service/.venv` exists (run `cd src/PayerEdi.S3Service; .\setup.ps1` once).
 2. Run `dotnet test` from repo root.
 3. Record summary results in `docs/testing.md` (do not paste full raw console logs).

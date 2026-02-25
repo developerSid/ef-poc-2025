@@ -1,6 +1,7 @@
 using PayerEdi.Ingestion.Extensions;
 using PayerEdi.Pharmacy.Data.Extensions;
 using PayerEdi.Pharmacy.Extensions;
+using Microsoft.Extensions.Configuration;
 
 namespace PayerEdi.Pharmacy.Tests.Extensions;
 
@@ -14,6 +15,7 @@ public static class Startup
     /// </summary>
     public static void AddTestServices(this IServiceCollection services, DbFixture fixture)
     {
+        var configuration = BuildConfiguration();
         services.AddSingleton(fixture);
 
         services.AddHipaa837pDbContext(sp =>
@@ -22,7 +24,7 @@ public static class Startup
             return dbFixture.ConnectionString;
         });
 
-        services.AddIngestionServices();
+        services.AddIngestionServices(configuration);
         services.AddPharmacyServices();
     }
 
@@ -57,5 +59,13 @@ public static class Startup
     public static async Task MigrateTestDatabaseAsync(this IServiceProvider provider, CancellationToken cancellationToken = default)
     {
         await provider.MigrateHipaa837pAsync(cancellationToken);
+    }
+
+    private static IConfiguration BuildConfiguration()
+    {
+        return new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+            .Build();
     }
 }

@@ -27,9 +27,8 @@ For Visual Studio:
 - Default Run values (when no args are passed):
   - `--host 127.0.0.1`
   - `--port 5000`
-- Override defaults with environment variables:
-  - `PAYEREDI_S3_HOST`
-  - `PAYEREDI_S3_PORT`
+- Defaults are loaded from root `appsettings.json` (`S3:Moto:Host`, `S3:Moto:Port`).
+- See `docs/CONFIGURATION.md` for full configuration keys.
 
 If setup says Python is missing, install it once:
 

@@ -1,5 +1,6 @@
 using EdiFabric.Templates.Hipaa5010;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PayerEdi.Ingestion.Extensions;
@@ -12,7 +13,6 @@ using Serilog;
 using System.Diagnostics;
 using System.Globalization;
 using System.Net.Sockets;
-using DataStartup = PayerEdi.Pharmacy.Data.Extensions.Startup;
 
 namespace PayerEdi.EdiFabric.MotoConsole;
 
@@ -35,8 +35,12 @@ internal static class Program
 
         try
         {
-            var options = MotoOptions.FromArgs(args);
-            var connectionString = ResolveConnectionString();
+            var configuration = BuildConfiguration();
+            var options = MotoOptions.FromConfiguration(configuration, args);
+            var connectionString = configuration.GetConnectionString("HipaaDb");
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new InvalidOperationException("Configuration key 'ConnectionStrings:HipaaDb' is required.");
+
             motoProcess = new MotoProcess(options);
             await motoProcess.StartAsync();
 
@@ -46,7 +50,7 @@ internal static class Program
                 logging.ClearProviders();
                 logging.AddSerilog(Log.Logger, dispose: false);
             });
-            services.AddIngestionServices();
+            services.AddIngestionServices(configuration);
             services.AddHipaa837pDbContext(_ => connectionString);
             services.AddPharmacyServices();
             services.AddSingleton(options);
@@ -83,14 +87,12 @@ internal static class Program
         }
     }
 
-    private static string ResolveConnectionString()
+    private static IConfiguration BuildConfiguration()
     {
-        var configuredConnection = Environment.GetEnvironmentVariable("HIPAA_DB_CONNECTION", EnvironmentVariableTarget.Process)
-            ?? Environment.GetEnvironmentVariable("HIPAA_DB_CONNECTION", EnvironmentVariableTarget.Machine);
-
-        return string.IsNullOrWhiteSpace(configuredConnection)
-            ? DataStartup.BuildSqlExpressConnectionString("PayerEdiPharmacy")
-            : configuredConnection;
+        return new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+            .Build();
     }
 }
 
@@ -102,8 +104,6 @@ internal sealed class MotoConsoleRunner(
     IServiceProvider provider,
     MotoOptions options)
 {
-    private const string SampleFileName = "837p-sample.edi";
-
     /// <summary>
     /// Executes the end-to-end moto ingestion workflow and verifies SQL persistence.
     /// </summary>
@@ -120,20 +120,20 @@ internal sealed class MotoConsoleRunner(
 
         await s3.EnsureBucketExistsAsync(options.Bucket);
 
-        var samplePath = Path.Combine(AppContext.BaseDirectory, SampleFileName);
+        var samplePath = Path.Combine(AppContext.BaseDirectory, options.SampleFileName);
         if (!File.Exists(samplePath))
             throw new FileNotFoundException($"Sample file not found at '{samplePath}'.", samplePath);
 
-        var inboundPrefix = options.InboundPrefix.Trim('/');
+        var inboundPrefix = options.Prefix.Trim('/');
         var inboundKey = string.IsNullOrWhiteSpace(inboundPrefix)
-            ? SampleFileName
-            : $"{inboundPrefix}/{SampleFileName}";
+            ? options.SampleFileName
+            : $"{inboundPrefix}/{options.SampleFileName}";
 
         await using (var sampleStream = File.OpenRead(samplePath))
         {
             await s3.UploadAsync(options.Bucket, inboundKey, sampleStream);
         }
-        logger.LogInformation("Uploaded '{SampleFile}' to s3://{Bucket}/{Key}", SampleFileName, options.Bucket, inboundKey);
+        logger.LogInformation("Uploaded '{SampleFile}' to s3://{Bucket}/{Key}", options.SampleFileName, options.Bucket, inboundKey);
 
         var payload = await s3.DownloadAsync(options.Bucket, inboundKey);
         await using var ediStream = new MemoryStream(payload);
@@ -157,34 +157,55 @@ internal sealed class MotoConsoleRunner(
 /// </summary>
 internal sealed class MotoOptions
 {
-    public string EndpointUrl { get; init; } = "http://127.0.0.1:5000";
-    public string Region { get; init; } = "us-east-1";
-    public string AccessKey { get; init; } = "test";
-    public string SecretKey { get; init; } = "test";
-    public string Bucket { get; init; } = "payeredi-edi";
-    public string InboundPrefix { get; init; } = "inbound";
-    public bool StartMoto { get; init; } = false;
-    public bool KillExistingMoto { get; init; } = false;
-    public bool KillMotoOnExit { get; init; } = false;
+    public string EndpointUrl { get; init; } = string.Empty;
+    public string Region { get; init; } = string.Empty;
+    public string AccessKey { get; init; } = string.Empty;
+    public string SecretKey { get; init; } = string.Empty;
+    public string Bucket { get; init; } = string.Empty;
+    public string Prefix { get; init; } = string.Empty;
+    public string SampleFileName { get; init; } = string.Empty;
+    public bool StartMoto { get; init; }
+    public bool KillExistingMoto { get; init; }
+    public bool KillMotoOnExit { get; init; }
 
     /// <summary>
-    /// Parses CLI flags into strongly typed options.
+    /// Loads options from configuration and applies CLI overrides.
     /// </summary>
-    public static MotoOptions FromArgs(string[] args)
+    public static MotoOptions FromConfiguration(IConfiguration configuration, string[] args)
     {
-        var values = ParseArgs(args);
-        return new MotoOptions
+        var s3Section = configuration.GetSection("S3");
+        var motoSection = s3Section.GetSection("Moto");
+        var configured = new MotoOptions
         {
-            EndpointUrl = GetArg(values, "--endpoint") ?? "http://127.0.0.1:5000",
-            Region = GetArg(values, "--region") ?? "us-east-1",
-            AccessKey = GetArg(values, "--access-key") ?? "test",
-            SecretKey = GetArg(values, "--secret-key") ?? "test",
-            Bucket = GetArg(values, "--bucket") ?? "payeredi-edi",
-            InboundPrefix = GetArg(values, "--prefix") ?? "inbound",
-            StartMoto = ParseBoolean(GetArg(values, "--start-moto"), false),
-            KillExistingMoto = ParseBoolean(GetArg(values, "--kill-existing-moto"), false),
-            KillMotoOnExit = ParseBoolean(GetArg(values, "--kill-moto-on-exit"), false)
+            EndpointUrl = s3Section["EndpointUrl"] ?? string.Empty,
+            Region = s3Section["Region"] ?? string.Empty,
+            AccessKey = s3Section["AccessKey"] ?? string.Empty,
+            SecretKey = s3Section["SecretKey"] ?? string.Empty,
+            Bucket = s3Section["Bucket"] ?? string.Empty,
+            Prefix = s3Section["Prefix"] ?? string.Empty,
+            SampleFileName = configuration["Ingestion:SampleFilePath"] ?? string.Empty,
+            StartMoto = motoSection.GetValue<bool?>("StartMoto") ?? false,
+            KillExistingMoto = motoSection.GetValue<bool?>("KillExistingMoto") ?? false,
+            KillMotoOnExit = motoSection.GetValue<bool?>("KillMotoOnExit") ?? false
         };
+
+        var values = ParseArgs(args);
+        var options = new MotoOptions
+        {
+            EndpointUrl = GetArg(values, "--endpoint") ?? configured.EndpointUrl,
+            Region = GetArg(values, "--region") ?? configured.Region,
+            AccessKey = GetArg(values, "--access-key") ?? configured.AccessKey,
+            SecretKey = GetArg(values, "--secret-key") ?? configured.SecretKey,
+            Bucket = GetArg(values, "--bucket") ?? configured.Bucket,
+            Prefix = GetArg(values, "--prefix") ?? configured.Prefix,
+            SampleFileName = GetArg(values, "--sample-file") ?? configured.SampleFileName,
+            StartMoto = ParseBoolean(GetArg(values, "--start-moto"), configured.StartMoto),
+            KillExistingMoto = ParseBoolean(GetArg(values, "--kill-existing-moto"), configured.KillExistingMoto),
+            KillMotoOnExit = ParseBoolean(GetArg(values, "--kill-moto-on-exit"), configured.KillMotoOnExit)
+        };
+
+        Validate(options);
+        return options;
     }
 
     private static Dictionary<string, string> ParseArgs(string[] args)
@@ -215,6 +236,24 @@ internal sealed class MotoOptions
             return parsed;
 
         return fallback;
+    }
+
+    private static void Validate(MotoOptions options)
+    {
+        if (string.IsNullOrWhiteSpace(options.EndpointUrl))
+            throw new InvalidOperationException("Configuration key 'S3:EndpointUrl' is required.");
+        if (string.IsNullOrWhiteSpace(options.Region))
+            throw new InvalidOperationException("Configuration key 'S3:Region' is required.");
+        if (string.IsNullOrWhiteSpace(options.AccessKey))
+            throw new InvalidOperationException("Configuration key 'S3:AccessKey' is required.");
+        if (string.IsNullOrWhiteSpace(options.SecretKey))
+            throw new InvalidOperationException("Configuration key 'S3:SecretKey' is required.");
+        if (string.IsNullOrWhiteSpace(options.Bucket))
+            throw new InvalidOperationException("Configuration key 'S3:Bucket' is required.");
+        if (string.IsNullOrWhiteSpace(options.Prefix))
+            throw new InvalidOperationException("Configuration key 'S3:Prefix' is required.");
+        if (string.IsNullOrWhiteSpace(options.SampleFileName))
+            throw new InvalidOperationException("Configuration key 'Ingestion:SampleFilePath' is required.");
     }
 }
 

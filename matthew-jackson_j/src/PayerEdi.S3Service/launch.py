@@ -1,15 +1,16 @@
-import os
 import subprocess
 import sys
 from pathlib import Path
+from config_loader import get_required, load_config
 
 
 def main() -> int:
     script_dir = Path(__file__).resolve().parent
     moto_script = script_dir / "run_moto_s3.py"
     venv_python = script_dir / ".venv" / "Scripts" / "python.exe"
-    host = os.environ.get("PAYEREDI_S3_HOST", "127.0.0.1")
-    port = os.environ.get("PAYEREDI_S3_PORT", "5000")
+    config = load_config()
+    host = str(get_required(config, "S3.Moto.Host"))
+    port = str(get_required(config, "S3.Moto.Port"))
 
     python_executable = str(venv_python if venv_python.exists() else Path(sys.executable))
 

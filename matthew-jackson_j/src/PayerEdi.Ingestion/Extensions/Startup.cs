@@ -1,4 +1,5 @@
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PayerEdi.Ingestion.Reader;
 using PayerEdi.Ingestion.S3;
@@ -15,8 +16,11 @@ public static class Startup
     /// <summary>
     /// Adds core ingestion services used for stream sniffing, reader creation, and token setup.
     /// </summary>
-    public static void AddIngestionServices(this IServiceCollection services)
+    public static void AddIngestionServices(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddOptions<EdiFabricOptions>()
+            .Bind(configuration.GetSection(EdiFabricOptions.SectionName));
+
         if (!services.Any(d => d.ServiceType == typeof(IEdiReaderSniffer)))
             services.AddSingleton<IEdiReaderSniffer, EdiReaderSniffer>();
 

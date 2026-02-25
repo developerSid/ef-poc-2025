@@ -24,12 +24,16 @@ dotnet ef --version
 
 ## Configure the Database Connection
 
-Set the connection string using the `HIPAA_DB_CONNECTION` environment variable.
+Set the runtime connection string in repository root `appsettings.json`:
 
-### PowerShell (per shell)
+- `ConnectionStrings:HipaaDb`
 
-```powershell
-setx HIPAA_DB_CONNECTION "Server=.\SQLEXPRESS;Database=HipaaDev;Trusted_Connection=True;TrustServerCertificate=True;" /M
+Example value:
+
+```json
+"ConnectionStrings": {
+  "HipaaDb": "Server=.\\SQLEXPRESS;Database=HipaaDev;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=True;"
+}
 ```
 
 You may change the database name (`HipaaDev`) as needed.

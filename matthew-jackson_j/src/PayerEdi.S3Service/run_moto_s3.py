@@ -1,12 +1,15 @@
 import argparse
 
 from moto.server import main as moto_server_main
+from config_loader import get_required, load_config
 
 
 def parse_args() -> argparse.Namespace:
+    config = load_config()
+
     parser = argparse.ArgumentParser(description="Run a local moto S3 server.")
-    parser.add_argument("--host", default="127.0.0.1", help="Bind host.")
-    parser.add_argument("--port", default="5000", help="Bind port.")
+    parser.add_argument("--host", default=str(get_required(config, "S3.Moto.Host")), help="Bind host.")
+    parser.add_argument("--port", default=str(get_required(config, "S3.Moto.Port")), help="Bind port.")
     return parser.parse_args()
 
 

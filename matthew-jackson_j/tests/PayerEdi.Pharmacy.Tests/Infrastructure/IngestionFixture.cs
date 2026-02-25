@@ -1,4 +1,5 @@
 using PayerEdi.Ingestion.Extensions;
+using Microsoft.Extensions.Configuration;
 
 namespace PayerEdi.Pharmacy.Tests.Infrastructure;
 
@@ -17,8 +18,13 @@ public sealed class IngestionFixture : IAsyncLifetime
     /// <inheritdoc />
     public ValueTask InitializeAsync()
     {
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
+            .Build();
+
         IServiceCollection services = new ServiceCollection();
-        services.AddIngestionServices();
+        services.AddIngestionServices(configuration);
 
         _provider = services.BuildServiceProvider(new ServiceProviderOptions
         {
