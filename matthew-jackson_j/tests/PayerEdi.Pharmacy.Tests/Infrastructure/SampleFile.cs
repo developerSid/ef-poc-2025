@@ -10,6 +10,17 @@ public static class SampleFile
     private static readonly Assembly Assembly = typeof(SampleFile).Assembly;
 
     /// <summary>
+    /// Reads an embedded sample file by filename suffix.
+    /// </summary>
+    public static byte[] ReadAllBytes(string fileName)
+    {
+        using var stream = Open(fileName);
+        using var memory = new MemoryStream();
+        stream.CopyTo(memory);
+        return memory.ToArray();
+    }
+
+    /// <summary>
     /// Opens an embedded sample file stream by filename suffix.
     /// </summary>
     public static Stream Open(string fileName)

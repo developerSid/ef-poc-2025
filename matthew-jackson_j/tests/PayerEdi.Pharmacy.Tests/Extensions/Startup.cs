@@ -1,4 +1,5 @@
 using PayerEdi.Ingestion.Extensions;
+using PayerEdi.Ingestion.IO;
 using PayerEdi.Pharmacy.Data.Extensions;
 using PayerEdi.Pharmacy.Extensions;
 using Microsoft.Extensions.Configuration;
@@ -26,6 +27,8 @@ public static class Startup
 
         services.AddIngestionServices(configuration);
         services.AddPharmacyServices();
+        services.AddScoped<TestFileService>();
+        services.AddScoped<IFileService>(sp => sp.GetRequiredService<TestFileService>());
     }
 
     /// <summary>

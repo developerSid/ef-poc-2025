@@ -70,11 +70,12 @@ public sealed class MotoS3EdiFileTests(DbFixture dbFixture, MotoS3Fixture fixtur
         }
 
         var payload = await consumer.DownloadAsync(Bucket, Key, cancellationToken);
-        await using var stream = new MemoryStream(payload);
 
         using var scope = dbFixture.CreateScope();
         var ingestion = scope.ServiceProvider.GetRequiredService<IHipaa837pIngestionService>();
-        var items = await ingestion.IngestAsync(stream, cancellationToken);
+        var files = scope.ServiceProvider.GetRequiredService<TestFileService>();
+        await files.PushAsync(Bucket, Key, payload, cancellationToken);
+        var items = await ingestion.IngestAsync(Bucket, Key, cancellationToken);
 
         Assert.Equal(5, items.Count);
         var transaction = Assert.Single(items.OfType<TS837P>());

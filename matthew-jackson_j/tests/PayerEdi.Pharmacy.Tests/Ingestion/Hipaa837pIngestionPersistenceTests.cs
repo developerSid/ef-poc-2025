@@ -8,6 +8,8 @@ namespace PayerEdi.Pharmacy.Tests.Ingestion;
 /// </summary>
 public sealed class Hipaa837pIngestionPersistenceTests(DbFixture fixture) : DbTestBase(fixture)
 {
+    private const string TestBucket = "unit-tests";
+
     /// <summary>
     /// Runs full 837P ingestion and asserts key header segments and transaction persistence match expectations.
     /// </summary>
@@ -15,10 +17,12 @@ public sealed class Hipaa837pIngestionPersistenceTests(DbFixture fixture) : DbTe
     [InlineData("837p-sample.edi")]
     public async Task TS837PIngestionFinishes(string resourceName)
     {
-        using var stream = SampleFile.Open(resourceName);
+        var payload = SampleFile.ReadAllBytes(resourceName);
+        var key = resourceName;
 
         var ingestion = GetService<IHipaa837pIngestionService>();
-        var expectedItems = await ingestion.IngestAsync(stream, CancellationToken);
+        await GetService<TestFileService>().PushAsync(TestBucket, key, payload, CancellationToken);
+        var expectedItems = await ingestion.IngestAsync(TestBucket, key, CancellationToken);
         Assert.Equal(5, expectedItems.Count);
         var expected = Assert.Single(expectedItems.OfType<TS837P>());
         Assert.True(expected.Id > 0);
@@ -65,11 +69,13 @@ public sealed class Hipaa837pIngestionPersistenceTests(DbFixture fixture) : DbTe
     [Fact]
     public async Task IngestWhenInputIsNotEdiThrowsAndPersistsNothing()
     {
-        using var stream = new MemoryStream("not-an-edi-payload"u8.ToArray());
+        var payload = "not-an-edi-payload"u8.ToArray();
+        const string Key = "invalid.edi";
 
         var ingestion = GetService<IHipaa837pIngestionService>();
+        await GetService<TestFileService>().PushAsync(TestBucket, Key, payload, CancellationToken);
 
-        await Assert.ThrowsAsync<NotSupportedException>(() => ingestion.IngestAsync(stream, CancellationToken));
+        await Assert.ThrowsAsync<NotSupportedException>(() => ingestion.IngestAsync(TestBucket, Key, CancellationToken));
 
         using var reloadContext = GetService<Hipaa837pDbContext>();
         var persistedTransactions = await reloadContext.Set<TS837P>().CountAsync(CancellationToken);
@@ -83,10 +89,12 @@ public sealed class Hipaa837pIngestionPersistenceTests(DbFixture fixture) : DbTe
     [InlineData("837i-sample.edi")]
     public async Task TS837IReadFinishes(string resourceName)
     {
-        using var stream = SampleFile.Open(resourceName);
+        var payload = SampleFile.ReadAllBytes(resourceName);
+        var key = resourceName;
 
         var ingestion = GetService<IHipaa837pIngestionService>();
-        var expectedItems = await ingestion.IngestAsync(stream, CancellationToken);
+        await GetService<TestFileService>().PushAsync(TestBucket, key, payload, CancellationToken);
+        var expectedItems = await ingestion.IngestAsync(TestBucket, key, CancellationToken);
         Assert.Equal(5, expectedItems.Count);
         var expected = Assert.Single(expectedItems.OfType<TS837I>());
         Assert.True(expected.Id > 0);
@@ -99,10 +107,12 @@ public sealed class Hipaa837pIngestionPersistenceTests(DbFixture fixture) : DbTe
     [InlineData("837-sample.edi")]
     public async Task TS837DReadFinishes(string resourceName)
     {
-        using var stream = SampleFile.Open(resourceName);
+        var payload = SampleFile.ReadAllBytes(resourceName);
+        var key = resourceName;
 
         var ingestion = GetService<IHipaa837pIngestionService>();
-        var expectedItems = await ingestion.IngestAsync(stream, CancellationToken);
+        await GetService<TestFileService>().PushAsync(TestBucket, key, payload, CancellationToken);
+        var expectedItems = await ingestion.IngestAsync(TestBucket, key, CancellationToken);
         Assert.Equal(5, expectedItems.Count);
         var expected = Assert.Single(expectedItems.OfType<TS837D>());
         Assert.True(expected.Id > 0);

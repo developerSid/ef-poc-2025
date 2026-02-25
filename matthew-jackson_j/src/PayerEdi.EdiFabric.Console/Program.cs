@@ -3,6 +3,7 @@ using EdiFabric.Templates.Hipaa5010;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PayerEdi.Ingestion.Extensions;
+using PayerEdi.Ingestion.IO;
 using PayerEdi.Pharmacy.Data.Extensions;
 using PayerEdi.Pharmacy.Extensions;
 using PayerEdi.Pharmacy.Services;
@@ -59,6 +60,7 @@ internal static class Program
             services.AddIngestionServices(configuration);
             services.AddHipaa837pDbContext(_ => connectionString);
             services.AddPharmacyServices();
+            services.AddScoped<IFileService, ConsoleFileService>();
 
             await using var provider = services.BuildServiceProvider(new ServiceProviderOptions
             {
@@ -69,18 +71,23 @@ internal static class Program
             Log.Information("Running HIPAA 837P database migration.");
             await provider.MigrateHipaa837pAsync();
 
-            if (!File.Exists(samplePath))
+            await using var scope = provider.CreateAsyncScope();
+            var ingestion = scope.ServiceProvider.GetRequiredService<IHipaa837pIngestionService>();
+            var fileService = scope.ServiceProvider.GetRequiredService<IFileService>();
+            var fullSamplePath = Path.GetFullPath(samplePath);
+            var bucket = Path.GetDirectoryName(fullSamplePath)
+                ?? throw new InvalidOperationException($"Unable to resolve sample directory from '{samplePath}'.");
+            var key = Path.GetFileName(fullSamplePath);
+
+            Log.Information("Ingesting sample file {SamplePath}.", samplePath);
+            var keys = await fileService.ListAsync(bucket);
+            if (!keys.Contains(key, StringComparer.OrdinalIgnoreCase))
             {
-                Log.Error("Sample file not found at {SamplePath}", samplePath);
+                Log.Error("Sample file '{SamplePath}' was not found in bucket '{Bucket}'.", samplePath, bucket);
                 return 1;
             }
 
-            await using var scope = provider.CreateAsyncScope();
-            var ingestion = scope.ServiceProvider.GetRequiredService<IHipaa837pIngestionService>();
-
-            Log.Information("Ingesting sample file {SamplePath}.", samplePath);
-            await using var stream = File.OpenRead(samplePath);
-            var transactions = await ingestion.IngestAsync(stream);
+            var transactions = await ingestion.IngestAsync(bucket, key);
 
             if (!transactions.Any(x => x.GetType() == typeof(TS837P)))
             {

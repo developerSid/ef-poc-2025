@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PayerEdi.Ingestion.Extensions;
+using PayerEdi.Ingestion.IO;
 using PayerEdi.Ingestion.S3;
 using PayerEdi.Pharmacy.Data.Extensions;
 using PayerEdi.Pharmacy.Data.Hipaa837p;
@@ -53,6 +54,7 @@ internal static class Program
             services.AddIngestionServices(configuration);
             services.AddHipaa837pDbContext(_ => connectionString);
             services.AddPharmacyServices();
+            services.AddScoped<IFileService, MotoFileService>();
             services.AddSingleton(options);
             services.AddSingleton<MotoConsoleRunner>();
             services.AddS3Consumer(configure =>
@@ -114,11 +116,9 @@ internal sealed class MotoConsoleRunner(
         await provider.MigrateHipaa837pAsync();
 
         await using var scope = provider.CreateAsyncScope();
-        var s3 = scope.ServiceProvider.GetRequiredService<IS3Consumer>();
+        var fileService = scope.ServiceProvider.GetRequiredService<IFileService>();
         var ingestion = scope.ServiceProvider.GetRequiredService<IHipaa837pIngestionService>();
         var dbContext = scope.ServiceProvider.GetRequiredService<Hipaa837pDbContext>();
-
-        await s3.EnsureBucketExistsAsync(options.Bucket);
 
         var samplePath = Path.Combine(AppContext.BaseDirectory, options.SampleFileName);
         if (!File.Exists(samplePath))
@@ -129,16 +129,14 @@ internal sealed class MotoConsoleRunner(
             ? options.SampleFileName
             : $"{inboundPrefix}/{options.SampleFileName}";
 
-        await using (var sampleStream = File.OpenRead(samplePath))
-        {
-            await s3.UploadAsync(options.Bucket, inboundKey, sampleStream);
-        }
-        logger.LogInformation("Uploaded '{SampleFile}' to s3://{Bucket}/{Key}", options.SampleFileName, options.Bucket, inboundKey);
+        var samplePayload = await File.ReadAllBytesAsync(samplePath);
+        await fileService.PushAsync(options.Bucket, inboundKey, samplePayload);
 
-        var payload = await s3.DownloadAsync(options.Bucket, inboundKey);
-        await using var ediStream = new MemoryStream(payload);
+        var keys = await fileService.ListAsync(options.Bucket);
+        if (!keys.Contains(inboundKey, StringComparer.Ordinal))
+            throw new InvalidOperationException($"Uploaded key '{inboundKey}' was not found in bucket '{options.Bucket}'.");
 
-        var items = await ingestion.IngestAsync(ediStream);
+        var items = await ingestion.IngestAsync(options.Bucket, inboundKey);
         var ingested = items.OfType<TS837P>().SingleOrDefault();
         if (ingested is null)
             throw new InvalidOperationException("Ingestion did not return a TS837P transaction.");
