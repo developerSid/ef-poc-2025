@@ -1,8 +1,9 @@
+using Microsoft.Extensions.Logging;
 using PayerEdi.Ingestion.IO;
 
 namespace PayerEdi.EdiFabric.Console;
 
-internal sealed class ConsoleFileService : IFileService
+internal sealed class ConsoleFileService(ILogger<ConsoleFileService> logger) : IFileService
 {
     public async Task PushAsync(string bucket, string key, byte[] payload, CancellationToken cancellationToken = default)
     {
@@ -15,6 +16,7 @@ internal sealed class ConsoleFileService : IFileService
             ?? throw new InvalidOperationException($"Unable to resolve directory for '{path}'.");
         Directory.CreateDirectory(directory);
         await File.WriteAllBytesAsync(path, payload, cancellationToken);
+        logger.LogInformation("Pushed local file '{Key}' to bucket '{Bucket}'.", key, bucket);
     }
 
     public Task<byte[]> PullAsync(string bucket, string key, CancellationToken cancellationToken = default)
@@ -24,6 +26,7 @@ internal sealed class ConsoleFileService : IFileService
         var path = ResolvePath(bucket, key);
         if (!File.Exists(path))
             throw new FileNotFoundException($"File not found at '{path}'.", path);
+        logger.LogInformation("Pulled local file '{Key}' from bucket '{Bucket}'.", key, bucket);
         return File.ReadAllBytesAsync(path, cancellationToken);
     }
 
@@ -38,6 +41,7 @@ internal sealed class ConsoleFileService : IFileService
             .GetFiles(bucketRoot, "*", SearchOption.AllDirectories)
             .Select(file => Path.GetRelativePath(bucketRoot, file).Replace('\\', '/'))
             .ToArray();
+        logger.LogInformation("Listed {Count} local file(s) in bucket '{Bucket}'.", keys.Length, bucket);
         return Task.FromResult<IReadOnlyList<string>>(keys);
     }
 

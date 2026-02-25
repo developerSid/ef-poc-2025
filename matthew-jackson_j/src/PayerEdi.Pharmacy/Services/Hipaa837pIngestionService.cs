@@ -1,4 +1,5 @@
 using EdiFabric.Core.Model.Edi;
+using Microsoft.Extensions.Logging;
 using PayerEdi.Ingestion.IO;
 using PayerEdi.Ingestion.Reader;
 using PayerEdi.Ingestion.Tokens;
@@ -10,6 +11,7 @@ namespace PayerEdi.Pharmacy.Services;
 /// Parses 837P content and persists EF-mapped parsed items in a single database transaction.
 /// </summary>
 public sealed class Hipaa837pIngestionService(
+    ILogger<Hipaa837pIngestionService> logger,
     IFileService fileService,
     IEdiReaderFactory readerFactory,
     IEdiTokenProvider tokenProvider,
@@ -21,6 +23,7 @@ public sealed class Hipaa837pIngestionService(
         ArgumentException.ThrowIfNullOrWhiteSpace(bucket);
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
 
+        logger.LogInformation("Starting ingestion for bucket '{Bucket}' key '{Key}'.", bucket, key);
         tokenProvider.InitToken();
 
         var payload = await fileService.PullAsync(bucket, key, cancellationToken);
@@ -28,6 +31,7 @@ public sealed class Hipaa837pIngestionService(
 
         using var reader = readerFactory.Create(stream);
         var items = reader.ReadAll();
+        logger.LogInformation("Parsed {Count} EDI item(s) from bucket '{Bucket}' key '{Key}'.", items.Count, bucket, key);
 
         using var scope = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
@@ -42,6 +46,7 @@ public sealed class Hipaa837pIngestionService(
 
         await dbContext.SaveChangesAsync(cancellationToken);
         await scope.CommitAsync(cancellationToken);
+        logger.LogInformation("Persisted ingestion results for bucket '{Bucket}' key '{Key}'.", bucket, key);
 
         return items;
     }

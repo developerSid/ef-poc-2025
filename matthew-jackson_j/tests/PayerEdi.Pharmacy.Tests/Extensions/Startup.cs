@@ -24,6 +24,7 @@ public static class Startup
             var dbFixture = sp.GetRequiredService<DbFixture>();
             return dbFixture.ConnectionString;
         });
+        services.AddLogging();
 
         services.AddIngestionServices(configuration);
         services.AddPharmacyServices();

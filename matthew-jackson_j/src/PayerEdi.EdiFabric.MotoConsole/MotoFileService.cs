@@ -25,12 +25,14 @@ internal sealed class MotoFileService(
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(bucket);
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
+        logger.LogInformation("Pulling s3://{Bucket}/{Key}", bucket, key);
         return s3Consumer.DownloadAsync(bucket, key, cancellationToken);
     }
 
     public Task<IReadOnlyList<string>> ListAsync(string bucket, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(bucket);
+        logger.LogInformation("Listing files in bucket '{Bucket}'.", bucket);
         return s3Consumer.ListKeysAsync(bucket, string.Empty, cancellationToken);
     }
 }

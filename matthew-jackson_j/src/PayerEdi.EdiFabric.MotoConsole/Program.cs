@@ -27,29 +27,40 @@ internal static class Program
     /// </summary>
     static async Task<int> Main(string[] args)
     {
-        Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Information()
-            .WriteTo.Console()
-            .CreateLogger();
+        var configuration = BuildConfiguration();
+        var serilogLogger = CreateSerilogLogger(configuration);
+        using var loggerFactory = new Serilog.Extensions.Logging.SerilogLoggerFactory(serilogLogger, dispose: false);
+        var logger = loggerFactory.CreateLogger("PayerEdi.EdiFabric.MotoConsole");
 
         MotoProcess? motoProcess = null;
 
         try
         {
-            var configuration = BuildConfiguration();
+            logger.LogInformation("Starting moto console application.");
+            logger.LogInformation("Loaded configuration from base directory '{BaseDirectory}'.", AppContext.BaseDirectory);
+
             var options = MotoOptions.FromConfiguration(configuration, args);
+            logger.LogInformation(
+                "Resolved moto options: endpoint '{EndpointUrl}', bucket '{Bucket}', prefix '{Prefix}', sample '{SampleFileName}', startMoto={StartMoto}.",
+                options.EndpointUrl,
+                options.Bucket,
+                options.Prefix,
+                options.SampleFileName,
+                options.StartMoto);
             var connectionString = configuration.GetConnectionString("HipaaDb");
             if (string.IsNullOrWhiteSpace(connectionString))
                 throw new InvalidOperationException("Configuration key 'ConnectionStrings:HipaaDb' is required.");
+            logger.LogInformation("SQL connection string resolved for HIPAA DB.");
 
-            motoProcess = new MotoProcess(options);
+            motoProcess = new MotoProcess(options, loggerFactory.CreateLogger<MotoProcess>());
             await motoProcess.StartAsync();
+            logger.LogInformation("Moto process startup sequence completed.");
 
             IServiceCollection services = new ServiceCollection();
             services.AddLogging(logging =>
             {
                 logging.ClearProviders();
-                logging.AddSerilog(Log.Logger, dispose: false);
+                logging.AddSerilog(serilogLogger, dispose: false);
             });
             services.AddIngestionServices(configuration);
             services.AddHipaa837pDbContext(_ => connectionString);
@@ -57,6 +68,7 @@ internal static class Program
             services.AddScoped<IFileService, MotoFileService>();
             services.AddSingleton(options);
             services.AddSingleton<MotoConsoleRunner>();
+            logger.LogInformation("Service registrations complete. Building service provider.");
             services.AddS3Consumer(configure =>
             {
                 configure.EndpointUrl = options.EndpointUrl;
@@ -71,21 +83,24 @@ internal static class Program
                 ValidateScopes = true,
                 ValidateOnBuild = true
             });
+            logger.LogInformation("Service provider built successfully.");
 
             var runner = provider.GetRequiredService<MotoConsoleRunner>();
+            logger.LogInformation("Resolved runner. Starting execution.");
             return await runner.RunAsync();
         }
         catch (Exception exception)
         {
-            Log.Fatal(exception, "Moto console failed.");
+            logger.LogCritical(exception, "Moto console failed.");
             return 1;
         }
         finally
         {
             if (motoProcess is not null)
+            {
+                logger.LogInformation("Disposing moto process.");
                 await motoProcess.DisposeAsync();
-
-            Log.CloseAndFlush();
+            }
         }
     }
 
@@ -95,6 +110,14 @@ internal static class Program
             .SetBasePath(AppContext.BaseDirectory)
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
             .Build();
+    }
+
+    private static Serilog.ILogger CreateSerilogLogger(IConfiguration configuration)
+    {
+        return new LoggerConfiguration()
+            .ReadFrom.Configuration(configuration)
+            .WriteTo.Console()
+            .CreateLogger();
     }
 }
 
@@ -258,7 +281,7 @@ internal sealed class MotoOptions
 /// <summary>
 /// Manages optional moto process startup/shutdown and local port cleanup.
 /// </summary>
-internal sealed class MotoProcess(MotoOptions options) : IAsyncDisposable
+internal sealed class MotoProcess(MotoOptions options, ILogger<MotoProcess> logger) : IAsyncDisposable
 {
     private Process? _process;
     private bool _startedByThisProcess;
@@ -281,7 +304,7 @@ internal sealed class MotoProcess(MotoOptions options) : IAsyncDisposable
 
         if (IsPortOpen(_host, _port))
         {
-            Log.Information("Moto appears to be already running at {Endpoint}. Reusing existing process.", options.EndpointUrl);
+            logger.LogInformation("Moto appears to be already running at {Endpoint}. Reusing existing process.", options.EndpointUrl);
             return;
         }
 
@@ -309,7 +332,7 @@ internal sealed class MotoProcess(MotoOptions options) : IAsyncDisposable
         _startedByThisProcess = true;
 
         await WaitForPortAsync(_host, _port, TimeSpan.FromSeconds(10));
-        Log.Information("Started moto process (PID: {Pid}) at {Endpoint}.", _process.Id, options.EndpointUrl);
+        logger.LogInformation("Started moto process (PID: {Pid}) at {Endpoint}.", _process.Id, options.EndpointUrl);
     }
 
     /// <summary>
@@ -324,7 +347,7 @@ internal sealed class MotoProcess(MotoOptions options) : IAsyncDisposable
 
             _process.Kill(entireProcessTree: true);
             await _process.WaitForExitAsync();
-            Log.Information("Stopped moto process (PID: {Pid}).", _process.Id);
+            logger.LogInformation("Stopped moto process (PID: {Pid}).", _process.Id);
             return;
         }
 
@@ -374,13 +397,13 @@ internal sealed class MotoProcess(MotoOptions options) : IAsyncDisposable
             try
             {
                 var process = Process.GetProcessById(pid);
-                Log.Information("Killing process PID {Pid} ({Name}) on port {Port} during {Reason}.", pid, process.ProcessName, _port, reason);
+                logger.LogInformation("Killing process PID {Pid} ({Name}) on port {Port} during {Reason}.", pid, process.ProcessName, _port, reason);
                 process.Kill(entireProcessTree: true);
                 await process.WaitForExitAsync();
             }
             catch (Exception exception)
             {
-                Log.Warning(exception, "Failed to kill PID {Pid} on port {Port}.", pid, _port);
+                logger.LogWarning(exception, "Failed to kill PID {Pid} on port {Port}.", pid, _port);
             }
         }
 
