@@ -1,0 +1,33 @@
+<Solution>
+  <Folder Name="/docs/">
+	<File Path="docs/CODING_STANDARDS.md" />
+	<File Path="docs/DB_MIGRATIONS.md" />
+	<File Path="docs/DBCONTEXT_METADATA_REPORT.md" />
+	<File Path="docs/DBCONTEXT_METADATA_REPORTER.md" />
+	<File Path="docs/DECISIONS.md" />
+	<File Path="docs/PHASES_NOTES.md" />
+	<File Path="docs/README.md" />
+	<File Path="docs/S3_SERVICE.md" />
+	<File Path="docs/STATEMENT_OF_WORK.md" />
+  </Folder>
+  <Folder Name="/samples/">
+    <File Path="samples/837-sample.edi" />
+    <File Path="samples/837i-sample.edi" />
+    <File Path="samples/837p-sample.edi" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/PayerEdi.EdiFabric.Console/PayerEdi.EdiFabric.Console.csproj" />
+    <Project Path="src/PayerEdi.EdiFabric.MotoConsole/PayerEdi.EdiFabric.MotoConsole.csproj" />
+    <Project Path="src/PayerEdi.EdiFabric.ValidatedConsole/PayerEdi.EdiFabric.ValidatedConsole.csproj" />
+    <Project Path="src/PayerEdi.Ingestion/PayerEdi.Ingestion.csproj" />
+    <Project Path="src/PayerEdi.Pharmacy.Data/PayerEdi.Pharmacy.Data.csproj" />
+    <Project Path="src/PayerEdi.Pharmacy.MetadataReport.Console/PayerEdi.Pharmacy.MetadataReport.Console.csproj" />
+    <Project Path="src/PayerEdi.Pharmacy/PayerEdi.Pharmacy.csproj" />
+    <Project Path="src/PayerEdi.S3Service/PayerEdi.S3Service.pyproj" Type="888888a0-9f3d-457c-b088-3a5042f75d52" Id="2496992a-f146-47f9-bfba-b775ac169486">
+      <Build Project="false" />
+    </Project>
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PayerEdi.Pharmacy.Tests/PayerEdi.Pharmacy.Tests.csproj" />
+  </Folder>
+</Solution>

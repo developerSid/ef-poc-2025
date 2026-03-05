@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
+    <PackageReference Include="AWSSDK.S3" Version="4.0.18.7" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.3" />
+    <PackageReference Include="xunit.v3" Version="3.2.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\PayerEdi.Pharmacy\PayerEdi.Pharmacy.csproj" />
+    <ProjectReference Include="..\..\src\PayerEdi.Pharmacy.Data\PayerEdi.Pharmacy.Data.csproj" />
+    <ProjectReference Include="..\..\src\PayerEdi.Ingestion\PayerEdi.Ingestion.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Samples\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\appsettings.json" Link="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\samples\837-sample.edi" Link="Samples\837-sample.edi" />
+    <EmbeddedResource Include="..\..\samples\837i-sample.edi" Link="Samples\837i-sample.edi" />
+    <EmbeddedResource Include="..\..\samples\837p-sample.edi" Link="Samples\837p-sample.edi" />
+  </ItemGroup>
+
+</Project>
