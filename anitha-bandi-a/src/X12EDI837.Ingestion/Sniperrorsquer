@@ -1,0 +1,4 @@
+SELECT c.ClaimId, c.IsValid, c.SnipErrorCount, s.ErrorMessage
+FROM [HIPAA_5010_837P].[dbo].[Claims] c
+JOIN [HIPAA_5010_837P].[dbo].[SnipValidationErrors] s ON s.ClaimId = c.Id
+ORDER BY c.Id;

@@ -1,0 +1,6 @@
+DELETE FROM SnipValidationErrors;
+DELETE FROM ServiceLines;
+DELETE FROM DiagnosisCodes;
+DELETE FROM Subscribers;
+DELETE FROM BillingProviders;
+DELETE FROM Claims;

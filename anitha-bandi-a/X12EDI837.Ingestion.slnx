@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/X12EDI837.Ingestion/X12EDI837.Ingestion.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/X12EDI837.Ingestion.Tests/X12EDI837.Ingestion.Tests.csproj" />
+  </Folder>
+</Solution>

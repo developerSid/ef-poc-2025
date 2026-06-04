@@ -1,0 +1,6 @@
+SELECT * FROM [HIPAA_5010_837P].[dbo].[Claims];
+SELECT * FROM [HIPAA_5010_837P].[dbo].[Subscribers];
+SELECT * FROM [HIPAA_5010_837P].[dbo].[BillingProviders];
+SELECT * FROM [HIPAA_5010_837P].[dbo].[ServiceLines];
+SELECT * FROM [HIPAA_5010_837P].[dbo].[DiagnosisCodes];
+SELECT * FROM [HIPAA_5010_837P].[dbo].[SnipValidationErrors];
