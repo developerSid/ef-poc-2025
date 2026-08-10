@@ -1,0 +1,34 @@
+﻿{
+  "profiles": {
+    "dental": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "commandLineArgs": "../../samples/EDI/837d-sample-3.edi",
+      "workingDirectory": "./",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "EDI_PROCESSOR_CONNECTIONSTRINGS__DEFAULT": "Server=localhost,1433;Database=PayerEdi;User Id=payeredi_app;Password=payeredi_app_password;TrustServerCertificate=True"
+      }
+    },
+    "professional": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "commandLineArgs": "../../samples/EDI/837p-sample.edi",
+      "workingDirectory": "./",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "EDI_PROCESSOR_CONNECTIONSTRINGS__DEFAULT": "Server=localhost,1433;Database=PayerEdi;User Id=payeredi_app;Password=payeredi_app_password;TrustServerCertificate=True"
+      }
+    },
+    "professionalunexpected": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "commandLineArgs": "../../samples/EDI/837p-unexpected-segment.edi",
+      "workingDirectory": "./",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "EDI_PROCESSOR_CONNECTIONSTRINGS__DEFAULT": "Server=localhost,1433;Database=PayerEdi;User Id=payeredi_app;Password=payeredi_app_password;TrustServerCertificate=True"
+      }
+    }
+  }
+}

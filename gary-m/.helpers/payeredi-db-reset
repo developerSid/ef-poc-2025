@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+source "$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/_payeredi_common.sh"
+
+require_command docker
+
+if [[ "${1:-}" != "--yes" ]]; then
+    printf 'This removes the SQL Server container and vadb volume. Type RESET to continue: '
+    read -r confirmation
+    [[ "$confirmation" == RESET ]] || {
+        printf 'Reset cancelled.\n'
+        exit 1
+    }
+fi
+
+compose --profile db down --remove-orphans --volumes
+printf 'PayerEDI database containers and volume removed.\n'
