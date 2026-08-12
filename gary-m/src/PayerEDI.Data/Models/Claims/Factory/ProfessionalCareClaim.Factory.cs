@@ -1,6 +1,6 @@
 using System.Globalization;
-
 using EdiFabric.Templates.Hipaa5010;
+using PayerEDI.Data.Models.Factory;
 
 namespace PayerEDI.Data.Models.Claims.Factory;
 

@@ -134,30 +134,3 @@ public enum CommunicationNumberQualifier
     [EnumMember(Value = "WP")]
     WorkPhoneNumber,
 }
-
-public static class CommunicationNumberQualifierExtensions
-{
-    extension(CommunicationNumberQualifier)
-    {
-        public static CommunicationNumberQualifier? FromValue(string value)
-        {
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                foreach (var qualifier in Enum.GetValues<CommunicationNumberQualifier>())
-                {
-                    var member = typeof(CommunicationNumberQualifier).GetMember(
-                        qualifier.ToString()
-                    )[0];
-                    var enumMember = member.GetCustomAttribute<EnumMemberAttribute>();
-
-                    if (string.Equals(enumMember?.Value, value, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return qualifier;
-                    }
-                }
-            }
-
-            return null;
-        }
-    }
-}

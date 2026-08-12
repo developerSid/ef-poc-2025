@@ -1,14 +1,6 @@
 using EdiFabric.Templates.Hipaa5010;
 
-namespace PayerEDI.Data.Models;
-
-public record CommunicationsContact(
-    string ContactFunctionCode,
-    string? Name,
-    CommunicationNumber? PrimaryNumber,
-    CommunicationNumber? SecondaryNumber,
-    CommunicationNumber? TertiaryNumber
-);
+namespace PayerEDI.Data.Models.Factory;
 
 public static class CommunicationsContactExtensions
 {

@@ -98,7 +98,7 @@ public class EdiProcessor(ILogger<EdiProcessor> logger)
                 case TS837D ts837D:
                     claims.Add(Process837D(isa, gs, ts837D));
                     break;
-                case ReaderErrorContext errorContext:
+                case ReaderErrorContext errorContext: // TODO: aggregate and pass back to caller, or stop processing and throw exception?
                     logger.LogError(
                         errorContext.Exception,
                         "Reader error at {ReaderErrorCode}: {ErrorMessage}",
@@ -119,13 +119,13 @@ public class EdiProcessor(ILogger<EdiProcessor> logger)
             }
         }
     }
-    
+
     private ProfessionalCareClaim Process837P(ISA isa, GS gs, TS837P ts837P)
     {
-        logger.LogInformation("837P transaction {Transaction}", ts837P);
-        logger.LogInformation("837P Model {Model}", ts837P.Model);
-        logger.LogInformation("837P ID {Id}", ts837P.Id);
-        logger.LogInformation("TS837P Loop 1000A NM1 ID {Id}", ts837P.AllNM1.Loop1000A.Id);
+        logger.LogDebug("837P transaction {Transaction}", ts837P);
+        logger.LogDebug("837P Model {Model}", ts837P.Model);
+        logger.LogDebug("837P ID {Id}", ts837P.Id);
+        logger.LogDebug("TS837P Loop 1000A NM1 ID {Id}", ts837P.AllNM1.Loop1000A.Id);
         logger.LogDebug(
             "837D belongs to functional group {GroupControlNumber}",
             gs.GroupControlNumber_6
@@ -156,10 +156,10 @@ public class EdiProcessor(ILogger<EdiProcessor> logger)
 
     private DentalCareClaim Process837D(ISA isa, GS gs, TS837D ts837D)
     {
-        logger.LogInformation("837D transaction {Transaction}", ts837D);
-        logger.LogInformation("837D Model {Model}", ts837D.Model);
-        logger.LogInformation("837D ID {Id}", ts837D.Id);
-        logger.LogInformation("TS837D Loop 1000A NM1 ID {Id}", ts837D.AllNM1.Loop1000A.Id);
+        logger.LogDebug("837D transaction {Transaction}", ts837D);
+        logger.LogDebug("837D Model {Model}", ts837D.Model);
+        logger.LogDebug("837D ID {Id}", ts837D.Id);
+        logger.LogDebug("TS837D Loop 1000A NM1 ID {Id}", ts837D.AllNM1.Loop1000A.Id);
         logger.LogDebug(
             "837D belongs to functional group {GroupControlNumber}",
             gs.GroupControlNumber_6

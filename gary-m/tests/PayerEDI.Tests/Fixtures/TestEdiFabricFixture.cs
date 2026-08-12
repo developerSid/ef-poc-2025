@@ -8,9 +8,11 @@ public class TestEdiFabricFixture : IAsyncDisposable
 
     public TestEdiFabricFixture()
     {
-        var ediFabricFreeDevKey = Environment.GetEnvironmentVariable(EdiFabricKeyEnvironmentVariable)
+        var ediFabricFreeDevKey =
+            Environment.GetEnvironmentVariable(EdiFabricKeyEnvironmentVariable)
             ?? throw new InvalidOperationException(
-                $"The {EdiFabricKeyEnvironmentVariable} environment variable is not set.");
+                $"The {EdiFabricKeyEnvironmentVariable} environment variable is not set."
+            );
 
         EdiFabricHelper.ConfigureEdiFabric(ediFabricFreeDevKey);
     }
