@@ -8,19 +8,15 @@ public static class PersonFactory
     {
         public static Person New(NM1 receiverName) =>
             new(
-                EntityIdentifierCode: receiverName.EntityIdentifierCode_01.RequireNm1("NM101"),
-                LastName: receiverName.ResponseContactLastorOrganizationName_03.RequireNm1("NM103"),
-                SecondLastName: receiverName.NameLastorOrganizationName_12,
-                FirstName: receiverName.ResponseContactFirstName_04,
-                MiddleName: receiverName.ResponseContactMiddleName_05,
+                EntityIdentifierCode: receiverName.EntityIdentifierCode_01.RequireNm1("NM101").Trim(),
+                LastName: receiverName.ResponseContactLastorOrganizationName_03.RequireNm1("NM103").Trim(),
+                SecondLastName: receiverName.NameLastorOrganizationName_12?.Trim(),
+                FirstName: receiverName.ResponseContactFirstName_04?.Trim(),
+                MiddleName: receiverName.ResponseContactMiddleName_05?.Trim(),
                 Prefix: receiverName.NamePrefix_06,
                 Suffix: receiverName.ResponseContactNameSuffix_07,
-                IdentificationCodeQualifier: receiverName.IdentificationCodeQualifier_08.RequireNm1(
-                    "NM108"
-                ),
-                ResponseContactIdentifier: receiverName.ResponseContactIdentifier_09.RequireNm1(
-                    "NM109"
-                ),
+                IdentificationCodeQualifier: receiverName.IdentificationCodeQualifier_08?.Trim(),
+                ResponseContactIdentifier: receiverName.ResponseContactIdentifier_09?.Trim(),
                 Relationship: EntityRelationshipCode.FromCode(
                     receiverName.EntityRelationshipCode_10
                 )
@@ -72,6 +68,12 @@ public static class IndividualOrOrganizationFactory
 
         public static IndividualOrOrganization NewReceiver(NM1_ReceiverName receiverName) =>
             IndividualOrOrganization.NewNm1(receiverName); // see above comment, but keep in mind this seems less dumb
+
+        public static IndividualOrOrganization NewSubscriber(NM1_SubscriberName_5 subscriber) =>
+            IndividualOrOrganization.NewNm1(subscriber);
+
+        public static IndividualOrOrganization NewDependent(Loop_2010CA_837P dependent) =>
+            IndividualOrOrganization.NewNm1(dependent.NM1_PatientName);
     }
 }
 

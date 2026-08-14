@@ -26,18 +26,14 @@
       Link="samples/EDI/837d-sample-3.edi"
       CopyToOutputDirectory="PreserveNewest"
     />
+    <None
+      Include="../../samples/EDI/837P-all-fields.edi"
+      Link="samples/EDI/837P-all-fields.edi"
+      CopyToOutputDirectory="PreserveNewest"
+    />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="../../src/PayerEDI.Data/PayerEDI.Data.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="..\..\samples\EDI\837P-all-fields.edi">
-      <Link>samples\EDI\837P-all-fields.edi</Link>
-    </Content>
-    <Content Include="..\..\samples\EDI\README.md">
-      <Link>samples\EDI\README.md</Link>
-    </Content>
   </ItemGroup>
 </Project>

@@ -1,7 +1,6 @@
 using PayerEDI.Data.Models;
 using PayerEDI.Data.Models.Claims;
 using PayerEDI.Tests.Fixtures;
-using EdiProcessorService = PayerEDI.Data.Services.EdiProcessor;
 
 namespace PayerEDI.Tests.Services.EdiProcessor;
 
@@ -9,12 +8,12 @@ public class Process837Dental
     : IClassFixture<TestLoggingFixture>,
         IClassFixture<TestEdiFabricFixture>
 {
-    private readonly EdiProcessorService _processor;
+    private readonly Data.Services.EdiProcessor _processor;
 
     public Process837Dental(TestLoggingFixture logging, TestEdiFabricFixture testEdiFabricFixture)
     {
         _ = testEdiFabricFixture;
-        _processor = new EdiProcessorService(logging.CreateLogger<EdiProcessorService>());
+        _processor = new Data.Services.EdiProcessor(logging.CreateLogger<Data.Services.EdiProcessor>());
     }
 
     [Fact]
@@ -44,8 +43,8 @@ public class Process837Dental
         Assert.Equal(TimeOnly.Parse("17:05"), dentalCareClaim.TransactionTime);
 
         // test submitter
-        Assert.Equal("41", dentalCareClaim.Submitter?.Submitter.EntityIdentifierCode);
-        Assert.IsType<NonPerson>(dentalCareClaim.Submitter);
+        Assert.Equal("41", dentalCareClaim.Submitter.Submitter.EntityIdentifierCode);
+        Assert.IsType<ClaimSubmitter>(dentalCareClaim.Submitter);
         NonPerson submitter = (NonPerson)dentalCareClaim.Submitter.Submitter;
         Assert.Equal("PREMIER BILLING SERVICE", submitter.OrganizationName);
         Assert.Null(submitter.AdditionalOrganizationName);

@@ -26,7 +26,7 @@ namespace PayerEDI.Data.Models;
 /// </para>
 /// </remarks>
 public abstract record IndividualOrOrganization(
-    string EntityIdentifierCode,
+    string? EntityIdentifierCode,
     string IdentificationCodeQualifier,
     string ResponseContactIdentifier
 );
@@ -48,15 +48,15 @@ public abstract record IndividualOrOrganization(
 /// <param name="ResponseContactIdentifier">NM1-09: Identification Code identifying the person. NM108 and NM109 are required together.</param>
 /// <param name="Relationship">NM1-10: Entity Relationship Code describing the person's relationship to the NM101 entity. It is nullable when NM110 is absent or not recognized.</param>
 public sealed record Person(
-    string EntityIdentifierCode,
+    string? EntityIdentifierCode,
     string LastName,
     string? SecondLastName,
     string? FirstName,
     string? MiddleName,
     string? Prefix,
     string? Suffix,
-    string IdentificationCodeQualifier,
-    string ResponseContactIdentifier,
+    string? IdentificationCodeQualifier,
+    string? ResponseContactIdentifier,
     EntityRelationshipCode? Relationship
 )
     : IndividualOrOrganization(
@@ -79,7 +79,7 @@ public sealed record Person(
 /// <param name="ResponseContactIdentifier">NM1-09: Identification Code identifying the organization or other entity. NM108 and NM109 are required together.</param>
 /// <param name="Relationship">NM1-10: Entity Relationship Code describing the entity's relationship to the NM101 entity. It is nullable when NM110 is absent or not recognized. C1110: If NM1-11 is present, then NM1-10 is required</param>
 public sealed record NonPerson(
-    string EntityIdentifierCode,
+    string? EntityIdentifierCode,
     string OrganizationName,
     string? AdditionalOrganizationName,
     string IdentificationCodeQualifier,

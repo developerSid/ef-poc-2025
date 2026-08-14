@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-
 using CommandLine;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -81,7 +80,11 @@ Parser
         {
             using var ediStream = File.OpenRead(ediFile);
             var claims = app.Services.GetRequiredService<EdiProcessor>().ProcessEdi(ediStream);
-            var jsonOptions = new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
+            var jsonOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            };
 
             logger.LogInformation("Claims found in {file}", ediFile);
             foreach (HealthCareClaim claim in claims) // These files can be batches of claims so need to process each one

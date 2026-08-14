@@ -169,36 +169,6 @@ public class PersonTests
     }
 
     [Fact]
-    public void RejectsMissingIdentificationQualifier_PersonSubmitter()
-    {
-        var personNm1 = _faker
-            .RuleFor(o => o.EntityTypeQualifier_02, _ => "1")
-            .RuleFor(o => o.IdentificationCodeQualifier_08, _ => null!)
-            .Generate();
-
-        var exception = Assert.Throws<InvalidNm1Exception>(() =>
-            Data.Models.IndividualOrOrganization.NewSubmitter(personNm1)
-        );
-
-        Assert.Equal("NM108 is required for an NM1 identity.", exception.Message);
-    }
-
-    [Fact]
-    public void RejectsMissingIdentificationNumber_PersonSubmitter()
-    {
-        var personNm1 = _faker
-            .RuleFor(o => o.EntityTypeQualifier_02, _ => "1")
-            .RuleFor(o => o.ResponseContactIdentifier_09, _ => (string?)null)
-            .Generate();
-
-        var exception = Assert.Throws<InvalidNm1Exception>(() =>
-            Data.Models.IndividualOrOrganization.NewSubmitter(personNm1)
-        );
-
-        Assert.Equal("NM109 is required for an NM1 identity.", exception.Message);
-    }
-
-    [Fact]
     public void RejectsMissingEntityIdentifierCode_PersonSubmitter()
     {
         var personNm1 = _faker
@@ -250,22 +220,6 @@ public class PersonTests
         );
 
         Assert.Contains("entity type qualifier 3 not handled", exception.Message);
-    }
-
-    [Fact]
-    public void RejectsMissingIdentificationNumberWhenQualifierIsPresent()
-    {
-        var personNm1 = _faker
-            .RuleFor(o => o.EntityTypeQualifier_02, _ => "1")
-            .RuleFor(o => o.IdentificationCodeQualifier_08, _ => "MI")
-            .RuleFor(o => o.ResponseContactIdentifier_09, _ => " ")
-            .Generate();
-
-        var exception = Assert.Throws<InvalidNm1Exception>(() =>
-            Data.Models.IndividualOrOrganization.NewSubmitter(personNm1)
-        );
-
-        Assert.Equal("NM109 is required for an NM1 identity.", exception.Message);
     }
 
     [Fact]

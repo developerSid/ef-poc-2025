@@ -33,7 +33,8 @@ public record ProfessionalCareClaim(
     DateOnly TransactionDate,
     TimeOnly TransactionTime,
     ClaimSubmitter Submitter,
-    IndividualOrOrganization Receiver
+    IndividualOrOrganization Receiver,
+    IList<Subscriber> Subscriber
 // Providers - Doctors or similar medical operators doing medical work
 // Patient
 // procedures
