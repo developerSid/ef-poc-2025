@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace PayerEDI.Data.Data;
+namespace PayerEDI.Data.Database;
 
 public sealed class PayerEdiDbContextFactory : IDesignTimeDbContextFactory<PayerEdiDbContext>
 {

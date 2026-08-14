@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PayerEDI.Data;
 using PayerEDI.Data.Data;
+using PayerEDI.Data.Database;
 using PayerEDI.Data.Models.Claims;
 using PayerEDI.Data.Services;
 using PayerEDI.Processor.Console.Command;

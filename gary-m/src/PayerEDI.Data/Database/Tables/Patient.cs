@@ -1,4 +1,4 @@
-namespace PayerEDI.Data.Db.Tables;
+namespace PayerEDI.Data.Database.Tables;
 
 public record Patient
 {

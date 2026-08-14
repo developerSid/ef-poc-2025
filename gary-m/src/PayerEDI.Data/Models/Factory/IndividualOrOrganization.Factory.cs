@@ -8,8 +8,12 @@ public static class PersonFactory
     {
         public static Person New(NM1 receiverName) =>
             new(
-                EntityIdentifierCode: receiverName.EntityIdentifierCode_01.RequireNm1("NM101").Trim(),
-                LastName: receiverName.ResponseContactLastorOrganizationName_03.RequireNm1("NM103").Trim(),
+                EntityIdentifierCode: receiverName
+                    .EntityIdentifierCode_01.RequireNm1("NM101")
+                    .Trim(),
+                LastName: receiverName
+                    .ResponseContactLastorOrganizationName_03.RequireNm1("NM103")
+                    .Trim(),
                 SecondLastName: receiverName.NameLastorOrganizationName_12?.Trim(),
                 FirstName: receiverName.ResponseContactFirstName_04?.Trim(),
                 MiddleName: receiverName.ResponseContactMiddleName_05?.Trim(),
@@ -66,6 +70,9 @@ public static class IndividualOrOrganizationFactory
             NM1_InformationReceiverName_4 submitterName // from what I can tell even though it has Receiver in the name this is the submitter name property
         ) => IndividualOrOrganization.NewNm1(submitterName);
 
+        public static IndividualOrOrganization NewSubscriber(NM1_SubscriberName_2 subscriber) =>
+            IndividualOrOrganization.NewNm1(subscriber);
+
         public static IndividualOrOrganization NewReceiver(NM1_ReceiverName receiverName) =>
             IndividualOrOrganization.NewNm1(receiverName); // see above comment, but keep in mind this seems less dumb
 
@@ -73,6 +80,9 @@ public static class IndividualOrOrganizationFactory
             IndividualOrOrganization.NewNm1(subscriber);
 
         public static IndividualOrOrganization NewDependent(Loop_2010CA_837P dependent) =>
+            IndividualOrOrganization.NewNm1(dependent.NM1_PatientName);
+
+        public static IndividualOrOrganization NewDependent(Loop_2010CA_837D dependent) =>
             IndividualOrOrganization.NewNm1(dependent.NM1_PatientName);
     }
 }

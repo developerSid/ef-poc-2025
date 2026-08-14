@@ -41,13 +41,14 @@ public static class DentalCareClaimFactory
                 var receiver = IndividualOrOrganization.NewReceiver(
                     claim.AllNM1.Loop1000B.NM1_ReceiverName
                 );
+                var subscribers = Subscriber.New(claim);
 
                 return new DentalCareClaim(
-                    Id: Guid.CreateVersion7(),
                     TransactionDate: date,
                     TransactionTime: time,
                     Submitter: submitter,
-                    Receiver: receiver
+                    Receiver: receiver,
+                    Subscriber: subscribers
                 );
             }
 

@@ -45,7 +45,6 @@ public static class ProfessionalCareClaimFactory
                 var subscribers = Subscriber.New(claim);
 
                 return new ProfessionalCareClaim(
-                    Id: Guid.CreateVersion7(),
                     TransactionDate: date,
                     TransactionTime: time,
                     Submitter: submitter,

@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace PayerEDI.Data.Models;
 
 // NM1 segment definition -> https://www.stedi.com/edi/x12-005010/segment/NM1
@@ -25,6 +27,12 @@ namespace PayerEDI.Data.Models;
 /// <see cref="EntityRelationshipCode"/> when its code is recognized.
 /// </para>
 /// </remarks>
+[JsonPolymorphic]
+[JsonDerivedType(typeof(Person), "person")]
+[JsonDerivedType(typeof(NonPerson), "nonPerson")]
+// These attributes are required because these values are exposed through the
+// abstract base type; System.Text.Json otherwise serializes only base properties
+// and omits fields declared on Person or NonPerson.
 public abstract record IndividualOrOrganization(
     string? EntityIdentifierCode,
     string IdentificationCodeQualifier,

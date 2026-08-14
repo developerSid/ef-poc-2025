@@ -13,7 +13,9 @@ public class Process837Dental
     public Process837Dental(TestLoggingFixture logging, TestEdiFabricFixture testEdiFabricFixture)
     {
         _ = testEdiFabricFixture;
-        _processor = new Data.Services.EdiProcessor(logging.CreateLogger<Data.Services.EdiProcessor>());
+        _processor = new Data.Services.EdiProcessor(
+            logging.CreateLogger<Data.Services.EdiProcessor>()
+        );
     }
 
     [Fact]
@@ -77,5 +79,36 @@ public class Process837Dental
         Assert.Equal("40", receiver.EntityIdentifierCode);
         Assert.Equal("46", receiver.IdentificationCodeQualifier);
         Assert.Equal("66783JJT", receiver.ResponseContactIdentifier);
+
+        // test subscriber
+        Assert.NotNull(dentalCareClaim.Subscriber);
+        Assert.Single(dentalCareClaim.Subscriber);
+        Subscriber subscriber = dentalCareClaim.Subscriber[0];
+        Assert.IsType<Person>(subscriber.Primary);
+        Person primary = (Person)subscriber.Primary;
+        Assert.Equal("IL", primary.EntityIdentifierCode);
+        Assert.Equal("SMITH", primary.LastName);
+        Assert.Equal("JANE", primary.FirstName);
+        Assert.Null(primary.MiddleName);
+        Assert.Null(primary.Prefix);
+        Assert.Null(primary.Suffix);
+        Assert.Equal("MI", primary.IdentificationCodeQualifier);
+        Assert.Equal("111223333", primary.ResponseContactIdentifier);
+        Assert.Null(primary.Relationship);
+
+        // test dependent
+        Assert.NotNull(subscriber.Dependents);
+        Assert.Single(subscriber.Dependents);
+        Assert.IsType<Person>(subscriber.Dependents[0]);
+        Person dependent = (Person)subscriber.Dependents[0];
+        Assert.Equal("QC", dependent.EntityIdentifierCode);
+        Assert.Equal("SMITH", dependent.LastName);
+        Assert.Equal("TED", dependent.FirstName);
+        Assert.Null(dependent.MiddleName);
+        Assert.Null(dependent.Prefix);
+        Assert.Null(dependent.Suffix);
+        Assert.Null(dependent.IdentificationCodeQualifier);
+        Assert.Null(dependent.ResponseContactIdentifier);
+        Assert.Null(dependent.Relationship);
     }
 }

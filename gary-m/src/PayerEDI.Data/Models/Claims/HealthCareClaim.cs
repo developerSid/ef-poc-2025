@@ -29,15 +29,12 @@ public sealed record UnknownClaim(HealthCareClaim Claim);
 /// <param name="Submitter">1000A Loop & PER Segment - Entity submitting the claim AKA Doctor's office or their Billing Service</param>
 /// <param name="Receiver">1000B Loop - The final destination or clearinghouse receiving the professional claim</param>
 public record ProfessionalCareClaim(
-    Guid Id,
     DateOnly TransactionDate,
     TimeOnly TransactionTime,
     ClaimSubmitter Submitter,
     IndividualOrOrganization Receiver,
     IList<Subscriber> Subscriber
 // Providers - Doctors or similar medical operators doing medical work
-// Patient
-// procedures
 ) : HealthCareClaim(TransactionDate, TransactionTime, Submitter, Receiver);
 
 /// <summary>
@@ -49,12 +46,10 @@ public record ProfessionalCareClaim(
 /// <param name="Submitter">1000A Loop & PER Segment - Entity submitting the claim AKA Doctor's office or their Billing Service</param>
 /// <param name="Receiver">1000B Loop - The final destination or clearinghouse receiving the professional claim</param>
 public sealed record DentalCareClaim(
-    Guid Id,
     DateOnly TransactionDate,
     TimeOnly TransactionTime,
     ClaimSubmitter Submitter,
-    IndividualOrOrganization Receiver
+    IndividualOrOrganization Receiver,
+    IList<Subscriber> Subscriber
 // Providers - Doctors or similar medical operators doing medical work
-// Patient
-// procedures
 ) : HealthCareClaim(TransactionDate, TransactionTime, Submitter, Receiver);
