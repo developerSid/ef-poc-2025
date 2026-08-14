@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+source "$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/_payeredi_common.sh"
+
+require_command dotnet
+
+export PAYEREDI_TEST_CONNECTION_STRING="${PAYEREDI_TEST_CONNECTION_STRING:-Server=localhost,1434;Database=PayerEdi;User Id=payeredi_app;Password=${PAYEREDI_APP_PASSWORD:-payeredi_app_password};TrustServerCertificate=True}"
+export PAYEREDI_TEST_ADMIN_CONNECTION_STRING="${PAYEREDI_TEST_ADMIN_CONNECTION_STRING:-Server=localhost,1434;Database=PayerEdi;User Id=sa;Password=${MSSQL_SA_PASSWORD:-password_123};TrustServerCertificate=True}"
+dotnet test tests/PayerEDI.Test.FT/PayerEDI.Test.FT.csproj "$@"

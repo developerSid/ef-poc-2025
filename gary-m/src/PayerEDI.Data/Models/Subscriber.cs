@@ -8,4 +8,7 @@ namespace PayerEDI.Data.Models;
 public record Subscriber(
     IndividualOrOrganization Primary,
     IList<IndividualOrOrganization> Dependents
-);
+)
+{
+    public Guid Id { get; init; } = Guid.CreateVersion7();
+}

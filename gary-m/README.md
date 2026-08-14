@@ -108,6 +108,18 @@ When custom credentials are used, update the launch-profile connection string or
 
 ### Local Scripts
 
+The functional-test database is disposable and stores SQL Server data in a Docker `tmpfs`:
+
+```shell
+./.helpers/payeredi-ft-db-start
+./.helpers/payeredi-ft-test
+./.helpers/payeredi-ft-db-stop
+```
+
+It runs as `vadb-test` on host port `1434`, while the persistent development database remains `vadb` on
+port `1433`. The functional-test project is `tests/PayerEDI.Test.FT`; its connection can be overridden with
+`PAYEREDI_TEST_CONNECTION_STRING`.
+
 | Script                    | Purpose                                                                                                  |
 |---------------------------|----------------------------------------------------------------------------------------------------------|
 | `payeredi-db-start`       | Starts SQL Server, waits for health, and reruns the idempotent database bootstrap.                       |
@@ -116,6 +128,9 @@ When custom credentials are used, update the launch-profile connection string or
 | `payeredi-db-reset --yes` | Destructively removes the Compose services and `vadb` volume. Without `--yes`, it asks for confirmation. |
 | `payeredi-dental`         | Runs the console with the `dental` launch profile.                                                       |
 | `payeredi-professional`   | Runs the console with the `professional` launch profile.                                                 |
+| `payeredi-ft-db-start`    | Starts, bootstraps, and migrates the disposable functional-test SQL Server.                              |
+| `payeredi-ft-test`        | Runs the SQL Server-backed `PayerEDI.Tests.FT` project.                                                  |
+| `payeredi-ft-db-stop`     | Stops the functional-test SQL Server and discards its tmpfs data.                                        |
 | `pretty-code              | Runs csharpier against _src/_ and _tests/_                                                               |
 
 Use `payeredi-db-stop` for a normal shutdown. Use `payeredi-db-reset --yes` only when the local database should be

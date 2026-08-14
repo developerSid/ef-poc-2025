@@ -56,6 +56,10 @@ public class Process837ProfessionalTests
         Assert.Equal("41", submitter.EntityIdentifierCode);
         Assert.Equal("46", submitter.IdentificationCodeQualifier);
         Assert.Equal("TGJ23", submitter.ResponseContactIdentifier);
+        Assert.Equal("46", professionalCareClaim.Submitter.ExternalIdentifier.Qualifier);
+        Assert.Equal("TGJ23", professionalCareClaim.Submitter.ExternalIdentifier.Value);
+        Assert.NotEqual(Guid.Empty, professionalCareClaim.Submitter.Id);
+        Assert.Equal('7', professionalCareClaim.Submitter.Id.ToString()[14]);
 
         // test admin comm contact
         Assert.NotNull(professionalCareClaim.Submitter.AdministrativeCommunicationsContact);
@@ -92,6 +96,8 @@ public class Process837ProfessionalTests
         Assert.NotNull(professionalCareClaim.Subscriber);
         Assert.Single(professionalCareClaim.Subscriber);
         Subscriber subscriber = professionalCareClaim.Subscriber[0];
+        Assert.NotEqual(Guid.Empty, subscriber.Id);
+        Assert.Equal('7', subscriber.Id.ToString()[14]);
         Assert.IsType<Person>(subscriber.Primary);
         Person primary = (Person)subscriber.Primary;
         Assert.Equal("IL", primary.EntityIdentifierCode);

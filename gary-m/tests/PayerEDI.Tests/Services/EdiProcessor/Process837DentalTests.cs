@@ -53,6 +53,8 @@ public class Process837Dental
         Assert.Equal("41", submitter.EntityIdentifierCode);
         Assert.Equal("46", submitter.IdentificationCodeQualifier);
         Assert.Equal("TGJ23", submitter.ResponseContactIdentifier);
+        Assert.Equal("46", dentalCareClaim.Submitter.ExternalIdentifier.Qualifier);
+        Assert.Equal("TGJ23", dentalCareClaim.Submitter.ExternalIdentifier.Value);
 
         // test admin comm contact
         Assert.NotNull(dentalCareClaim.Submitter.AdministrativeCommunicationsContact);
@@ -84,6 +86,8 @@ public class Process837Dental
         Assert.NotNull(dentalCareClaim.Subscriber);
         Assert.Single(dentalCareClaim.Subscriber);
         Subscriber subscriber = dentalCareClaim.Subscriber[0];
+        Assert.NotEqual(Guid.Empty, subscriber.Id);
+        Assert.Equal('7', subscriber.Id.ToString()[14]);
         Assert.IsType<Person>(subscriber.Primary);
         Person primary = (Person)subscriber.Primary;
         Assert.Equal("IL", primary.EntityIdentifierCode);

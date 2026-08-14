@@ -15,7 +15,16 @@ public static class ClaimSubmitterFactory
                 claim.AllNM1.Loop1000A.PER_SubmitterEDIContactInformation
             );
 
-            return new ClaimSubmitter(submitter, administrativeCommunicationsContact); // TODO: Handle submitter and acc are required
+            var externalIdentifier = new ExternalIdentifier(
+                submitter.IdentificationCodeQualifier,
+                submitter.ResponseContactIdentifier
+            );
+
+            return new ClaimSubmitter(
+                submitter,
+                administrativeCommunicationsContact,
+                externalIdentifier
+            ); // TODO: Handle submitter and acc are required
         }
 
         public static ClaimSubmitter New(TS837D claim)
@@ -27,7 +36,16 @@ public static class ClaimSubmitterFactory
                 claim.AllNM1.Loop1000A.PER_SubmitterEDIContactInformation
             );
 
-            return new ClaimSubmitter(submitter, administrativeCommunicationsContact); // TODO: Handle submitter and acc are required
+            var externalIdentifier = new ExternalIdentifier(
+                submitter.IdentificationCodeQualifier,
+                submitter.ResponseContactIdentifier
+            );
+
+            return new ClaimSubmitter(
+                submitter,
+                administrativeCommunicationsContact,
+                externalIdentifier
+            ); // TODO: Handle submitter and acc are required
         }
     }
 }
