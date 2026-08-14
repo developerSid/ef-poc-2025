@@ -6,38 +6,38 @@ Developer status checklist
 
 | Phase      | Task             | Sub-Task                                       | Status |
 |------------|------------------|------------------------------------------------|:------:|
-| 🟩 Phase 1 | Setup Project    | Create .NET 8 console/web app                  |   ☑   |
-| 🟩 Phase 1 | Setup Project    | Add EdiFabric NuGet Packages                   |   ☑   |
-| 🟩 Phase 1 | Setup Project    | Configure SQL Server Express connection        |   ☑   |
-| 🟩 Phase 1 | Setup Project    | Use Entity Framework Core                      |   ☐   |
-| 🟩 Phase 1 | Implementation   | Ingest sample 837 EDI file using EdiFabric     |   ☑   |
+| 🟩 Phase 1 | Setup Project    | Create .NET 8 console/web app                  |   ✅   |
+| 🟩 Phase 1 | Setup Project    | Add EdiFabric NuGet Packages                   |   ✅   |
+| 🟩 Phase 1 | Setup Project    | Configure SQL Server Express connection        |   ✅   |
+| 🟩 Phase 1 | Setup Project    | Use Entity Framework Core                      |   ⬛   |
+| 🟩 Phase 1 | Implementation   | Ingest sample 837 EDI file using EdiFabric     |   ✅   |
 | 🟩 Phase 1 | Implementation   | Parse EDI segments (ISA, GS, ST, BHT, etc.)    |   🟨   |
-| 🟩 Phase 1 | Implementation   | Map to database entities                       |   ☐   |
-| 🟩 Phase 1 | Implementation   | Store parsed data in SQL Server Express        |   ☐   |
-| 🟩 Phase 1 | Implementation   | Include 1 unit test (XUnit/NUnit)              |   ☑   |
-| 🟩 Phase 1 | Deliverables     | Working C# application                         |   ☑   |
-| 🟩 Phase 1 | Deliverables     | Database schema/migrations                     |   ☑   |
-| 🟩 Phase 1 | Deliverables     | Sample 837 test file                           |   ☐   |
-| 🟩 Phase 1 | Deliverables     | Unit test coverage                             |   ☐   |
-| 🟩 Phase 1 | Deliverables     | README with setup instructions                 |   ☐   |
-| 🟩 Phase 1 | Deliverables     | Phase 1 demo                                   |   ☐   |
-| 🟦 Phase 2 | S3 Integration   | Use moto.py for S3                             |   ☐   |
-| 🟦 Phase 2 | S3 Integration   | Read EDI file from S3 bucket                   |   ☐   |
-| 🟦 Phase 2 | S3 Integration   | Process files asynchronously                   |   ☐   |
-| 🟦 Phase 2 | Success Criteria | Application successfully parses 837 EDI file   |   ☐   |
-| 🟦 Phase 2 | Success Criteria | Data is correctly stored in SQL Server Express |   ☐   |
-| 🟦 Phase 2 | Success Criteria | At least one unit test passes                  |   ☐   |
-| 🟦 Phase 2 | Success Criteria | Code is properly documented                    |   ☐   |
-| 🟦 Phase 2 | Success Criteria | Peer review completed                          |   ☐   |
-| 🟦 Phase 2 | Success Criteria | Phase 2 demo                                   |   ☐   |
-| 🟥 Phase 3 | SNIP Validation  | Add SNIP Validation Level                      |   ☐   |
+| 🟩 Phase 1 | Implementation   | Map to database entities                       |   ⬛   |
+| 🟩 Phase 1 | Implementation   | Store parsed data in SQL Server Express        |   ⬛   |
+| 🟩 Phase 1 | Implementation   | Include 1 unit test (XUnit/NUnit)              |   ✅   |
+| 🟩 Phase 1 | Deliverables     | Working C# application                         |   ✅   |
+| 🟩 Phase 1 | Deliverables     | Database schema/migrations                     |   ✅   |
+| 🟩 Phase 1 | Deliverables     | Sample 837 test file                           |   ⬛   |
+| 🟩 Phase 1 | Deliverables     | Unit test coverage                             |   ⬛   |
+| 🟩 Phase 1 | Deliverables     | README with setup instructions                 |   ⬛   |
+| 🟩 Phase 1 | Deliverables     | Phase 1 demo                                   |   ⬛   |
+| 🟦 Phase 2 | S3 Integration   | Use moto.py for S3                             |   ⬛   |
+| 🟦 Phase 2 | S3 Integration   | Read EDI file from S3 bucket                   |   ⬛   |
+| 🟦 Phase 2 | S3 Integration   | Process files asynchronously                   |   ⬛   |
+| 🟦 Phase 2 | Success Criteria | Application successfully parses 837 EDI file   |   ⬛   |
+| 🟦 Phase 2 | Success Criteria | Data is correctly stored in SQL Server Express |   ⬛   |
+| 🟦 Phase 2 | Success Criteria | At least one unit test passes                  |   ⬛   |
+| 🟦 Phase 2 | Success Criteria | Code is properly documented                    |   ⬛   |
+| 🟦 Phase 2 | Success Criteria | Peer review completed                          |   ⬛   |
+| 🟦 Phase 2 | Success Criteria | Phase 2 demo                                   |   ⬛   |
+| 🟥 Phase 3 | SNIP Validation  | Add SNIP Validation Level                      |   ⬛   |
 
 **Status Key**
 
-- `☐` Not started
+- `⬛` Not started
 - `🟨` In progress
-- `☑` Complete
-- `⛔` Blocked
+- `✅` Complete
+- `❌` Blocked
 
 ## Setup
 

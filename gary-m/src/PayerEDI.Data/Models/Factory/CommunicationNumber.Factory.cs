@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 namespace PayerEDI.Data.Models.Factory;
 
-public static class CommunicationNumberQualifierExtensions
+public static class CommunicationNumberQualifierFactory
 {
     extension(CommunicationNumberQualifier)
     {
@@ -30,7 +30,7 @@ public static class CommunicationNumberQualifierExtensions
     }
 }
 
-public static class CommunicationNumberExtensions
+public static class CommunicationNumberFactory
 {
     extension(CommunicationNumber)
     {

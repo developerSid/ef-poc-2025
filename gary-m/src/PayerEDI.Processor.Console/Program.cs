@@ -1,4 +1,7 @@
-﻿using CommandLine;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+
+using CommandLine;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -78,22 +81,20 @@ Parser
         {
             using var ediStream = File.OpenRead(ediFile);
             var claims = app.Services.GetRequiredService<EdiProcessor>().ProcessEdi(ediStream);
+            var jsonOptions = new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
 
             logger.LogInformation("Claims found in {file}", ediFile);
             foreach (HealthCareClaim claim in claims) // These files can be batches of claims so need to process each one
             {
-                switch (claim) // FIXME: can be this be made exhaustive at some point
+                object claimToLog = claim switch
                 {
-                    case ProfessionalCareClaim professionalCareClaim:
-                        logger.LogInformation("Profession Claim: {claim}", professionalCareClaim);
-                        break;
-                    case DentalCareClaim dentalClaim:
-                        logger.LogInformation("Dental Claim: {claim}", dentalClaim);
-                        break;
-                    default:
-                        logger.LogError("Unhandled Claim: {claim}", claim);
-                        break;
-                }
+                    ProfessionalCareClaim professionalCareClaim => professionalCareClaim,
+                    DentalCareClaim dentalClaim => dentalClaim,
+                    _ => new UnknownClaim(claim),
+                };
+
+                var claimJson = JsonSerializer.Serialize(claimToLog, jsonOptions);
+                logger.LogInformation("Claim:\n{ClaimJson:l}", claimJson); // apparently the :l tells Serilog to render newlines rather than print \n ... fancy
             }
         }
         else

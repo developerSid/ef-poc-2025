@@ -1,8 +1,7 @@
 using System.Reflection;
-using EdiFabric.Core.Model.Edi;
 using EdiFabric.Core.Model.Edi.X12;
 
-namespace PayerEDI.Data;
+namespace PayerEDI.Data.Helpers;
 
 public static class X12TypeFactory
 {
@@ -14,7 +13,8 @@ public static class X12TypeFactory
             {
                 "005010X224A2" or "005010X224" =>
                     typeof(EdiFabric.Templates.Hipaa5010.TS837D).GetTypeInfo(),
-                "005010X222A1" => typeof(EdiFabric.Templates.Hipaa5010.TS837P).GetTypeInfo(),
+                "005010X222A1" or "005010X222A2" =>
+                    typeof(EdiFabric.Templates.Hipaa5010.TS837P).GetTypeInfo(),
                 "005010X223A2" => typeof(EdiFabric.Templates.Hipaa5010.TS837I).GetTypeInfo(),
                 var implementationCodePreference => throw new Exception(
                     $"Unsupported implementation code preference. {implementationCodePreference}"

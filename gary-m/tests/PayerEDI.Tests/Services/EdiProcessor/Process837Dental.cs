@@ -44,9 +44,9 @@ public class Process837Dental
         Assert.Equal(TimeOnly.Parse("17:05"), dentalCareClaim.TransactionTime);
 
         // test submitter
-        Assert.Equal("41", dentalCareClaim.Submitter?.EntityIdentifierCode);
+        Assert.Equal("41", dentalCareClaim.Submitter?.Submitter.EntityIdentifierCode);
         Assert.IsType<NonPerson>(dentalCareClaim.Submitter);
-        NonPerson submitter = (NonPerson)dentalCareClaim.Submitter;
+        NonPerson submitter = (NonPerson)dentalCareClaim.Submitter.Submitter;
         Assert.Equal("PREMIER BILLING SERVICE", submitter.OrganizationName);
         Assert.Null(submitter.AdditionalOrganizationName);
         Assert.Equal("41", submitter.EntityIdentifierCode);
@@ -54,10 +54,11 @@ public class Process837Dental
         Assert.Equal("TGJ23", submitter.ResponseContactIdentifier);
 
         // test admin comm contact
-        Assert.NotNull(dentalCareClaim.AdministrativeCommunicationsContact);
-        Assert.Single(dentalCareClaim.AdministrativeCommunicationsContact);
-        CommunicationsContact communicationsContact =
-            dentalCareClaim.AdministrativeCommunicationsContact[0];
+        Assert.NotNull(dentalCareClaim.Submitter.AdministrativeCommunicationsContact);
+        Assert.Single(dentalCareClaim.Submitter.AdministrativeCommunicationsContact);
+        CommunicationsContact communicationsContact = dentalCareClaim
+            .Submitter
+            .AdministrativeCommunicationsContact[0];
         Assert.Equal("IC", communicationsContact.ContactFunctionCode);
         Assert.Equal("JERRY", communicationsContact.Name);
         Assert.NotNull(communicationsContact.PrimaryNumber);

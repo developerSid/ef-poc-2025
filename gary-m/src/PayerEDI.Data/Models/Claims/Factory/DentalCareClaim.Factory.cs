@@ -37,12 +37,7 @@ public static class DentalCareClaimFactory
                 )
             )
             {
-                var submitter = IndividualOrOrganization.NewSubmitter(
-                    claim.AllNM1.Loop1000A.NM1_SubmitterName
-                );
-                var administrativeCommunicationsContact = CommunicationsContact.New(
-                    claim.AllNM1.Loop1000A.PER_SubmitterEDIContactInformation
-                );
+                var submitter = ClaimSubmitter.New(claim);
                 var receiver = IndividualOrOrganization.NewReceiver(
                     claim.AllNM1.Loop1000B.NM1_ReceiverName
                 );
@@ -52,13 +47,12 @@ public static class DentalCareClaimFactory
                     TransactionDate: date,
                     TransactionTime: time,
                     Submitter: submitter,
-                    AdministrativeCommunicationsContact: administrativeCommunicationsContact,
                     Receiver: receiver
                 );
             }
 
             throw new ArgumentException(
-                $"Claim Date must be formatted {ClaimDateFormat} as and claimTime must be formatted {ClaimDateFormat}"
+                $"Claim Date must be formatted as {ClaimDateFormat} and claimTime must be formatted as {ClaimDateFormat}"
             );
         }
     }

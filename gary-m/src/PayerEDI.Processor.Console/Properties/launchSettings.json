@@ -29,6 +29,16 @@
         "DOTNET_ENVIRONMENT": "Development",
         "EDI_PROCESSOR_CONNECTIONSTRINGS__DEFAULT": "Server=localhost,1433;Database=PayerEdi;User Id=payeredi_app;Password=payeredi_app_password;TrustServerCertificate=True"
       }
+    },
+    "professionalall": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "commandLineArgs": "../../samples/EDI/837P-all-fields.edi",
+      "workingDirectory": "./",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "EDI_PROCESSOR_CONNECTIONSTRINGS__DEFAULT": "Server=localhost,1433;Database=PayerEdi;User Id=payeredi_app;Password=payeredi_app_password;TrustServerCertificate=True"
+      }
     }
   }
 }

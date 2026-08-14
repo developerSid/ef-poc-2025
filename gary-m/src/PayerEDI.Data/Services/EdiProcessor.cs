@@ -4,6 +4,7 @@ using EdiFabric.Core.Model.Edi.X12;
 using EdiFabric.Framework.Readers;
 using EdiFabric.Templates.Hipaa5010;
 using Microsoft.Extensions.Logging;
+using PayerEDI.Data.Helpers;
 using PayerEDI.Data.Models.Claims;
 using PayerEDI.Data.Models.Claims.Factory;
 
@@ -93,10 +94,26 @@ public class EdiProcessor(ILogger<EdiProcessor> logger)
             switch (transaction)
             {
                 case TS837P ts837P:
-                    claims.Add(Process837P(isa, gs, ts837P));
+                    logger.LogDebug("837P transaction {Transaction}", ts837P);
+                    claims.Add(ProfessionalCareClaim.New(gs.Date_4, gs.Time_5, ts837P));
+                    var claimId = ts837P
+                        .Loop2000A[0]
+                        .Loop2000B[0]
+                        .Loop2000C[0]
+                        .Loop2300[0]
+                        .CLM_ClaimInformation
+                        .PatientControlNumber_01;
+                    var two = ts837P
+                        .Loop2000A[0]
+                        .Loop2000B[0]
+                        .Loop2000C[0]
+                        .Loop2300[0]
+                        .CLM_ClaimInformation
+                        .PatientControlNumber_01;
                     break;
                 case TS837D ts837D:
-                    claims.Add(Process837D(isa, gs, ts837D));
+                    logger.LogDebug("837D transaction {Transaction}", ts837D);
+                    claims.Add(DentalCareClaim.New(gs.Date_4, gs.Time_5, ts837D));
                     break;
                 case ReaderErrorContext errorContext: // TODO: aggregate and pass back to caller, or stop processing and throw exception?
                     logger.LogError(
@@ -118,73 +135,5 @@ public class EdiProcessor(ILogger<EdiProcessor> logger)
                     break;
             }
         }
-    }
-
-    private ProfessionalCareClaim Process837P(ISA isa, GS gs, TS837P ts837P)
-    {
-        logger.LogDebug("837P transaction {Transaction}", ts837P);
-        logger.LogDebug("837P Model {Model}", ts837P.Model);
-        logger.LogDebug("837P ID {Id}", ts837P.Id);
-        logger.LogDebug("TS837P Loop 1000A NM1 ID {Id}", ts837P.AllNM1.Loop1000A.Id);
-        logger.LogDebug(
-            "837D belongs to functional group {GroupControlNumber}",
-            gs.GroupControlNumber_6
-        );
-
-        ts837P.Loop2000A.ForEach(billingProvider =>
-        {
-            logger.LogInformation(
-                "TS837D Billing Provider First Name: {BillingProviderFirstName}",
-                billingProvider
-                    .AllNM1
-                    .Loop2010AA
-                    .NM1_BillingProviderName
-                    .ResponseContactFirstName_04
-            );
-            logger.LogInformation(
-                "TS837D Billing Provider Last or Org Name: {BillingProviderLastOrgName}",
-                billingProvider
-                    .AllNM1
-                    .Loop2010AA
-                    .NM1_BillingProviderName
-                    .ResponseContactLastorOrganizationName_03
-            );
-        });
-
-        return ProfessionalCareClaim.New(gs.Date_4, gs.Time_5, ts837P);
-    }
-
-    private DentalCareClaim Process837D(ISA isa, GS gs, TS837D ts837D)
-    {
-        logger.LogDebug("837D transaction {Transaction}", ts837D);
-        logger.LogDebug("837D Model {Model}", ts837D.Model);
-        logger.LogDebug("837D ID {Id}", ts837D.Id);
-        logger.LogDebug("TS837D Loop 1000A NM1 ID {Id}", ts837D.AllNM1.Loop1000A.Id);
-        logger.LogDebug(
-            "837D belongs to functional group {GroupControlNumber}",
-            gs.GroupControlNumber_6
-        );
-
-        ts837D.Loop2000A.ForEach(billingProvider =>
-        {
-            logger.LogInformation(
-                "TS837D Billing Provider First Name: {BillingProviderFirstName}",
-                billingProvider
-                    .AllNM1
-                    .Loop2010AA
-                    .NM1_BillingProviderName
-                    .ResponseContactFirstName_04
-            );
-            logger.LogInformation(
-                "TS837D Billing Provider Last or Org Name: {BillingProviderLastOrgName}",
-                billingProvider
-                    .AllNM1
-                    .Loop2010AA
-                    .NM1_BillingProviderName
-                    .ResponseContactLastorOrganizationName_03
-            );
-        });
-
-        return DentalCareClaim.New(gs.Date_4, gs.Time_5, ts837D);
     }
 }

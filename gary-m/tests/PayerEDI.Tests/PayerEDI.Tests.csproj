@@ -31,4 +31,13 @@
   <ItemGroup>
     <ProjectReference Include="../../src/PayerEDI.Data/PayerEDI.Data.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\samples\EDI\837P-all-fields.edi">
+      <Link>samples\EDI\837P-all-fields.edi</Link>
+    </Content>
+    <Content Include="..\..\samples\EDI\README.md">
+      <Link>samples\EDI\README.md</Link>
+    </Content>
+  </ItemGroup>
 </Project>
