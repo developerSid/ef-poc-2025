@@ -1,19 +1,13 @@
 using Microsoft.EntityFrameworkCore;
-using PayerEDI.Data.Database;
 using PayerEDI.Data.Database.Tables;
 using PayerEDI.Test.FT.Database.Fixtures;
 
 namespace PayerEDI.Test.FT.Database;
 
-public sealed class PatientTests : IClassFixture<SqlServerFixture>, IAsyncLifetime
+public sealed class PatientTests(SqlServerFixture fixture)
+    : IClassFixture<SqlServerFixture>,
+        IAsyncLifetime
 {
-    private readonly SqlServerFixture fixture;
-
-    public PatientTests(SqlServerFixture fixture)
-    {
-        this.fixture = fixture;
-    }
-
     public Task InitializeAsync() => fixture.PrepareDatabaseAsync();
 
     public Task DisposeAsync() => Task.CompletedTask;
@@ -32,8 +26,10 @@ public sealed class PatientTests : IClassFixture<SqlServerFixture>, IAsyncLifeti
     {
         await using var context = fixture.CreateContext();
 
-        var migrationCount = await context.Database
-            .SqlQueryRaw<int>("SELECT COUNT(*) AS [Value] FROM [dbo].[__EFMigrationsHistory]")
+        var migrationCount = await context
+            .Database.SqlQueryRaw<int>(
+                "SELECT COUNT(*) AS [Value] FROM [dbo].[__EFMigrationsHistory]"
+            )
             .SingleAsync();
 
         Assert.True(migrationCount > 0);
@@ -70,7 +66,9 @@ public sealed class PatientTests : IClassFixture<SqlServerFixture>, IAsyncLifeti
         await using (var context = fixture.CreateContext())
         {
             var persistedPerson = await context.Patients.SingleAsync(item => item.Id == person.Id);
-            var persistedOrganization = await context.Patients.SingleAsync(item => item.Id == organization.Id);
+            var persistedOrganization = await context.Patients.SingleAsync(item =>
+                item.Id == organization.Id
+            );
 
             Assert.Equal("25", persistedPerson.Relationship);
             Assert.Equal("Jane", persistedPerson.FirstName);

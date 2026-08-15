@@ -131,6 +131,7 @@ port `1433`. The functional-test project is `tests/PayerEDI.Test.FT`; its connec
 | `payeredi-ft-db-start`    | Starts, bootstraps, and migrates the disposable functional-test SQL Server.                              |
 | `payeredi-ft-test`        | Runs the SQL Server-backed `PayerEDI.Tests.FT` project.                                                  |
 | `payeredi-ft-db-stop`     | Stops the functional-test SQL Server and discards its tmpfs data.                                        |
+| `payeredi-down`            | Stops and removes all Compose containers while preserving named volumes.                                  |
 | `pretty-code              | Runs csharpier against _src/_ and _tests/_                                                               |
 
 Use `payeredi-db-stop` for a normal shutdown. Use `payeredi-db-reset --yes` only when the local database should be

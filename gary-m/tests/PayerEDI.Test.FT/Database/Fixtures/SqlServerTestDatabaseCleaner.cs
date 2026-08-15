@@ -24,7 +24,11 @@ internal static class SqlServerTestDatabaseCleaner
             {
                 foreach (var table in orderedTables)
                 {
-                    await ExecuteAsync(connection, transaction, $"TRUNCATE TABLE {table.QualifiedName};");
+                    await ExecuteAsync(
+                        connection,
+                        transaction,
+                        $"TRUNCATE TABLE {table.QualifiedName};"
+                    );
                 }
             }
             else
@@ -40,7 +44,11 @@ internal static class SqlServerTestDatabaseCleaner
 
                 foreach (var table in orderedTables)
                 {
-                    await ExecuteAsync(connection, transaction, $"DELETE FROM {table.QualifiedName};");
+                    await ExecuteAsync(
+                        connection,
+                        transaction,
+                        $"DELETE FROM {table.QualifiedName};"
+                    );
                 }
 
                 foreach (var table in orderedTables)
@@ -127,7 +135,11 @@ internal static class SqlServerTestDatabaseCleaner
         while (remaining.Count > 0)
         {
             var leafTables = remaining
-                .Where(table => relationships.All(relationship => relationship.Child != table || !remaining.Contains(relationship.Parent)))
+                .Where(table =>
+                    relationships.All(relationship =>
+                        relationship.Child != table || !remaining.Contains(relationship.Parent)
+                    )
+                )
                 .ToList();
 
             if (leafTables.Count == 0)
@@ -160,7 +172,8 @@ internal static class SqlServerTestDatabaseCleaner
     {
         public string QualifiedName => $"{Quote(Schema)}.{Quote(Name)}";
 
-        private static string Quote(string value) => $"[{value.Replace("]", "]]", StringComparison.Ordinal)}]";
+        private static string Quote(string value) =>
+            $"[{value.Replace("]", "]]", StringComparison.Ordinal)}]";
     }
 
     private sealed record Relationship(Table Child, Table Parent);

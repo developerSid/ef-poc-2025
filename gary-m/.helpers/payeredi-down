@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+source "$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/_payeredi_common.sh"
+
+require_command docker
+
+compose --profile '*' down --remove-orphans
