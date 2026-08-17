@@ -4,7 +4,7 @@ using PayerEDI.Test.FT.Database.Fixtures;
 
 namespace PayerEDI.Test.FT.Database;
 
-public sealed class PatientTests(SqlServerFixture fixture)
+public sealed class PatientTableTests(SqlServerFixture fixture)
     : IClassFixture<SqlServerFixture>,
         IAsyncLifetime
 {
@@ -18,7 +18,7 @@ public sealed class PatientTests(SqlServerFixture fixture)
         await using var context = fixture.CreateContext();
 
         Assert.True(await context.Database.CanConnectAsync());
-        Assert.Equal("Patients", context.Model.FindEntityType(typeof(Patient))!.GetTableName());
+        Assert.Equal("Patients", context.Model.FindEntityType(typeof(PatientTable))!.GetTableName());
     }
 
     [Fact]
@@ -38,7 +38,7 @@ public sealed class PatientTests(SqlServerFixture fixture)
     [Fact]
     public async Task Person_and_organization_rows_persist_with_nullable_flattened_fields()
     {
-        var person = new Patient
+        var person = new PatientTable
         {
             EntityType = "Person",
             EntityIdentifierCode = "IL",
@@ -48,7 +48,7 @@ public sealed class PatientTests(SqlServerFixture fixture)
             FirstName = "Jane",
             Relationship = "25",
         };
-        var organization = new Patient
+        var organization = new PatientTable
         {
             EntityType = "NonPerson",
             EntityIdentifierCode = "PR",

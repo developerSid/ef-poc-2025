@@ -1,6 +1,6 @@
 namespace PayerEDI.Data.Database.Tables;
 
-public record CareGiver
+public record CareGiverTable
 {
     public Guid Id { get; init; }
     public string FirstName { get; set; }

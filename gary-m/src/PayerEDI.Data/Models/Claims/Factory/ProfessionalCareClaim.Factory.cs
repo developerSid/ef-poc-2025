@@ -49,7 +49,7 @@ public static class ProfessionalCareClaimFactory
                     TransactionTime: time,
                     Submitter: submitter,
                     Receiver: receiver,
-                    Subscriber: subscribers
+                    Subscribers: subscribers
                 );
             }
 

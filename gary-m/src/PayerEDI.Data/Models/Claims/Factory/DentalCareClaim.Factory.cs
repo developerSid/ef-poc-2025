@@ -48,7 +48,7 @@ public static class DentalCareClaimFactory
                     TransactionTime: time,
                     Submitter: submitter,
                     Receiver: receiver,
-                    Subscriber: subscribers
+                    Subscribers: subscribers
                 );
             }
 

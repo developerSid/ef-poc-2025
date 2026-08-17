@@ -83,9 +83,9 @@ public class Process837Dental
         Assert.Equal("66783JJT", receiver.ResponseContactIdentifier);
 
         // test subscriber
-        Assert.NotNull(dentalCareClaim.Subscriber);
-        Assert.Single(dentalCareClaim.Subscriber);
-        Subscriber subscriber = dentalCareClaim.Subscriber[0];
+        Assert.NotNull(dentalCareClaim.Subscribers);
+        Assert.Single(dentalCareClaim.Subscribers);
+        Subscriber subscriber = dentalCareClaim.Subscribers[0];
         Assert.NotEqual(Guid.Empty, subscriber.Id);
         Assert.Equal('7', subscriber.Id.ToString()[14]);
         Assert.IsType<Person>(subscriber.Primary);

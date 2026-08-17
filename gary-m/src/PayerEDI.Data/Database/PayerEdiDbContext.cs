@@ -5,11 +5,11 @@ namespace PayerEDI.Data.Database;
 
 public class PayerEdiDbContext(DbContextOptions<PayerEdiDbContext> options) : DbContext(options)
 {
-    public DbSet<Patient> Patients => Set<Patient>();
+    public DbSet<PatientTable> Patients => Set<PatientTable>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        var patient = modelBuilder.Entity<Patient>();
+        var patient = modelBuilder.Entity<PatientTable>();
 
         patient.ToTable("Patients");
         patient.HasKey(item => item.Id);

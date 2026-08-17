@@ -1,6 +1,6 @@
 namespace PayerEDI.Data.Database.Tables;
 
-public record Patient
+public record PatientTable
 {
     public Guid Id { get; init; } = Guid.CreateVersion7();
     public required string EntityType { get; init; }
