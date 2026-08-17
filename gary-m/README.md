@@ -6,13 +6,13 @@ Developer status checklist
 
 | Phase      | Task             | Sub-Task                                       | Status |
 |------------|------------------|------------------------------------------------|:------:|
-| 🟩 Phase 1 | Setup Project    | Create .NET 8 console/web app                  |   ✅   |
+| 🟩 Phase 1 | Setup Project    | Create .NET 10 console/web app                 |   ✅   |
 | 🟩 Phase 1 | Setup Project    | Add EdiFabric NuGet Packages                   |   ✅   |
 | 🟩 Phase 1 | Setup Project    | Configure SQL Server Express connection        |   ✅   |
-| 🟩 Phase 1 | Setup Project    | Use Entity Framework Core                      |   ⬛   |
+| 🟩 Phase 1 | Setup Project    | Use Entity Framework Core                      |   ✅   |
 | 🟩 Phase 1 | Implementation   | Ingest sample 837 EDI file using EdiFabric     |   ✅   |
 | 🟩 Phase 1 | Implementation   | Parse EDI segments (ISA, GS, ST, BHT, etc.)    |   🟨   |
-| 🟩 Phase 1 | Implementation   | Map to database entities                       |   ⬛   |
+| 🟩 Phase 1 | Implementation   | Map to database entities                       |   🟨   |
 | 🟩 Phase 1 | Implementation   | Store parsed data in SQL Server Express        |   ⬛   |
 | 🟩 Phase 1 | Implementation   | Include 1 unit test (XUnit/NUnit)              |   ✅   |
 | 🟩 Phase 1 | Deliverables     | Working C# application                         |   ✅   |
