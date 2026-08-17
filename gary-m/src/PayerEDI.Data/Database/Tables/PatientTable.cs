@@ -1,3 +1,5 @@
+using PayerEDI.Data.Models;
+
 namespace PayerEDI.Data.Database.Tables;
 
 public record PatientTable
@@ -16,4 +18,15 @@ public record PatientTable
     public string? OrganizationName { get; init; }
     public string? AdditionalOrganizationName { get; init; }
     public string? Relationship { get; init; }
+}
+
+public static class PatientTableExtensions
+{
+    extension(PatientTable)
+    {
+        public static PatientTable New(Person person)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

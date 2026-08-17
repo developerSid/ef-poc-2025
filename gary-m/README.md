@@ -9,17 +9,17 @@ Developer status checklist
 | 🟩 Phase 1 | Setup Project    | Create .NET 10 console/web app                 |   ✅   |
 | 🟩 Phase 1 | Setup Project    | Add EdiFabric NuGet Packages                   |   ✅   |
 | 🟩 Phase 1 | Setup Project    | Configure SQL Server Express connection        |   ✅   |
-| 🟩 Phase 1 | Setup Project    | Use Entity Framework Core                      |   ✅   |
+| 🟩 Phase 1 | Setup Project    | Use Entity Framework Core                      |   🟨   |
 | 🟩 Phase 1 | Implementation   | Ingest sample 837 EDI file using EdiFabric     |   ✅   |
 | 🟩 Phase 1 | Implementation   | Parse EDI segments (ISA, GS, ST, BHT, etc.)    |   🟨   |
 | 🟩 Phase 1 | Implementation   | Map to database entities                       |   🟨   |
-| 🟩 Phase 1 | Implementation   | Store parsed data in SQL Server Express        |   ⬛   |
+| 🟩 Phase 1 | Implementation   | Store parsed data in SQL Server Express        |   🟨   |
 | 🟩 Phase 1 | Implementation   | Include 1 unit test (XUnit/NUnit)              |   ✅   |
 | 🟩 Phase 1 | Deliverables     | Working C# application                         |   ✅   |
 | 🟩 Phase 1 | Deliverables     | Database schema/migrations                     |   ✅   |
 | 🟩 Phase 1 | Deliverables     | Sample 837 test file                           |   ⬛   |
 | 🟩 Phase 1 | Deliverables     | Unit test coverage                             |   ⬛   |
-| 🟩 Phase 1 | Deliverables     | README with setup instructions                 |   ⬛   |
+| 🟩 Phase 1 | Deliverables     | README with setup instructions                 |   🟨   |
 | 🟩 Phase 1 | Deliverables     | Phase 1 demo                                   |   ⬛   |
 | 🟦 Phase 2 | S3 Integration   | Use moto.py for S3                             |   ⬛   |
 | 🟦 Phase 2 | S3 Integration   | Read EDI file from S3 bucket                   |   ⬛   |
@@ -39,6 +39,9 @@ Developer status checklist
 - `✅` Complete
 - `❌` Blocked
 
+
+--- 
+# Bellow needs a lot of work read at your own peril
 ## Setup
 
 I am using .NET 10. I used
