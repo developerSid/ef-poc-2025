@@ -18,7 +18,10 @@ public sealed class PatientTableTests(SqlServerFixture fixture)
         await using var context = fixture.CreateContext();
 
         Assert.True(await context.Database.CanConnectAsync());
-        Assert.Equal("Patients", context.Model.FindEntityType(typeof(PatientTable))!.GetTableName());
+        Assert.Equal(
+            "Patients",
+            context.Model.FindEntityType(typeof(PatientTable))!.GetTableName()
+        );
     }
 
     [Fact]

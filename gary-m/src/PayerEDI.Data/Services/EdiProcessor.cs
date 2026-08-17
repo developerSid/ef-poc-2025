@@ -96,20 +96,6 @@ public class EdiProcessor(ILogger<EdiProcessor> logger)
                 case TS837P ts837P:
                     logger.LogDebug("837P transaction {Transaction}", ts837P);
                     claims.Add(ProfessionalCareClaim.New(gs.Date_4, gs.Time_5, ts837P));
-                    var claimId = ts837P
-                        .Loop2000A[0]
-                        .Loop2000B[0]
-                        .Loop2000C[0]
-                        .Loop2300[0]
-                        .CLM_ClaimInformation
-                        .PatientControlNumber_01;
-                    var two = ts837P
-                        .Loop2000A[0]
-                        .Loop2000B[0]
-                        .Loop2000C[0]
-                        .Loop2300[0]
-                        .CLM_ClaimInformation
-                        .PatientControlNumber_01;
                     break;
                 case TS837D ts837D:
                     logger.LogDebug("837D transaction {Transaction}", ts837D);

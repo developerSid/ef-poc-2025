@@ -24,9 +24,17 @@ public static class PatientTableExtensions
 {
     extension(PatientTable)
     {
-        public static PatientTable New(Person person)
-        {
-            throw new NotImplementedException();
-        }
+        public static PatientTable New(Person person) =>
+            new()
+            {
+                EntityType = "Person",
+                IdentificationCodeQualifier = person.IdentificationCodeQualifier,
+                ResponseContactIdentifier = person.ResponseContactIdentifier,
+                LastName = person.LastName,
+                FirstName = person.FirstName,
+                MiddleName = person.MiddleName,
+                Prefix = person.Prefix,
+                Suffix = person.Suffix,
+            };
     }
 }

@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PayerEDI.Data;
-using PayerEDI.Data.Data;
 using PayerEDI.Data.Database;
 using PayerEDI.Data.Models.Claims;
 using PayerEDI.Data.Services;
@@ -88,9 +87,9 @@ Parser
             };
 
             logger.LogInformation("Claims found in {file}", ediFile);
-            foreach (HealthCareClaim claim in claims) // These files can be batches of claims so need to process each one
+            foreach (HealthCareClaim claim in claims) // These files can be batches, how to handle something that doesn't fit the HealthCareClaim hierarchy at some point?
             {
-                object claimToLog = claim switch
+                HealthCareClaim claimToLog = claim switch
                 {
                     ProfessionalCareClaim professionalCareClaim => professionalCareClaim,
                     DentalCareClaim dentalClaim => dentalClaim,

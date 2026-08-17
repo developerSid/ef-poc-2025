@@ -17,8 +17,13 @@ public abstract record HealthCareClaim(
 /// <summary>
 /// Placeholder for an unknown claim as yet TBD, use wisely
 /// </summary>
-/// <param name="Claim">The claim we haven't handled yet</param>
-public sealed record UnknownClaim(HealthCareClaim Claim);
+/// <param name="WrappedClaim">The claim we haven't handled yet</param>
+public sealed record UnknownClaim(HealthCareClaim WrappedClaim) : HealthCareClaim(TransactionDate: WrappedClaim.TransactionDate,
+    TransactionTime: WrappedClaim.TransactionTime, Submitter: WrappedClaim.Submitter, Receiver: WrappedClaim.Receiver)
+{
+    /// <summary>The claim we haven't handled yet</summary>
+    public HealthCareClaim WrappedClaim { get; init; } = WrappedClaim;
+}
 
 /// <summary>
 /// 837P - Professional Health Care Claim
