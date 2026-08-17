@@ -98,6 +98,16 @@ Parser
 
                 var claimJson = JsonSerializer.Serialize(claimToLog, jsonOptions);
                 logger.LogInformation("Claim:\n{ClaimJson:l}", claimJson); // apparently the :l tells Serilog to render newlines rather than print \n ... fancy
+
+                switch (claimToLog)
+                {
+                    case ProfessionalCareClaim proClaim when logger.IsEnabled(LogLevel.Trace):
+                        logger.LogTrace("TS837P:\n{ProClaim:l}", JsonSerializer.Serialize(proClaim.AssociatedEdi, jsonOptions));
+                        break;
+                    case DentalCareClaim dentalClaim when logger.IsEnabled(LogLevel.Trace):
+                        logger.LogTrace("TS837P:\n{DentalClaim:l}", JsonSerializer.Serialize(dentalClaim.AssociatedEdi, jsonOptions));
+                        break;
+                }
             }
         }
         else

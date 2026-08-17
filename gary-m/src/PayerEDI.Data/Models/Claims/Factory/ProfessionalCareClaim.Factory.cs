@@ -45,6 +45,7 @@ public static class ProfessionalCareClaimFactory
                 var subscribers = Subscriber.New(claim);
 
                 return new ProfessionalCareClaim(
+                    AssociatedEdi: claim,
                     TransactionDate: date,
                     TransactionTime: time,
                     Submitter: submitter,

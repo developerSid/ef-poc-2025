@@ -1,3 +1,6 @@
+using EdiFabric.Core.Model.Edi;
+using EdiFabric.Templates.Hipaa5010;
+
 namespace PayerEDI.Data.Models.Claims;
 
 /// <summary>
@@ -18,7 +21,8 @@ public abstract record HealthCareClaim(
 /// Placeholder for an unknown claim as yet TBD, use wisely
 /// </summary>
 /// <param name="WrappedClaim">The claim we haven't handled yet</param>
-public sealed record UnknownClaim(HealthCareClaim WrappedClaim) : HealthCareClaim(TransactionDate: WrappedClaim.TransactionDate,
+public sealed record UnknownClaim(HealthCareClaim WrappedClaim) : HealthCareClaim(
+    TransactionDate: WrappedClaim.TransactionDate,
     TransactionTime: WrappedClaim.TransactionTime, Submitter: WrappedClaim.Submitter, Receiver: WrappedClaim.Receiver)
 {
     /// <summary>The claim we haven't handled yet</summary>
@@ -34,6 +38,7 @@ public sealed record UnknownClaim(HealthCareClaim WrappedClaim) : HealthCareClai
 /// <param name="Submitter">1000A Loop & PER Segment - Entity submitting the claim AKA Doctor's office or their Billing Service</param>
 /// <param name="Receiver">1000B Loop - The final destination or clearinghouse receiving the professional claim</param>
 public record ProfessionalCareClaim(
+    TS837P AssociatedEdi,
     DateOnly TransactionDate,
     TimeOnly TransactionTime,
     ClaimSubmitter Submitter,
@@ -51,6 +56,7 @@ public record ProfessionalCareClaim(
 /// <param name="Submitter">1000A Loop & PER Segment - Entity submitting the claim AKA Doctor's office or their Billing Service</param>
 /// <param name="Receiver">1000B Loop - The final destination or clearinghouse receiving the professional claim</param>
 public sealed record DentalCareClaim(
+    TS837D AssociatedEdi,
     DateOnly TransactionDate,
     TimeOnly TransactionTime,
     ClaimSubmitter Submitter,

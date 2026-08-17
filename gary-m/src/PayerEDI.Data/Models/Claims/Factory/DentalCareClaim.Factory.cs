@@ -44,6 +44,7 @@ public static class DentalCareClaimFactory
                 var subscribers = Subscriber.New(claim);
 
                 return new DentalCareClaim(
+                    AssociatedEdi: claim,
                     TransactionDate: date,
                     TransactionTime: time,
                     Submitter: submitter,
