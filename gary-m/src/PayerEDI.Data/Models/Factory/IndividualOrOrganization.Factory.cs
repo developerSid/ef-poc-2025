@@ -25,6 +25,9 @@ public static class PersonFactory
                     receiverName.EntityRelationshipCode_10
                 )
             );
+
+        public static Person New(Loop_2310A_837P provider) =>
+            Person.New(provider.NM1_ReferringProviderName);
     }
 }
 

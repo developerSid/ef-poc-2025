@@ -1,6 +1,9 @@
-﻿using System.Text.Json;
+﻿using System.Security.AccessControl;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using CommandLine;
+using EdiFabric.Core.Model.Edi;
+using EdiFabric.Templates.Hipaa5010;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -87,25 +90,42 @@ Parser
             };
 
             logger.LogInformation("Claims found in {file}", ediFile);
-            foreach (HealthCareClaim claim in claims) // These files can be batches, how to handle something that doesn't fit the HealthCareClaim hierarchy at some point?
+            foreach ((EdiMessage, HealthCareClaim) claim in claims) // These files can be batches, how to handle something that doesn't fit the HealthCareClaim hierarchy at some point?
             {
-                HealthCareClaim claimToLog = claim switch
+                switch (claim)
                 {
-                    ProfessionalCareClaim professionalCareClaim => professionalCareClaim,
-                    DentalCareClaim dentalClaim => dentalClaim,
-                    _ => new UnknownClaim(claim),
-                };
-
-                var claimJson = JsonSerializer.Serialize(claimToLog, jsonOptions);
-                logger.LogInformation("Claim:\n{ClaimJson:l}", claimJson); // apparently the :l tells Serilog to render newlines rather than print \n ... fancy
-
-                switch (claimToLog)
-                {
-                    case ProfessionalCareClaim proClaim when logger.IsEnabled(LogLevel.Trace):
-                        logger.LogTrace("TS837P:\n{ProClaim:l}", JsonSerializer.Serialize(proClaim.AssociatedEdi, jsonOptions));
+                    case (TS837P _, ProfessionalCareClaim pro)
+                        when logger.IsEnabled(LogLevel.Debug):
+                        logger.LogDebug(
+                            "TS837P:\n{ProClaim:l}",
+                            JsonSerializer.Serialize(pro, jsonOptions)
+                        );
                         break;
-                    case DentalCareClaim dentalClaim when logger.IsEnabled(LogLevel.Trace):
-                        logger.LogTrace("TS837P:\n{DentalClaim:l}", JsonSerializer.Serialize(dentalClaim.AssociatedEdi, jsonOptions));
+                    case (TS837D _, DentalCareClaim dental) when logger.IsEnabled(LogLevel.Debug):
+                        logger.LogDebug(
+                            "TS837P:\n{DentalClaim:l}",
+                            JsonSerializer.Serialize(dental, jsonOptions)
+                        );
+                        break;
+                    default:
+                        logger.LogWarning("Unknown claim: {Claim}", claim);
+                        break;
+                }
+
+                switch (claim)
+                {
+                    case (TS837P edi, ProfessionalCareClaim _)
+                        when logger.IsEnabled(LogLevel.Trace):
+                        logger.LogTrace(
+                            "TS837P:\n{ProClaim:l}",
+                            JsonSerializer.Serialize(edi, jsonOptions)
+                        );
+                        break;
+                    case (TS837D edi, DentalCareClaim _) when logger.IsEnabled(LogLevel.Trace):
+                        logger.LogTrace(
+                            "TS837P:\n{DentalClaim:l}",
+                            JsonSerializer.Serialize(edi, jsonOptions)
+                        );
                         break;
                 }
             }

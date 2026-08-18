@@ -43,14 +43,15 @@ public static class ProfessionalCareClaimFactory
                     claim.AllNM1.Loop1000B.NM1_ReceiverName
                 );
                 var subscribers = Subscriber.New(claim);
+                var healthcareProviders = HealthcareProvider.New(claim);
 
                 return new ProfessionalCareClaim(
-                    AssociatedEdi: claim,
                     TransactionDate: date,
                     TransactionTime: time,
                     Submitter: submitter,
                     Receiver: receiver,
-                    Subscribers: subscribers
+                    Subscribers: subscribers,
+                    HealthcareProviders: healthcareProviders
                 );
             }
 

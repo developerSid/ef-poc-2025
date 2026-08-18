@@ -1,3 +1,4 @@
+using EdiFabric.Templates.Hipaa5010;
 using PayerEDI.Data.Models;
 using PayerEDI.Data.Models.Claims;
 using PayerEDI.Tests.Fixtures;
@@ -34,12 +35,10 @@ public class Process837Dental
 
         Assert.NotEmpty(claims);
         Assert.Single(claims);
-        var firstClaim = claims[0];
+        var (edi, firstClaim) = claims[0];
 
-        Assert.IsType<DentalCareClaim>(firstClaim);
-        Assert.NotNull(firstClaim);
-
-        DentalCareClaim dentalCareClaim = (firstClaim as DentalCareClaim)!;
+        Assert.IsType<TS837D>(edi);
+        DentalCareClaim dentalCareClaim = Assert.IsType<DentalCareClaim>(firstClaim);
 
         Assert.Equal(DateOnly.Parse("2008-05-03"), dentalCareClaim.TransactionDate);
         Assert.Equal(TimeOnly.Parse("17:05"), dentalCareClaim.TransactionTime);
@@ -114,5 +113,8 @@ public class Process837Dental
         Assert.Null(dependent.IdentificationCodeQualifier);
         Assert.Null(dependent.ResponseContactIdentifier);
         Assert.Null(dependent.Relationship);
+
+        // test healthcare providers
+        Assert.NotEmpty(dentalCareClaim.HealthcareProviders); // FIXME: Dental Healthcare providers need to be mapped
     }
 }

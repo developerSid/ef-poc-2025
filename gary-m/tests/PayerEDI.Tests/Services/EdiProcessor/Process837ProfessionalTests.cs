@@ -1,3 +1,4 @@
+using EdiFabric.Templates.Hipaa5010;
 using PayerEDI.Data.Models;
 using PayerEDI.Data.Models.Claims;
 using PayerEDI.Tests.Fixtures;
@@ -37,12 +38,12 @@ public class Process837ProfessionalTests
 
         Assert.NotEmpty(claims);
         Assert.Single(claims);
-        var firstClaim = claims[0];
+        var (edi, firstClaim) = claims[0];
 
-        Assert.IsType<ProfessionalCareClaim>(firstClaim);
-        Assert.NotNull(firstClaim);
-
-        ProfessionalCareClaim professionalCareClaim = (firstClaim as ProfessionalCareClaim)!;
+        Assert.IsType<TS837P>(edi);
+        ProfessionalCareClaim professionalCareClaim = Assert.IsType<ProfessionalCareClaim>(
+            firstClaim
+        );
 
         Assert.Equal(DateOnly.Parse("2006-10-15"), professionalCareClaim.TransactionDate);
         Assert.Equal(TimeOnly.Parse("17:05"), professionalCareClaim.TransactionTime);
@@ -124,5 +125,8 @@ public class Process837ProfessionalTests
         Assert.Null(dependent.IdentificationCodeQualifier);
         Assert.Null(dependent.ResponseContactIdentifier);
         Assert.Null(dependent.Relationship);
+
+        // test healthcare providers
+        Assert.Single(professionalCareClaim.HealthcareProviders);
     }
 }

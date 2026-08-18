@@ -12,9 +12,9 @@ namespace PayerEDI.Data.Services;
 
 public class EdiProcessor(ILogger<EdiProcessor> logger)
 {
-    public IList<HealthCareClaim> ProcessEdi(Stream ediStream)
+    public IList<(EdiMessage, HealthCareClaim)> ProcessEdi(Stream ediStream)
     {
-        var claims = new List<HealthCareClaim>();
+        var claims = new List<(EdiMessage, HealthCareClaim)>();
         using var edi = new X12Reader(ediStream, X12TypeFactory.GetTypeInfo);
         var transactions = edi.ReadToEnd().ToList();
         // Keep this interface-typed so nested processors share one boxed enumerator instead of advancing copied struct enumerators.
@@ -46,7 +46,7 @@ public class EdiProcessor(ILogger<EdiProcessor> logger)
     }
 
     private void ProcessInterchange(
-        List<HealthCareClaim> claims,
+        List<(EdiMessage, HealthCareClaim)> claims,
         IEnumerator<IEdiItem> transactionEnumerator,
         ISA isa
     )
@@ -77,7 +77,7 @@ public class EdiProcessor(ILogger<EdiProcessor> logger)
     }
 
     private void ProcessFunctionalGroup(
-        List<HealthCareClaim> claims,
+        List<(EdiMessage, HealthCareClaim)> claims,
         IEnumerator<IEdiItem> transactionEnumerator,
         ISA isa,
         GS gs
@@ -95,11 +95,11 @@ public class EdiProcessor(ILogger<EdiProcessor> logger)
             {
                 case TS837P ts837P:
                     logger.LogDebug("837P transaction {Transaction}", ts837P);
-                    claims.Add(ProfessionalCareClaim.New(gs.Date_4, gs.Time_5, ts837P));
+                    claims.Add((ts837P, ProfessionalCareClaim.New(gs.Date_4, gs.Time_5, ts837P)));
                     break;
                 case TS837D ts837D:
                     logger.LogDebug("837D transaction {Transaction}", ts837D);
-                    claims.Add(DentalCareClaim.New(gs.Date_4, gs.Time_5, ts837D));
+                    claims.Add((ts837D, DentalCareClaim.New(gs.Date_4, gs.Time_5, ts837D)));
                     break;
                 case ReaderErrorContext errorContext: // TODO: aggregate and pass back to caller, or stop processing and throw exception?
                     logger.LogError(
@@ -114,7 +114,7 @@ public class EdiProcessor(ILogger<EdiProcessor> logger)
                     logger.LogInformation("Control Group Number {Number}", ge.GroupControlNumber_2);
                     return; // end of section
                 default:
-                    logger.LogInformation(
+                    logger.LogWarning(
                         "Unhandled transaction type in functional group {Transaction}",
                         transaction
                     );

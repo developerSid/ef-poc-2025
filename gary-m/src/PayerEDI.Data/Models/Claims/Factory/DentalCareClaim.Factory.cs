@@ -42,14 +42,15 @@ public static class DentalCareClaimFactory
                     claim.AllNM1.Loop1000B.NM1_ReceiverName
                 );
                 var subscribers = Subscriber.New(claim);
+                var healthcareProviders = HealthcareProvider.New(claim);
 
                 return new DentalCareClaim(
-                    AssociatedEdi: claim,
                     TransactionDate: date,
                     TransactionTime: time,
                     Submitter: submitter,
                     Receiver: receiver,
-                    Subscribers: subscribers
+                    Subscribers: subscribers,
+                    HealthcareProviders: healthcareProviders
                 );
             }
 
