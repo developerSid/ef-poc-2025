@@ -5,10 +5,19 @@ namespace PayerEDI.Data.Database;
 
 public class PayerEdiDbContext(DbContextOptions<PayerEdiDbContext> options) : DbContext(options)
 {
+    public DbSet<DocumentTable> Documents => Set<DocumentTable>();
     public DbSet<PatientTable> Patients => Set<PatientTable>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        var document = modelBuilder.Entity<DocumentTable>();
+
+        document.ToTable("documents");
+        document.HasKey(item => item.Id);
+        document.Property(item => item.Id).HasColumnType("uniqueidentifier").ValueGeneratedNever();
+        document.Property(item => item.EdiMessageType).HasMaxLength(128).IsRequired();
+        document.Property(item => item.Xml).HasColumnType("xml").IsRequired();
+
         var patient = modelBuilder.Entity<PatientTable>();
 
         patient.ToTable("Patients");

@@ -1,6 +1,7 @@
-﻿using System.Security.AccessControl;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Xml;
+using System.Xml.Serialization;
 using CommandLine;
 using EdiFabric.Core.Model.Edi;
 using EdiFabric.Templates.Hipaa5010;
@@ -11,10 +12,23 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PayerEDI.Data;
 using PayerEDI.Data.Database;
+using PayerEDI.Data.Database.Tables;
 using PayerEDI.Data.Models.Claims;
 using PayerEDI.Data.Services;
 using PayerEDI.Processor.Console.Command;
 using Serilog;
+
+static string SerializeXml<T>(T value)
+{
+    var serializer = new XmlSerializer(value is null ? typeof(T) : value.GetType());
+    var settings = new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true };
+
+    using var stringWriter = new StringWriter();
+    using var xmlWriter = XmlWriter.Create(stringWriter, settings);
+    serializer.Serialize(xmlWriter, value);
+
+    return stringWriter.ToString();
+}
 
 Parser
     .Default.ParseArguments<CliOptions>(args)
@@ -94,18 +108,30 @@ Parser
             {
                 switch (claim)
                 {
-                    case (TS837P _, ProfessionalCareClaim pro)
+                    case (TS837P edi, ProfessionalCareClaim pro)
                         when logger.IsEnabled(LogLevel.Debug):
                         logger.LogDebug(
                             "TS837P:\n{ProClaim:l}",
                             JsonSerializer.Serialize(pro, jsonOptions)
                         );
+                        var proDoc = new DocumentTable
+                        {
+                            EdiMessageType = "TS837P",
+                            Xml = SerializeXml(edi),
+                        };
+                        logger.LogDebug("DocumentTable: {Document:l}", proDoc);
                         break;
-                    case (TS837D _, DentalCareClaim dental) when logger.IsEnabled(LogLevel.Debug):
+                    case (TS837D edi, DentalCareClaim dental) when logger.IsEnabled(LogLevel.Debug):
                         logger.LogDebug(
-                            "TS837P:\n{DentalClaim:l}",
+                            "TS837D:\n{DentalClaim:l}",
                             JsonSerializer.Serialize(dental, jsonOptions)
                         );
+                        var dentalDoc = new DocumentTable
+                        {
+                            EdiMessageType = "TS837D",
+                            Xml = SerializeXml(edi),
+                        };
+                        logger.LogDebug("DocumentTable: {Document:l}", dentalDoc);
                         break;
                     default:
                         logger.LogWarning("Unknown claim: {Claim}", claim);
@@ -116,16 +142,10 @@ Parser
                 {
                     case (TS837P edi, ProfessionalCareClaim _)
                         when logger.IsEnabled(LogLevel.Trace):
-                        logger.LogTrace(
-                            "TS837P:\n{ProClaim:l}",
-                            JsonSerializer.Serialize(edi, jsonOptions)
-                        );
+                        logger.LogTrace("TS837P XML:\n{ProClaimXml:l}", SerializeXml(edi));
                         break;
                     case (TS837D edi, DentalCareClaim _) when logger.IsEnabled(LogLevel.Trace):
-                        logger.LogTrace(
-                            "TS837P:\n{DentalClaim:l}",
-                            JsonSerializer.Serialize(edi, jsonOptions)
-                        );
+                        logger.LogTrace("TS837D XML:\n{DentalClaimXml:l}", SerializeXml(edi));
                         break;
                 }
             }
