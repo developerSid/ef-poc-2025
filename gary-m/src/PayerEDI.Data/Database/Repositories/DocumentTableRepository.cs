@@ -3,16 +3,16 @@ using PayerEDI.Data.Database.Tables;
 
 namespace PayerEDI.Data.Database.Repositories;
 
-public class PatientRepository(PayerEdiDbContext context)
+public class DocumentTableRepository(PayerEdiDbContext context)
 {
-    public void AddRange(IEnumerable<PatientTable> patients) => context.Patients.AddRange(patients);
+    public void Add(DocumentTable documentTable) => context.Documents.Add(documentTable);
 
     public Task<int> SaveAsync(
-        IEnumerable<PatientTable> patients,
+        DocumentTable documentTable,
         CancellationToken cancellationToken = default
     )
     {
-        AddRange(patients);
+        Add(documentTable);
         return context.SaveChangesAsync(cancellationToken);
     }
 }

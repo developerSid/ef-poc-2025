@@ -12,7 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PayerEDI.Data;
 using PayerEDI.Data.Database;
-using PayerEDI.Data.Database.Tables;
+using PayerEDI.Data.Database.Repositories;
 using PayerEDI.Data.Models.Claims;
 using PayerEDI.Data.Services;
 using PayerEDI.Processor.Console.Command;
@@ -73,6 +73,9 @@ Parser
                         dbOptions.UseSqlServer(connectionString)
                     );
                     services.AddSingleton<EdiProcessor>();
+                    services.AddScoped<DocumentTableRepository>();
+                    services.AddScoped<PatientRepository>();
+                    services.AddScoped<PersistenceService>();
                 }
             )
             .UseSerilog(
@@ -104,34 +107,34 @@ Parser
             };
 
             logger.LogInformation("Claims found in {file}", ediFile);
+            using var scope = app.Services.CreateScope();
+            var persistenceService = scope.ServiceProvider.GetRequiredService<PersistenceService>();
+
             foreach ((EdiMessage, HealthCareClaim) claim in claims) // These files can be batches, how to handle something that doesn't fit the HealthCareClaim hierarchy at some point?
             {
                 switch (claim)
                 {
-                    case (TS837P edi, ProfessionalCareClaim pro)
-                        when logger.IsEnabled(LogLevel.Debug):
-                        logger.LogDebug(
-                            "TS837P:\n{ProClaim:l}",
-                            JsonSerializer.Serialize(pro, jsonOptions)
-                        );
-                        var proDoc = new DocumentTable
+                    case (TS837P edi, ProfessionalCareClaim pro):
+                        persistenceService.Save(edi).GetAwaiter().GetResult();
+                        persistenceService.Save(pro).GetAwaiter().GetResult();
+                        if (logger.IsEnabled(LogLevel.Debug))
                         {
-                            EdiMessageType = "TS837P",
-                            Xml = SerializeXml(edi),
-                        };
-                        logger.LogDebug("DocumentTable: {Document:l}", proDoc);
+                            logger.LogDebug(
+                                "TS837P:\n{ProClaim:l}",
+                                JsonSerializer.Serialize(pro, jsonOptions)
+                            );
+                        }
                         break;
-                    case (TS837D edi, DentalCareClaim dental) when logger.IsEnabled(LogLevel.Debug):
-                        logger.LogDebug(
-                            "TS837D:\n{DentalClaim:l}",
-                            JsonSerializer.Serialize(dental, jsonOptions)
-                        );
-                        var dentalDoc = new DocumentTable
+                    case (TS837D edi, DentalCareClaim dental):
+                        persistenceService.Save(edi).GetAwaiter().GetResult();
+                        persistenceService.Save(dental).GetAwaiter().GetResult();
+                        if (logger.IsEnabled(LogLevel.Debug))
                         {
-                            EdiMessageType = "TS837D",
-                            Xml = SerializeXml(edi),
-                        };
-                        logger.LogDebug("DocumentTable: {Document:l}", dentalDoc);
+                            logger.LogDebug(
+                                "TS837D:\n{DentalClaim:l}",
+                                JsonSerializer.Serialize(dental, jsonOptions)
+                            );
+                        }
                         break;
                     default:
                         logger.LogWarning("Unknown claim: {Claim}", claim);
