@@ -6,8 +6,7 @@ public static class SubscriberFactory
 {
     extension(Subscriber)
     {
-        public static IList<Subscriber> New(TS837P claim) =>
-            //var dependentLoop = claim.Loop2000A[0].Loop2000B[0].Loop2000C;
+        public static List<Subscriber> New(TS837P claim) =>
             claim
                 .Loop2000A.SelectMany(billingProvider => billingProvider.Loop2000B)
                 .Select(subscriber => new Subscriber(
@@ -23,7 +22,7 @@ public static class SubscriberFactory
                 ))
                 .ToList();
 
-        public static IList<Subscriber> New(TS837D claim) =>
+        public static List<Subscriber> New(TS837D claim) =>
             claim
                 .Loop2000A.SelectMany(billingProvider => billingProvider.Loop2000B)
                 .Select(subscriber => new Subscriber(

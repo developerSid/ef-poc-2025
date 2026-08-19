@@ -5,6 +5,5 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/PayerEDI.Tests/PayerEDI.Tests.csproj" />
-    <Project Path="tests/PayerEDI.Test.FT/PayerEDI.Test.FT.csproj" />
   </Folder>
 </Solution>

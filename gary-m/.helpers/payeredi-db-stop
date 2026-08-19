@@ -3,5 +3,5 @@ source "$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/_payeredi_co
 
 require_command docker
 
-compose --profile db down --remove-orphans
+compose down --remove-orphans
 printf 'PayerEDI containers stopped; the vadb volume was preserved.\n'

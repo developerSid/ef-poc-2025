@@ -34,7 +34,7 @@ public static class CommunicationsContactExtensions
             );
         }
 
-        public static CommunicationsContact? MaybeNew(
+        private static CommunicationsContact? MaybeNew(
             PER_BillingProviderContactInformation? contactInfo
         )
         {
@@ -49,14 +49,8 @@ public static class CommunicationsContactExtensions
             return CommunicationsContact.New(contactInfo);
         }
 
-        public static IList<CommunicationsContact> New(
+        public static List<CommunicationsContact> New(
             IList<PER_BillingProviderContactInformation> contactInfos
-        )
-        {
-            return contactInfos
-                .Select(CommunicationsContact.MaybeNew)
-                .Where(c => c != null)
-                .ToList()!; // FIXME: Is there a way to indicate to the compiler that we have filtered nulls out so the ! isn't needed?
-        }
+        ) => contactInfos.Select(CommunicationsContact.MaybeNew).Where(c => c != null).ToList()!; // FIXME: Is there a way to indicate to the compiler that we have filtered nulls out so the ! isn't needed?
     }
 }

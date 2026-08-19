@@ -29,7 +29,7 @@ compose() {
 wait_for_database() {
     local container_id health_status attempt
 
-    container_id="$(compose --profile db ps -q vadb)"
+    container_id="$(compose ps -q vadb)"
     if [[ -z "$container_id" ]]; then
         printf 'SQL Server container was not created.\n' >&2
         exit 1
@@ -42,7 +42,7 @@ wait_for_database() {
                 return 0
                 ;;
             unhealthy)
-                compose --profile db logs vadb >&2 || true
+                compose logs vadb >&2 || true
                 printf 'SQL Server reported an unhealthy status.\n' >&2
                 exit 1
                 ;;
@@ -50,7 +50,7 @@ wait_for_database() {
         sleep 2
     done
 
-    compose --profile db logs vadb >&2 || true
+    compose logs vadb >&2 || true
     printf 'Timed out waiting for SQL Server to become healthy.\n' >&2
     exit 1
 }

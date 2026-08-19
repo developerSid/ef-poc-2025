@@ -28,6 +28,9 @@ public static class PersonFactory
 
         public static Person New(Loop_2310A_837P provider) =>
             Person.New(provider.NM1_ReferringProviderName);
+
+        public static Person New(Loop_2310A_837D provider) =>
+            Person.New(provider.NM1_ReferringProviderName);
     }
 }
 

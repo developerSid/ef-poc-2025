@@ -12,7 +12,7 @@ namespace PayerEDI.Data.Services;
 
 public class EdiProcessor(ILogger<EdiProcessor> logger)
 {
-    public IList<(EdiMessage, HealthCareClaim)> ProcessEdi(Stream ediStream)
+    public List<(EdiMessage, HealthCareClaim)> ProcessEdi(Stream ediStream)
     {
         var claims = new List<(EdiMessage, HealthCareClaim)>();
         using var edi = new X12Reader(ediStream, X12TypeFactory.GetTypeInfo);
@@ -61,7 +61,7 @@ public class EdiProcessor(ILogger<EdiProcessor> logger)
             switch (transaction)
             {
                 case GS gs:
-                    ProcessFunctionalGroup(claims, transactionEnumerator, isa, gs);
+                    ProcessFunctionalGroup(claims, transactionEnumerator, gs);
                     break;
                 case IEA iea:
                     logger.LogInformation("Transaction End {Transaction}", iea);
@@ -79,7 +79,6 @@ public class EdiProcessor(ILogger<EdiProcessor> logger)
     private void ProcessFunctionalGroup(
         List<(EdiMessage, HealthCareClaim)> claims,
         IEnumerator<IEdiItem> transactionEnumerator,
-        ISA isa,
         GS gs
     )
     {

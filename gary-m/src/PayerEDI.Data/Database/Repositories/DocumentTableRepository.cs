@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using PayerEDI.Data.Database.Tables;
 
 namespace PayerEDI.Data.Database.Repositories;

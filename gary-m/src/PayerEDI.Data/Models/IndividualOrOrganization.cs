@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using EdiFabric.Templates.Hipaa5010;
 
 namespace PayerEDI.Data.Models;
 

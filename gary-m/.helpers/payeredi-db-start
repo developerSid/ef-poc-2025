@@ -3,8 +3,8 @@ source "$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/_payeredi_co
 
 require_command docker
 
-compose --profile db up -d vadb
+compose up -d vadb
 wait_for_database
-compose --profile db run --rm --no-deps db-init
+compose run --rm --no-deps db-init
 
 printf 'PayerEdi database is ready.\n'
