@@ -43,6 +43,7 @@ public static class DentalCareClaimFactory
                 );
                 var subscribers = Subscriber.New(claim);
                 var healthcareProviders = HealthcareProvider.New(claim);
+                var procedures = Procedure.New(claim);
 
                 return new DentalCareClaim(
                     TransactionDate: date,
@@ -50,7 +51,8 @@ public static class DentalCareClaimFactory
                     Submitter: submitter,
                     Receiver: receiver,
                     Subscribers: subscribers,
-                    HealthcareProviders: healthcareProviders
+                    HealthcareProviders: healthcareProviders,
+                    Procedures: procedures
                 );
             }
 

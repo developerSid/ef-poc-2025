@@ -46,7 +46,8 @@ public record ProfessionalCareClaim(
     ClaimSubmitter Submitter,
     IndividualOrOrganization Receiver,
     IList<Subscriber> Subscribers,
-    IList<HealthcareProvider> HealthcareProviders
+    IList<HealthcareProvider> HealthcareProviders,
+    IList<Procedure> Procedures
 // Providers - Doctors or similar medical operators doing medical work
 ) : HealthCareClaim(TransactionDate, TransactionTime, Submitter, Receiver);
 
@@ -64,6 +65,7 @@ public sealed record DentalCareClaim(
     ClaimSubmitter Submitter,
     IndividualOrOrganization Receiver,
     IList<Subscriber> Subscribers,
-    IList<HealthcareProvider> HealthcareProviders
+    IList<HealthcareProvider> HealthcareProviders,
+    IList<Procedure> Procedures
 // Providers - Doctors or similar medical operators doing medical work
 ) : HealthCareClaim(TransactionDate, TransactionTime, Submitter, Receiver);

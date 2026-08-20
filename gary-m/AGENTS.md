@@ -22,6 +22,10 @@ Use `./.helpers/payeredi-db-start` and `./.helpers/payeredi-db-migrate` to start
 
 Use nullable-enabled C# with four-space indentation, file-scoped namespaces, records for database table entities, and primary constructors where they improve clarity. Use PascalCase for types and members, camelCase for locals and parameters, and descriptive `*Table`, `*Repository`, `*Service`, and `*Extensions` names. Keep EF configuration in `PayerEdiDbContext` and use async database operations with cancellation tokens.
 
+### C# and .NET Version
+
+Before adding or changing C# code, inspect `global.json` and use syntax supported by its selected .NET SDK. This repository selects the .NET 10 SDK (`10.0.*`), whose corresponding default language version is C# 14; C# 14 syntax may be used when it improves clarity. Do not use syntax from a newer or preview language version unless the project explicitly opts into it. Also verify the project’s target framework and existing language-version settings, since a project-level setting takes precedence over the SDK default.
+
 ## Testing Guidelines
 
 Tests use xUnit and follow descriptive `Method_Scenario_ExpectedResult` names. Add focused tests beside the relevant feature area, and include parser, mapping, null, and persistence edge cases where applicable. Run the full `dotnet test` command before submitting changes.
@@ -33,6 +37,10 @@ When describing the differences between a branch and the current branch, begin w
 ## Security & Configuration Tips
 
 Do not commit connection strings, EdiFabric keys, generated secrets, or production data. Use the `EDI_PROCESSOR_` environment-variable prefix and the example appsettings/launch profiles for local configuration. Database migrations require `EDI_PROCESSOR_CONNECTIONSTRINGS__MIGRATION`; normal processing uses `EDI_PROCESSOR_CONNECTIONSTRINGS__DEFAULT` and `EDI_PROCESSOR_KEY__EDIFABRIC`.
+
+## Agent Skills
+
+All agent harnesses, including Codex, Copilot CLI, and OpenCode, must look in `.agent/skills/` for available repository skills before starting a task. Each skill is in its own subdirectory; when a skill is relevant, read and follow its instructions. Treat these skills as shared guidance regardless of which harness is running the agent.
 
 ## Agent Restrictions
 

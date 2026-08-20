@@ -114,6 +114,11 @@ public class Process837Dental
         Assert.Null(dependent.ResponseContactIdentifier);
         Assert.Null(dependent.Relationship);
 
+        // test service lines
+        Assert.Equal(2, dentalCareClaim.Procedures.Count);
+        Assert.Equal("D2150", dentalCareClaim.Procedures[0].ProcedureCode);
+        Assert.Equal("100", dentalCareClaim.Procedures[0].ChargeAmount);
+
         // test healthcare providers
         Assert.NotEmpty(dentalCareClaim.HealthcareProviders);
 

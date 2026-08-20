@@ -126,6 +126,12 @@ public class Process837ProfessionalTests
         Assert.Null(dependent.ResponseContactIdentifier);
         Assert.Null(dependent.Relationship);
 
+        // test service lines
+        Assert.Equal(4, professionalCareClaim.Procedures.Count);
+        Assert.Equal("99299", professionalCareClaim.Procedures[0].ProcedureCode);
+        Assert.Equal("40", professionalCareClaim.Procedures[0].ChargeAmount);
+        Assert.Equal("RD8", professionalCareClaim.Procedures[0].ServiceDateFormatQualifier);
+
         // test healthcare providers
         Assert.Single(professionalCareClaim.HealthcareProviders);
         var healthCareProvider = professionalCareClaim.HealthcareProviders[0];

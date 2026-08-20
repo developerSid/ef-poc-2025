@@ -44,6 +44,7 @@ public static class ProfessionalCareClaimFactory
                 );
                 var subscribers = Subscriber.New(claim);
                 var healthcareProviders = HealthcareProvider.New(claim);
+                var procedures = Procedure.New(claim);
 
                 return new ProfessionalCareClaim(
                     TransactionDate: date,
@@ -51,7 +52,8 @@ public static class ProfessionalCareClaimFactory
                     Submitter: submitter,
                     Receiver: receiver,
                     Subscribers: subscribers,
-                    HealthcareProviders: healthcareProviders
+                    HealthcareProviders: healthcareProviders,
+                    Procedures: procedures
                 );
             }
 
