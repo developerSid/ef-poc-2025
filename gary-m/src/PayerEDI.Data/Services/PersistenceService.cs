@@ -1,5 +1,5 @@
-using EdiFabric.Templates.Hipaa5010;
 using EdiFabric.Core.Model.Edi.ErrorContexts;
+using EdiFabric.Templates.Hipaa5010;
 using FastEnumUtility;
 using PayerEDI.Data.Database;
 using PayerEDI.Data.Database.Repositories;

@@ -17,14 +17,30 @@ namespace PayerEDI.Data.Database.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DocumentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    ControlNumber = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: true),
-                    Edition = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true),
-                    Release = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: true),
+                    Name = table.Column<string>(
+                        type: "nvarchar(128)",
+                        maxLength: 128,
+                        nullable: false
+                    ),
+                    ControlNumber = table.Column<string>(
+                        type: "nvarchar(128)",
+                        maxLength: 128,
+                        nullable: true
+                    ),
+                    Edition = table.Column<string>(
+                        type: "nvarchar(64)",
+                        maxLength: 64,
+                        nullable: true
+                    ),
+                    Release = table.Column<string>(
+                        type: "nvarchar(128)",
+                        maxLength: 128,
+                        nullable: true
+                    ),
                     Index = table.Column<int>(type: "int", nullable: false),
                     ValidatedSegmentsCount = table.Column<int>(type: "int", nullable: false),
                     Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Codes = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Codes = table.Column<string>(type: "nvarchar(max)", nullable: false),
                 },
                 constraints: table =>
                 {
@@ -34,8 +50,10 @@ namespace PayerEDI.Data.Database.Migrations
                         column: x => x.DocumentId,
                         principalTable: "documents",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "edi_segment_error",
@@ -44,12 +62,24 @@ namespace PayerEDI.Data.Database.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     EdiErrorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    Name = table.Column<string>(
+                        type: "nvarchar(128)",
+                        maxLength: 128,
+                        nullable: false
+                    ),
                     Position = table.Column<int>(type: "int", nullable: false),
-                    LoopId = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: true),
+                    LoopId = table.Column<string>(
+                        type: "nvarchar(128)",
+                        maxLength: 128,
+                        nullable: true
+                    ),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SpecRef = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Codes = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    SpecRef = table.Column<string>(
+                        type: "nvarchar(256)",
+                        maxLength: 256,
+                        nullable: true
+                    ),
+                    Codes = table.Column<string>(type: "nvarchar(max)", nullable: false),
                 },
                 constraints: table =>
                 {
@@ -59,28 +89,30 @@ namespace PayerEDI.Data.Database.Migrations
                         column: x => x.EdiErrorId,
                         principalTable: "edi_error",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_edi_error_DocumentId",
                 table: "edi_error",
-                column: "DocumentId");
+                column: "DocumentId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_edi_segment_error_EdiErrorId",
                 table: "edi_segment_error",
-                column: "EdiErrorId");
+                column: "EdiErrorId"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "edi_segment_error");
+            migrationBuilder.DropTable(name: "edi_segment_error");
 
-            migrationBuilder.DropTable(
-                name: "edi_error");
+            migrationBuilder.DropTable(name: "edi_error");
         }
     }
 }

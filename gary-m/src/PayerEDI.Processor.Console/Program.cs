@@ -52,25 +52,27 @@ await Parser
                 {
                     services.AddSingleton<IEdiProcessor, EdiFabricEdiProcessor>();
 
-                    if (options.Save)
+                    if (!options.Save)
                     {
-                        var connectionString =
-                            context.Configuration.GetConnectionString("Default")
-                            ?? throw new InvalidOperationException(
-                                "The default database connection string is required when --save is enabled. Set EDI_PROCESSOR_CONNECTIONSTRINGS__DEFAULT."
-                            );
-
-                        // AddDbContext registers the EF Core context as scoped by default so each processing
-                        // scope gets one unit-of-work context; DbContext is not thread-safe and should not
-                        // be shared across concurrent work or retained for the application's lifetime.
-                        services.AddDbContext<PayerEdiDbContext>(dbOptions =>
-                            dbOptions.UseSqlServer(connectionString)
-                        );
-                        // These services consume the scoped EF Core DbContext, so they must also be scoped.
-                        services.AddScoped<IDocumentTableRepository, DocumentTableRepository>();
-                        services.AddScoped<IPatientRepository, PatientRepository>();
-                        services.AddScoped<IPersistenceService, PersistenceService>();
+                        return;
                     }
+
+                    var connectionString =
+                        context.Configuration.GetConnectionString("Default")
+                        ?? throw new InvalidOperationException(
+                            "The default database connection string is required when --save is enabled. Set EDI_PROCESSOR_CONNECTIONSTRINGS__DEFAULT."
+                        );
+
+                    // AddDbContext registers the EF Core context as scoped by default so each processing
+                    // scope gets one unit-of-work context; DbContext is not thread-safe and should not
+                    // be shared across concurrent work or retained for the application's lifetime.
+                    services.AddDbContext<PayerEdiDbContext>(dbOptions =>
+                        dbOptions.UseSqlServer(connectionString)
+                    );
+                    // These services consume the scoped EF Core DbContext, so they must also be scoped.
+                    services.AddScoped<IDocumentTableRepository, DocumentTableRepository>();
+                    services.AddScoped<IPatientRepository, PatientRepository>();
+                    services.AddScoped<IPersistenceService, PersistenceService>();
                 }
             )
             .UseSerilog(
@@ -94,9 +96,7 @@ await Parser
         if (File.Exists(ediFile))
         {
             await using var ediStream = File.OpenRead(ediFile);
-            var claims = app
-                .Services.GetRequiredService<IEdiProcessor>()
-                .ProcessEdi(ediStream);
+            var claims = app.Services.GetRequiredService<IEdiProcessor>().ProcessEdi(ediStream);
             var jsonOptions = new JsonSerializerOptions
             {
                 WriteIndented = true,
@@ -131,7 +131,7 @@ await Parser
 
                 switch (claim.Item2)
                 {
-                    case (ProfessionalCareClaim pro):
+                    case ProfessionalCareClaim pro:
 
                         if (logger.IsEnabled(LogLevel.Debug))
                         {
@@ -142,7 +142,7 @@ await Parser
                         }
 
                         break;
-                    case (DentalCareClaim dental):
+                    case DentalCareClaim dental:
                         if (logger.IsEnabled(LogLevel.Debug))
                         {
                             logger.LogDebug(

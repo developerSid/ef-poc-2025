@@ -20,15 +20,16 @@ public static class SegmentErrorContextExtensions
     public static EdiSegmentErrorTable CreateEdiSegmentError(
         this SegmentErrorContext errorContext,
         Guid ediErrorId
-    ) => new()
-    {
-        EdiErrorId = ediErrorId,
-        Message = errorContext.Message ?? string.Empty,
-        Name = errorContext.Name ?? string.Empty,
-        Position = errorContext.Position,
-        LoopId = errorContext.LoopId,
-        Value = errorContext.Value,
-        SpecRef = errorContext.SpecRef,
-        Codes = errorContext.Codes.Select(code => code.ToString()).ToArray(),
-    };
+    ) =>
+        new()
+        {
+            EdiErrorId = ediErrorId,
+            Message = errorContext.Message ?? string.Empty,
+            Name = errorContext.Name ?? string.Empty,
+            Position = errorContext.Position,
+            LoopId = errorContext.LoopId,
+            Value = errorContext.Value,
+            SpecRef = errorContext.SpecRef,
+            Codes = errorContext.Codes.Select(code => code.ToString()).ToArray(),
+        };
 }

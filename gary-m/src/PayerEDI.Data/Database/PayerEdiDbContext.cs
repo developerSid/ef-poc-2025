@@ -46,7 +46,10 @@ public class PayerEdiDbContext(DbContextOptions<PayerEdiDbContext> options) : Db
 
         ediSegmentError.ToTable("edi_segment_error");
         ediSegmentError.HasKey(item => item.Id);
-        ediSegmentError.Property(item => item.Id).HasColumnType("uniqueidentifier").ValueGeneratedNever();
+        ediSegmentError
+            .Property(item => item.Id)
+            .HasColumnType("uniqueidentifier")
+            .ValueGeneratedNever();
         ediSegmentError.Property(item => item.EdiErrorId).HasColumnType("uniqueidentifier");
         ediSegmentError.Property(item => item.Message).HasColumnType("nvarchar(max)").IsRequired();
         ediSegmentError.Property(item => item.Name).HasMaxLength(128).IsRequired();

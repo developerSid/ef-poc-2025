@@ -45,11 +45,7 @@ public class EdiErrorTableExtensionsTests
     [Fact]
     public void CreateEdiError_DoesNotPersistHasErrors()
     {
-        var source = new MessageErrorContext
-        {
-            Name = "837",
-            HasErrors = true,
-        };
+        var source = new MessageErrorContext { Name = "837", HasErrors = true };
 
         var result = source.CreateEdiError(Guid.NewGuid());
 

@@ -12,10 +12,7 @@ public static class EdiMessageXmlExtensions
         OmitXmlDeclaration = true,
     };
 
-    public static string ToXml(
-        this EdiMessage? value,
-        XmlWriterSettings? settings = null
-    )
+    public static string ToXml(this EdiMessage? value, XmlWriterSettings? settings = null)
     {
         if (value is null)
         {
