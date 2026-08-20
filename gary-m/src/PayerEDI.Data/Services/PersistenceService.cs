@@ -1,5 +1,6 @@
-using FastEnumUtility;
 using EdiFabric.Templates.Hipaa5010;
+using FastEnumUtility;
+using PayerEDI.Data.Database;
 using PayerEDI.Data.Database.Repositories;
 using PayerEDI.Data.Database.Tables;
 using PayerEDI.Data.Helpers;
@@ -9,20 +10,39 @@ using PayerEDI.Data.Models.Claims;
 namespace PayerEDI.Data.Services;
 
 public class PersistenceService(
-    DocumentTableRepository documentTableRepository,
-    PatientRepository patientRepository
-)
+    PayerEdiDbContext context,
+    IDocumentTableRepository documentTableRepository,
+    IPatientRepository patientRepository
+) : IPersistenceService
 {
+    public Task Save(
+        TS837P ts837P,
+        ProfessionalCareClaim professionalCareClaim,
+        CancellationToken cancellationToken = default
+    ) =>
+        SaveClaimAsync(
+            ts837P.CreateDocument(),
+            GetPatients(professionalCareClaim.Subscribers),
+            cancellationToken
+        );
+
+    public Task Save(
+        TS837D ts837D,
+        DentalCareClaim dentalCareClaim,
+        CancellationToken cancellationToken = default
+    ) =>
+        SaveClaimAsync(
+            ts837D.CreateDocument(),
+            GetPatients(dentalCareClaim.Subscribers),
+            cancellationToken
+        );
+
     public async Task<DocumentTable> Save(
         TS837P ts837P,
         CancellationToken cancellationToken = default
     )
     {
-        var documentTable = new DocumentTable
-        {
-            EdiMessageType = nameof(TS837P),
-            Xml = ts837P.ToXml(),
-        };
+        var documentTable = ts837P.CreateDocument();
 
         await documentTableRepository.SaveAsync(documentTable, cancellationToken);
         return documentTable;
@@ -33,11 +53,7 @@ public class PersistenceService(
         CancellationToken cancellationToken = default
     )
     {
-        var documentTable = new DocumentTable
-        {
-            EdiMessageType = nameof(TS837D),
-            Xml = ts837D.ToXml(),
-        };
+        var documentTable = ts837D.CreateDocument();
 
         await documentTableRepository.SaveAsync(documentTable, cancellationToken);
         return documentTable;
@@ -70,6 +86,26 @@ public class PersistenceService(
             .SelectMany(subscriber => new[] { subscriber.Primary }.Concat(subscriber.Dependents))
             .Select(ToPatientTable)
             .ToArray();
+
+    private async Task SaveClaimAsync(
+        DocumentTable documentTable,
+        IReadOnlyCollection<PatientTable> patients,
+        CancellationToken cancellationToken
+    )
+    {
+        // Keep the document and its patients atomic: a failed claim must not leave only half of
+        // its records persisted. The transaction also uses this scope's single DbContext instance.
+        await using var transaction = await context.Database.BeginTransactionAsync( // this is how EF Core handles transactions, Spring does this with an annotation on the method
+            cancellationToken
+        );
+
+        documentTableRepository.Add(documentTable);
+        patientRepository.AddRange(patients);
+        // Add and AddRange only stage both entity sets in the same DbContext; this single
+        // SaveChangesAsync call is the only database commit for the entire claim.
+        await context.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+    }
 
     private static PatientTable ToPatientTable(IndividualOrOrganization entity) =>
         entity switch

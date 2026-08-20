@@ -17,7 +17,7 @@ using PayerEDI.Data.Services;
 using PayerEDI.Processor.Console.Command;
 using Serilog;
 
-Parser
+await Parser
     .Default.ParseArguments<CliOptions>(args)
     .WithNotParsed(errors =>
     {
@@ -26,10 +26,10 @@ Parser
             Console.WriteLine(error);
         }
     })
-    .WithParsed(options =>
+    .WithParsedAsync(async options =>
     {
         var ediFile = Path.GetFullPath(options.EdiFile, Directory.GetCurrentDirectory());
-        var app = Host.CreateDefaultBuilder(args)
+        using var app = Host.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration(
                 (hostingContext, config) =>
                 {
@@ -56,13 +56,17 @@ Parser
                             "The default database connection string is required. Set EDI_PROCESSOR_CONNECTIONSTRINGS__DEFAULT."
                         );
 
+                    // AddDbContext registers the EF Core context as scoped by default so each processing
+                    // scope gets one unit-of-work context; DbContext is not thread-safe and should not
+                    // be shared across concurrent work or retained for the application's lifetime.
                     services.AddDbContext<PayerEdiDbContext>(dbOptions =>
                         dbOptions.UseSqlServer(connectionString)
                     );
-                    services.AddSingleton<EdiProcessor>();
-                    services.AddScoped<DocumentTableRepository>();
-                    services.AddScoped<PatientRepository>();
-                    services.AddScoped<PersistenceService>();
+                    services.AddSingleton<IEdiProcessor, EdiFabricEdiProcessor>();
+                    // These services consume the scoped EF Core DbContext, so they must also be scoped.
+                    services.AddScoped<IDocumentTableRepository, DocumentTableRepository>();
+                    services.AddScoped<IPatientRepository, PatientRepository>();
+                    services.AddScoped<IPersistenceService, PersistenceService>();
                 }
             )
             .UseSerilog(
@@ -85,8 +89,10 @@ Parser
 
         if (File.Exists(ediFile))
         {
-            using var ediStream = File.OpenRead(ediFile);
-            var claims = app.Services.GetRequiredService<EdiProcessor>().ProcessEdi(ediStream);
+            await using var ediStream = File.OpenRead(ediFile);
+            var claims = app
+                .Services.GetRequiredService<IEdiProcessor>()
+                .ProcessEdi(ediStream);
             var jsonOptions = new JsonSerializerOptions
             {
                 WriteIndented = true,
@@ -94,16 +100,20 @@ Parser
             };
 
             logger.LogInformation("Claims found in {file}", ediFile);
-            using var scope = app.Services.CreateScope();
-            var persistenceService = scope.ServiceProvider.GetRequiredService<PersistenceService>();
 
             foreach ((EdiMessage, HealthCareClaim) claim in claims) // These files can be batches, how to handle something that doesn't fit the HealthCareClaim hierarchy at some point?
             {
+                // Use one scope per claim so its scoped DbContext and change tracker are disposed
+                // promptly instead of retaining every entity from the entire EDI file.
+                await using var scope = app.Services.CreateAsyncScope();
+                var persistenceService =
+                    scope.ServiceProvider.GetRequiredService<IPersistenceService>();
+
                 switch (claim)
                 {
                     case (TS837P edi, ProfessionalCareClaim pro):
-                        persistenceService.Save(edi).GetAwaiter().GetResult();
-                        persistenceService.Save(pro).GetAwaiter().GetResult();
+                        await persistenceService.Save(edi, pro);
+
                         if (logger.IsEnabled(LogLevel.Debug))
                         {
                             logger.LogDebug(
@@ -111,10 +121,11 @@ Parser
                                 JsonSerializer.Serialize(pro, jsonOptions)
                             );
                         }
+
                         break;
                     case (TS837D edi, DentalCareClaim dental):
-                        persistenceService.Save(edi).GetAwaiter().GetResult();
-                        persistenceService.Save(dental).GetAwaiter().GetResult();
+                        await persistenceService.Save(edi, dental);
+
                         if (logger.IsEnabled(LogLevel.Debug))
                         {
                             logger.LogDebug(
@@ -122,6 +133,7 @@ Parser
                                 JsonSerializer.Serialize(dental, jsonOptions)
                             );
                         }
+
                         break;
                     default:
                         logger.LogWarning("Unknown claim: {Claim}", claim);

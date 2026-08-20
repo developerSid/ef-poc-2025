@@ -10,7 +10,7 @@ using PayerEDI.Data.Models.Claims.Factory;
 
 namespace PayerEDI.Data.Services;
 
-public class EdiProcessor(ILogger<EdiProcessor> logger)
+public class EdiFabricEdiProcessor(ILogger<EdiFabricEdiProcessor> logger) : IEdiProcessor
 {
     public List<(EdiMessage, HealthCareClaim)> ProcessEdi(Stream ediStream)
     {

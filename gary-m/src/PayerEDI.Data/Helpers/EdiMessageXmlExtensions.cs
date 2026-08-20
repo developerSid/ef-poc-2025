@@ -1,9 +1,10 @@
 using System.Xml;
 using System.Xml.Serialization;
+using EdiFabric.Core.Model.Edi;
 
 namespace PayerEDI.Data.Helpers;
 
-public static class XmlExtensions
+public static class EdiMessageXmlExtensions
 {
     private static readonly XmlWriterSettings DefaultSettings = new()
     {
@@ -11,7 +12,10 @@ public static class XmlExtensions
         OmitXmlDeclaration = true,
     };
 
-    public static string ToXml<T>(this T value, XmlWriterSettings? settings = null)
+    public static string ToXml(
+        this EdiMessage? value,
+        XmlWriterSettings? settings = null
+    )
     {
         if (value is null)
         {

@@ -1,5 +1,5 @@
-using FastEnumUtility;
 using System.Runtime.Serialization;
+using FastEnumUtility;
 
 namespace PayerEDI.Data.Models.Factory;
 
@@ -13,7 +13,13 @@ public static class CommunicationNumberQualifierFactory
             {
                 foreach (var member in FastEnum.GetMembers<CommunicationNumberQualifier>())
                 {
-                    if (string.Equals(member.EnumMemberAttribute?.Value, value, StringComparison.OrdinalIgnoreCase))
+                    if (
+                        string.Equals(
+                            member.EnumMemberAttribute?.Value,
+                            value,
+                            StringComparison.OrdinalIgnoreCase
+                        )
+                    )
                     {
                         return member.Value;
                     }

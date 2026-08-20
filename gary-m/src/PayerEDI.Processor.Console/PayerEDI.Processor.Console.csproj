@@ -30,6 +30,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>14</LangVersion>
     <Nullable>enable</Nullable>
     <RootNamespace>PayerEDI.Processor.Console</RootNamespace>
     <StartWorkingDirectory>$(MSBuildProjectDirectory)</StartWorkingDirectory>

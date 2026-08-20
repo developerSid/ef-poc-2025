@@ -1,5 +1,5 @@
-using FastEnumUtility;
 using System.Runtime.Serialization;
+using FastEnumUtility;
 
 namespace PayerEDI.Data.Models;
 
@@ -398,7 +398,13 @@ public static class EntityRelationshipCodeExtensions
             {
                 foreach (var member in FastEnum.GetMembers<EntityRelationshipCode>())
                 {
-                    if (string.Equals(member.EnumMemberAttribute?.Value, code, StringComparison.OrdinalIgnoreCase))
+                    if (
+                        string.Equals(
+                            member.EnumMemberAttribute?.Value,
+                            code,
+                            StringComparison.OrdinalIgnoreCase
+                        )
+                    )
                     {
                         return member.Value;
                     }

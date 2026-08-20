@@ -9,7 +9,7 @@ public class Process837ProfessionalTests
     : IClassFixture<TestLoggingFixture>,
         IClassFixture<TestEdiFabricFixture>
 {
-    private readonly Data.Services.EdiProcessor _processor;
+    private readonly Data.Services.EdiFabricEdiProcessor _processor;
 
     public Process837ProfessionalTests(
         TestLoggingFixture logging,
@@ -17,8 +17,8 @@ public class Process837ProfessionalTests
     )
     {
         _ = testEdiFabricFixture;
-        _processor = new Data.Services.EdiProcessor(
-            logging.CreateLogger<Data.Services.EdiProcessor>()
+        _processor = new Data.Services.EdiFabricEdiProcessor(
+            logging.CreateLogger<Data.Services.EdiFabricEdiProcessor>()
         );
     }
 
