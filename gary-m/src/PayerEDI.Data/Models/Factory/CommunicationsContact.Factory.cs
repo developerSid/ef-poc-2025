@@ -51,6 +51,10 @@ public static class CommunicationsContactExtensions
 
         public static List<CommunicationsContact> New(
             IList<PER_BillingProviderContactInformation> contactInfos
-        ) => contactInfos.Select(CommunicationsContact.MaybeNew).Where(c => c != null).ToList()!; // FIXME: Is there a way to indicate to the compiler that we have filtered nulls out so the ! isn't needed?
+        ) =>
+            contactInfos
+                .Select(CommunicationsContact.MaybeNew)
+                .OfType<CommunicationsContact>()
+                .ToList();
     }
 }

@@ -8,19 +8,13 @@
 - `samples/EDI/` contains sample 837 input files; `docs/` contains onboarding and EDI/EF Core notes.
 - `.helpers/` contains scripts for database lifecycle, profiles, and formatting.
 
-## Build, Test, and Development Commands
-
-```bash
-dotnet build src/PayerEDI.Processor.Console/PayerEDI.Processor.Console.csproj
-dotnet test tests/PayerEDI.Tests/PayerEDI.Tests.csproj
-dotnet run --project src/PayerEDI.Processor.Console --launch-profile professionalall
-```
-
 Use `./.helpers/payeredi-db-start` and `./.helpers/payeredi-db-migrate` to start the local SQL Server and apply EF migrations. Use `./.helpers/pretty-code` to format `src/` and `tests/`. Database reset and truncate helpers are destructive; review their confirmation flags before use.
 
 ## Coding Style & Naming Conventions
 
 Use nullable-enabled C# with four-space indentation, file-scoped namespaces, records for database table entities, and primary constructors where they improve clarity. Use PascalCase for types and members, camelCase for locals and parameters, and descriptive `*Table`, `*Repository`, `*Service`, and `*Extensions` names. Keep EF configuration in `PayerEdiDbContext` and use async database operations with cancellation tokens.
+
+Before adding an extension method, first grep the entire codebase for an existing method that provides the same behavior or targets the same type; reuse or extend the existing implementation when appropriate instead of creating a duplicate. Extension methods for standard-library classes belong under `src/PayerEDI.Data/Helpers/` and must be placed in a file named `{StdlibClassName}Extensions.cs` (for example, `StringExtensions.cs`).
 
 ### C# and .NET Version
 
@@ -38,10 +32,6 @@ When describing the differences between a branch and the current branch, begin w
 
 Do not commit connection strings, EdiFabric keys, generated secrets, or production data. Use the `EDI_PROCESSOR_` environment-variable prefix and the example appsettings/launch profiles for local configuration. Database migrations require `EDI_PROCESSOR_CONNECTIONSTRINGS__MIGRATION`; normal processing uses `EDI_PROCESSOR_CONNECTIONSTRINGS__DEFAULT` and `EDI_PROCESSOR_KEY__EDIFABRIC`.
 
-## Agent Skills
-
-All agent harnesses, including Codex, Copilot CLI, and OpenCode, must look in `.agent/skills/` for available repository skills before starting a task. Each skill is in its own subdirectory; when a skill is relevant, read and follow its instructions. Treat these skills as shared guidance regardless of which harness is running the agent.
-
 ## Agent Restrictions
 
 Agents must not modify the contents or history of this Git repository unless the user explicitly requests the specific change. This includes, but is not limited to, running `git commit`, `git push`, `git merge`, `git rebase`, or destructive reset/checkout commands. Agents may prepare requested working-tree changes and report them for user review.
@@ -50,4 +40,4 @@ Agents must not modify the contents or history of this Git repository unless the
 - **Be concise**: Answer directly without preamble, affirmations, or commentary on ideas.
 - **Skip summaries**: After editing or creating code, do not explain what you did unless asked.
 - **No flattery**: Do not praise the user's choices, questions, or code.
-- Always answer in English
+- **Language**: Always answer in English

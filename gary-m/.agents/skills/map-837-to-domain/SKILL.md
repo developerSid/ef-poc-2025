@@ -19,7 +19,7 @@ The current domain model represents:
 - People and organizations through `IndividualOrOrganization`.
 - Providers through the polymorphic `HealthcareProvider` hierarchy.
 
-`Procedure` is currently an empty placeholder and is not attached to either claim record. Do not invent procedure or service-line fields. Report them as unmapped unless the user explicitly requests a domain-model expansion.
+`Procedure` represents mapped service-line data and is attached to claim records through the claim factories. Do not invent additional procedure or service-line fields; report source values as unmapped unless the user explicitly requests a domain-model expansion.
 
 ## Workflow
 
@@ -63,6 +63,8 @@ var providers = HealthcareProvider.New(claim);
 
 Avoid putting raw EDI traversal throughout the processor or persistence service. Keep EDI-to-domain translation in `Models/Factory` and `Models/Claims/Factory`.
 
+When mapping repeated EDI loops into records, separate collection traversal from record construction. The array/collection pipeline may use `SelectMany`, `Where`, and a short `Select`, but must delegate each source item to a dedicated static `New` mapping method. Do not put a large object initializer that instantiates the target record inline inside the traversal `Select`; keep transaction-specific overloads such as the 837P and 837D procedure mappings in their own `New` methods. `src/PayerEDI.Data/Models/Factory/Procedure.Factory.cs` is the reference pattern to follow, and its former inline `Select` initializer is an anti-pattern.
+
 ## Completion checklist
 
 Before declaring a mapping complete, verify:
@@ -73,5 +75,5 @@ Before declaring a mapping complete, verify:
 - Required and optional element behavior is defined.
 - Repeated loops are preserved.
 - Unmapped segments and unsupported variants are reported.
-- Domain-model gaps, especially the current `Procedure` placeholder, are called out.
+- Domain-model gaps and any unmapped procedure/service-line fields are called out.
 - Focused tests pass, followed by the project test command when the change affects shared mapping behavior.
