@@ -1,4 +1,4 @@
-using System.Reflection;
+using FastEnumUtility;
 using System.Runtime.Serialization;
 
 namespace PayerEDI.Data.Models;
@@ -387,10 +387,7 @@ public enum EntityRelationshipCode
 public static class EntityRelationshipCodeExtensions
 {
     public static string ToCode(this EntityRelationshipCode code) =>
-        typeof(EntityRelationshipCode)
-            .GetField(code.ToString())
-            ?.GetCustomAttribute<EnumMemberAttribute>()
-            ?.Value
+        code.GetEnumMemberValue()
         ?? throw new InvalidOperationException($"No EnumMember value found for {code}.");
 
     extension(EntityRelationshipCode)
@@ -399,16 +396,11 @@ public static class EntityRelationshipCodeExtensions
         {
             if (!string.IsNullOrWhiteSpace(code))
             {
-                foreach (var relationshipCode in Enum.GetValues<EntityRelationshipCode>())
+                foreach (var member in FastEnum.GetMembers<EntityRelationshipCode>())
                 {
-                    var member = typeof(EntityRelationshipCode).GetMember(
-                        relationshipCode.ToString()
-                    )[0];
-                    var enumMember = member.GetCustomAttribute<EnumMemberAttribute>();
-
-                    if (string.Equals(enumMember?.Value, code, StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(member.EnumMemberAttribute?.Value, code, StringComparison.OrdinalIgnoreCase))
                     {
-                        return relationshipCode;
+                        return member.Value;
                     }
                 }
             }

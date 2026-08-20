@@ -1,4 +1,4 @@
-using System.Reflection;
+using FastEnumUtility;
 using System.Runtime.Serialization;
 
 namespace PayerEDI.Data.Models.Factory;
@@ -11,16 +11,11 @@ public static class CommunicationNumberQualifierFactory
         {
             if (!string.IsNullOrWhiteSpace(value))
             {
-                foreach (var qualifier in Enum.GetValues<CommunicationNumberQualifier>())
+                foreach (var member in FastEnum.GetMembers<CommunicationNumberQualifier>())
                 {
-                    var member = typeof(CommunicationNumberQualifier).GetMember(
-                        qualifier.ToString()
-                    )[0];
-                    var enumMember = member.GetCustomAttribute<EnumMemberAttribute>();
-
-                    if (string.Equals(enumMember?.Value, value, StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(member.EnumMemberAttribute?.Value, value, StringComparison.OrdinalIgnoreCase))
                     {
-                        return qualifier;
+                        return member.Value;
                     }
                 }
             }

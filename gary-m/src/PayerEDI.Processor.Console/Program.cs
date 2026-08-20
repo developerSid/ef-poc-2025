@@ -1,7 +1,5 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Xml;
-using System.Xml.Serialization;
 using CommandLine;
 using EdiFabric.Core.Model.Edi;
 using EdiFabric.Templates.Hipaa5010;
@@ -13,22 +11,11 @@ using Microsoft.Extensions.Logging;
 using PayerEDI.Data;
 using PayerEDI.Data.Database;
 using PayerEDI.Data.Database.Repositories;
+using PayerEDI.Data.Helpers;
 using PayerEDI.Data.Models.Claims;
 using PayerEDI.Data.Services;
 using PayerEDI.Processor.Console.Command;
 using Serilog;
-
-static string SerializeXml<T>(T value)
-{
-    var serializer = new XmlSerializer(value is null ? typeof(T) : value.GetType());
-    var settings = new XmlWriterSettings { Indent = true, OmitXmlDeclaration = true };
-
-    using var stringWriter = new StringWriter();
-    using var xmlWriter = XmlWriter.Create(stringWriter, settings);
-    serializer.Serialize(xmlWriter, value);
-
-    return stringWriter.ToString();
-}
 
 Parser
     .Default.ParseArguments<CliOptions>(args)
@@ -145,10 +132,10 @@ Parser
                 {
                     case (TS837P edi, ProfessionalCareClaim _)
                         when logger.IsEnabled(LogLevel.Trace):
-                        logger.LogTrace("TS837P XML:\n{ProClaimXml:l}", SerializeXml(edi));
+                        logger.LogTrace("TS837P XML:\n{ProClaimXml:l}", edi.ToXml());
                         break;
                     case (TS837D edi, DentalCareClaim _) when logger.IsEnabled(LogLevel.Trace):
-                        logger.LogTrace("TS837D XML:\n{DentalClaimXml:l}", SerializeXml(edi));
+                        logger.LogTrace("TS837D XML:\n{DentalClaimXml:l}", edi.ToXml());
                         break;
                 }
             }

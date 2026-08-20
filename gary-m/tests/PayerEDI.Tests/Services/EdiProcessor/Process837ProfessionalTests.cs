@@ -128,5 +128,22 @@ public class Process837ProfessionalTests
 
         // test healthcare providers
         Assert.Single(professionalCareClaim.HealthcareProviders);
+        var healthCareProvider = professionalCareClaim.HealthcareProviders[0];
+
+        Assert.Equal(
+            new Person(
+                EntityIdentifierCode: "DN",
+                LastName: "DOE",
+                SecondLastName: null,
+                FirstName: "JONE",
+                MiddleName: "C",
+                Prefix: null,
+                Suffix: null,
+                IdentificationCodeQualifier: "XX",
+                ResponseContactIdentifier: "5234567805",
+                Relationship: null
+            ),
+            healthCareProvider.Provider
+        );
     }
 }

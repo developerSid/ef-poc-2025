@@ -115,6 +115,24 @@ public class Process837Dental
         Assert.Null(dependent.Relationship);
 
         // test healthcare providers
-        Assert.NotEmpty(dentalCareClaim.HealthcareProviders); // FIXME: Dental Healthcare providers need to be mapped
+        Assert.NotEmpty(dentalCareClaim.HealthcareProviders);
+
+        var healthCareProvider = dentalCareClaim.HealthcareProviders[0];
+
+        Assert.Equal(
+            new Person(
+                EntityIdentifierCode: "DN",
+                LastName: "DOE",
+                SecondLastName: null,
+                FirstName: "JONE",
+                MiddleName: "C",
+                Prefix: null,
+                Suffix: null,
+                IdentificationCodeQualifier: "XX",
+                ResponseContactIdentifier: "5234567805",
+                Relationship: null
+            ),
+            healthCareProvider.Provider
+        );
     }
 }

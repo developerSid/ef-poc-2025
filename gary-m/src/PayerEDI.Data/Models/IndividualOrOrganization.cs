@@ -36,8 +36,8 @@ namespace PayerEDI.Data.Models;
 // and omits fields declared on Person or NonPerson.
 public abstract record IndividualOrOrganization(
     string? EntityIdentifierCode,
-    string IdentificationCodeQualifier,
-    string ResponseContactIdentifier
+    string? IdentificationCodeQualifier,
+    string? ResponseContactIdentifier
 );
 
 /// <summary>

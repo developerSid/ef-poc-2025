@@ -148,6 +148,7 @@ Bellow is a breakdown of all the available scripts.
 |----------------------------|----------------------------------------------------------------------------------------------------------|
 | `payeredi-db-start`        | Starts SQL Server, waits for health, and reruns the idempotent database bootstrap.                       |
 | `payeredi-db-migrate`      | Applies pending EF Core migrations with the administrative connection.                                   |
+| `payeredi-db-truncate`     | Truncates / empties all user tables in the `PayerEdi` database.                                          |
 | `payeredi-db-stop`         | Stops the Compose services while preserving the `vadb` volume.                                           |
 | `payeredi-db-reset --yes`  | Destructively removes the Compose services and `vadb` volume. Without `--yes`, it asks for confirmation. |
 | `payeredi-dental`          | Runs the console with the `dental` launch profile.                                                       |
@@ -156,8 +157,9 @@ Bellow is a breakdown of all the available scripts.
 | `payeredi-down`            | Stops and removes all Compose containers while preserving named volumes.                                 |
 | `pretty-code`              | Runs csharpier against _src/_ and _tests/_                                                               |
 
-Use `payeredi-db-stop` for a normal shutdown. Use `payeredi-db-reset --yes` only when the local database should be
-recreated from scratch; it deletes all data in the named volume.
+Use `payeredi-db-truncate` to quickly clear all data from user tables while preserving the database schema and migration
+history. Use `payeredi-db-stop` for a normal shutdown. Use `payeredi-db-reset --yes` only when the local database should
+be recreated from scratch; it deletes all data in the named volume.
 
 ## Formatting
 
