@@ -1,4 +1,5 @@
 using EdiFabric.Templates.Hipaa5010;
+using EdiFabric.Core.Model.Edi.ErrorContexts;
 using FastEnumUtility;
 using PayerEDI.Data.Database;
 using PayerEDI.Data.Database.Repositories;
@@ -23,6 +24,7 @@ public class PersistenceService(
         SaveClaimAsync(
             ts837P.CreateDocument(),
             GetPatients(professionalCareClaim.Subscribers),
+            ts837P.ErrorContext,
             cancellationToken
         );
 
@@ -34,6 +36,7 @@ public class PersistenceService(
         SaveClaimAsync(
             ts837D.CreateDocument(),
             GetPatients(dentalCareClaim.Subscribers),
+            ts837D.ErrorContext,
             cancellationToken
         );
 
@@ -90,6 +93,7 @@ public class PersistenceService(
     private async Task SaveClaimAsync(
         DocumentTable documentTable,
         IReadOnlyCollection<PatientTable> patients,
+        MessageErrorContext? errorContext,
         CancellationToken cancellationToken
     )
     {
@@ -101,6 +105,10 @@ public class PersistenceService(
 
         documentTableRepository.Add(documentTable);
         patientRepository.AddRange(patients);
+        if (errorContext is not null)
+        {
+            context.EdiErrors.Add(errorContext.CreateEdiError(documentTable.Id));
+        }
         // Add and AddRange only stage both entity sets in the same DbContext; this single
         // SaveChangesAsync call is the only database commit for the entire claim.
         await context.SaveChangesAsync(cancellationToken);

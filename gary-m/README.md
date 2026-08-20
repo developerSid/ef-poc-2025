@@ -49,6 +49,8 @@ Developer status checklist
     * Simple CLI tool for processing an EDI File
 * [tests/PayerEDI.Tests]
     * Unit tests for small parts of the Data project
+* [.github/skills/map-837-to-domain](./.github/skills/map-837-to-domain/SKILL.md)
+    * Guidance for mapping EdiFabric transactions to the existing domain factories without assuming a fixed service-line segment
 
 ## Setup
 
