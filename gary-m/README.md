@@ -54,8 +54,8 @@ Developer status checklist
 
 ## Setup
 
-I'm running on Fedora Linux 44 (Workstation), and I have Docker installed and my user is in the docker user group so no
-sudo is required to run docker commands. If you do this on Linux you may have to prepend `sudo` to the commands bellow.
+I'm running on Fedora Linux 44 (Workstation), and I have Podman installed for rootless containers. If you use a
+configuration that requires elevated privileges, you may need to prepend `sudo` to the commands below.
 Note most of this should work on Windows with minor changes, but it is all untested for now.
 
 1. Install .Net 10
@@ -68,23 +68,59 @@ Note most of this should work on Windows with minor changes, but it is all untes
 
 ## Usage
 
-The database is hosted in Docker using Docker Compose.
+The database is hosted in Podman using the Compose specification. Podman requires a Compose provider such as
+`podman-compose` for the `podman compose` command.
+
+On Fedora, install the required tools with:
+
+```shell
+sudo dnf install podman podman-compose
+```
+
+Enable the rootless Podman API socket used by the Compose provider:
+
+```shell
+systemctl --user enable --now podman.socket
+```
+
+To keep the user service available after logging out, enable lingering for your user:
+
+```shell
+loginctl enable-linger "$USER"
+```
+
+Rootless Podman can use the published port `1433` because it is above the privileged-port threshold. The Compose file
+adds an SELinux relabel option to the read-only bootstrap-script mount for Fedora hosts.
+
+`podman compose` is a thin wrapper around an external Compose provider. If Docker Compose is installed, Podman may use
+it as the provider while still running containers through Podman's API. The provider warning is informational. Set
+`PODMAN_COMPOSE_WARNING_LOGS=false` to suppress it.
+
+If a Compose command reports that `/run/user/<uid>/podman/podman.sock` is missing, check the socket with:
+
+```shell
+systemctl --user is-active podman.socket
+ls -l "$XDG_RUNTIME_DIR/podman/podman.sock"
+podman compose ps
+```
+
+Start the socket with `systemctl --user start podman.socket` if it is inactive.
 
 ### The Direct Way
 
 #### Step 1 Start the database in the foreground
 
-`docker compose up vadb`
+`podman compose up vadb`
 
 Wait for the db to become healthy, watch the output from the terminal
 
-Docker Compose gives you the option of detaching by pressing D or padding the `-d` switch you prefer to not watch the
-terminal once the db starts up
+Compose gives you the option of detaching by adding the `-d` switch if you prefer not to watch the terminal once the
+database starts up.
 
 #### Step 2 Initialize the database
 
 ```shell
-docker compose run --rm --no-deps db-init
+podman compose run --rm --no-deps db-init
 ```
 
 ```shell 
@@ -125,7 +161,7 @@ dotnet run --project src/PayerEDI.Processor.Console --launch-profile professiona
 #### Step 4 Tear It All Down
 
 ```shell
-docker compose down --remove-orphans --volumes
+podman compose down --remove-orphans --volumes
 ```
 
 ### The Helper Scripts Way
@@ -151,12 +187,12 @@ Bellow is a breakdown of all the available scripts.
 | `payeredi-db-start`        | Starts SQL Server, waits for health, and reruns the idempotent database bootstrap.                       |
 | `payeredi-db-migrate`      | Applies pending EF Core migrations with the administrative connection.                                   |
 | `payeredi-db-truncate`     | Truncates / empties all user tables in the `PayerEdi` database.                                          |
-| `payeredi-db-stop`         | Stops the Compose services while preserving the `vadb` volume.                                           |
-| `payeredi-db-reset --yes`  | Destructively removes the Compose services and `vadb` volume. Without `--yes`, it asks for confirmation. |
+| `payeredi-db-stop`         | Stops the Podman Compose services while preserving the `vadb` volume.                                    |
+| `payeredi-db-reset --yes`  | Destructively removes the Podman Compose services and `vadb` volume. Without `--yes`, it asks for confirmation. |
 | `payeredi-dental`          | Runs the console with the `dental` launch profile.                                                       |
 | `payeredi-professional`    | Runs the console with the `professional` launch profile.                                                 |
 | `payeredi-professionalall` | Runs the console with the `professionalall` launch profile.                                              |
-| `payeredi-down`            | Stops and removes all Compose containers while preserving named volumes.                                 |
+| `payeredi-down`            | Stops and removes all Podman Compose containers while preserving named volumes.                         |
 | `pretty-code`              | Runs csharpier against _src/_ and _tests/_                                                               |
 
 Use `payeredi-db-truncate` to quickly clear all data from user tables while preserving the database schema and migration

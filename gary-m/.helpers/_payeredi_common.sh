@@ -23,7 +23,7 @@ require_command() {
 }
 
 compose() {
-    docker compose --project-directory "$repo_root" "$@"
+    podman compose --project-directory "$repo_root" "$@"
 }
 
 wait_for_database() {
@@ -36,7 +36,7 @@ wait_for_database() {
     fi
 
     for attempt in {1..60}; do
-        health_status="$(docker inspect --format '{{.State.Health.Status}}' "$container_id" 2>/dev/null || true)"
+        health_status="$(podman inspect --format '{{.State.Health.Status}}' "$container_id" 2>/dev/null || true)"
         case "$health_status" in
             healthy)
                 return 0

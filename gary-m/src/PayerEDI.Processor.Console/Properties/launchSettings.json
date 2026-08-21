@@ -33,7 +33,7 @@
     "professionalall": {
       "commandName": "Project",
       "dotnetRunMessages": true,
-      "commandLineArgs": "../../samples/EDI/837P-all-fields.edi",
+      "commandLineArgs": "../../samples/EDI/837P-all-fields.edi --save",
       "workingDirectory": "./",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development",

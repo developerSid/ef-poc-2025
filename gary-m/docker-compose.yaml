@@ -42,7 +42,7 @@ services:
       MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:-password_123}"
       PAYEREDI_APP_PASSWORD: "${PAYEREDI_APP_PASSWORD:-payeredi_app_password}"
     volumes:
-      - ./database:/scripts:ro
+      - ./database:/scripts:ro,Z
     entrypoint: ["/opt/mssql-tools18/bin/sqlcmd"]
     command:
       - -S
