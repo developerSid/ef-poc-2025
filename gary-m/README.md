@@ -18,9 +18,9 @@ Developer status checklist
 | 🟩 Phase 1 | Deliverables     | Working C# application                         |   ✅   |
 | 🟩 Phase 1 | Deliverables     | Database schema/migrations                     |   ✅   |
 | 🟩 Phase 1 | Deliverables     | Sample 837 test file                           |   ✅   |
-| 🟩 Phase 1 | Deliverables     | Unit test coverage                             |   🟨   |
+| 🟩 Phase 1 | Deliverables     | Unit test coverage                             |   ✅   |
 | 🟩 Phase 1 | Deliverables     | README with setup instructions                 |   ✅   |
-| 🟩 Phase 1 | Deliverables     | Phase 1 demo                                   |   ⬛   |
+| 🟩 Phase 1 | Deliverables     | Phase 1 demo                                   |   🟨   |
 | 🟦 Phase 2 | S3 Integration   | Use moto.py for S3                             |   ⬛   |
 | 🟦 Phase 2 | S3 Integration   | Read EDI file from S3 bucket                   |   ⬛   |
 | 🟦 Phase 2 | S3 Integration   | Process files asynchronously                   |   ⬛   |
