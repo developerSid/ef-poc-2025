@@ -47,7 +47,7 @@ public class Process837ProfessionalTests
 
         Assert.Equal(
             new DateTime(2006, 10, 15, 17, 5, 0),
-            professionalCareClaim.TransactionDateTime
+            professionalCareClaim.TransactedAt
         );
 
         // test submitter

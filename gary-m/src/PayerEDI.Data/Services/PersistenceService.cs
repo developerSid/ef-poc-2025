@@ -25,7 +25,7 @@ public class PersistenceService(
         logger.LogTrace("Saving professional care claim {Claim}", professionalCareClaim);
 
         return SaveClaimAsync(
-            ts837P.CreateDocument(professionalCareClaim.TransactionDateTime),
+            ts837P.CreateDocument(professionalCareClaim.TransactedAt),
             GetPatients(professionalCareClaim.Subscribers),
             ts837P.ErrorContext,
             cancellationToken
@@ -41,7 +41,7 @@ public class PersistenceService(
         logger.LogTrace("Saving dental care claim {Claim}", dentalCareClaim);
 
         return SaveClaimAsync(
-            ts837D.CreateDocument(dentalCareClaim.TransactionDateTime),
+            ts837D.CreateDocument(dentalCareClaim.TransactedAt),
             GetPatients(dentalCareClaim.Subscribers),
             ts837D.ErrorContext,
             cancellationToken
