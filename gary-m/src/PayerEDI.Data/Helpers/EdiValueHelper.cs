@@ -14,7 +14,7 @@ public static class EdiValueHelper
     )
     {
         var value = valueSelector(nm1);
-        
+
         return string.IsNullOrWhiteSpace(value)
             ? throw new InvalidNm1Exception($"{element} is required for an NM1 identity.")
             : value.Trim();

@@ -168,37 +168,38 @@ I had AI generate a bunch of shell scripts to make some this easier
 #### With Helper Scripts
 
 ```shell
-./.helpers/payeredi-db-start
-./.helpers/payeredi-db-migrate
-./.helpers/payeredi-dental
-./.helpers/payeredi-professional
-./.helpers/payeredi-professionalall
-./.helpers/payeredi-db-stop
-./.helpers/payeredi-db-reset --yes
+./.helpers/db-start
+./.helpers/db-migrate
+./.helpers/dental
+./.helpers/professional
+./.helpers/professionalall
+./.helpers/db-stop
+./.helpers/db-reset --yes
 ```
 
 Bellow is a breakdown of all the available scripts.
 
-| Script                     | Purpose                                                                                                         |
-|----------------------------|-----------------------------------------------------------------------------------------------------------------|
-| `payeredi-db-start`        | Starts SQL Server, waits for health, and reruns the idempotent database bootstrap.                              |
-| `payeredi-db-migrate`      | Applies pending EF Core migrations with the administrative connection.                                          |
-| `payeredi-db-truncate`     | Truncates / empties all user tables in the `PayerEdi` database.                                                 |
-| `payeredi-db-stop`         | Stops the Podman Compose services while preserving the `vadb` volume.                                           |
-| `payeredi-db-reset --yes`  | Destructively removes the Podman Compose services and `vadb` volume. Without `--yes`, it asks for confirmation. |
-| `payeredi-dental`          | Runs the console with the `dental` launch profile.                                                              |
-| `payeredi-professional`    | Runs the console with the `professional` launch profile.                                                        |
-| `payeredi-professionalall` | Runs the console with the `professionalall` launch profile.                                                     |
-| `payeredi-down`            | Stops and removes all Podman Compose containers while preserving named volumes.                                 |
-| `pretty-code`              | Runs csharpier against _src/_ and _tests/_                                                                      |
+| Script                | Purpose                                                                                                         |
+|-----------------------|-----------------------------------------------------------------------------------------------------------------|
+| `db-start`            | Starts SQL Server, waits for health, and reruns the idempotent database bootstrap.                              |
+| `db-migrate`          | Applies pending EF Core migrations with the administrative connection.                                          |
+| `db-truncate`         | Truncates / empties all user tables in the `PayerEdi` database.                                                 |
+| `db-stop`             | Stops the Podman Compose services while preserving the `vadb` volume.                                           |
+| `db-reset --yes`      | Destructively removes the Podman Compose services and `vadb` volume. Without `--yes`, it asks for confirmation. |
+| `run-dental`          | Runs the console with the `dental` launch profile.                                                              |
+| `run-professional`    | Runs the console with the `professional` launch profile.                                                        |
+| `run-professionalall` | Runs the console with the `professionalall` launch profile.                                                     |
+| `local-down`          | Stops and removes all Podman Compose containers while preserving named volumes.                                 |
+| `pretty-code`         | Runs csharpier against _src/_ and _tests/_                                                                      |
+| `style-check`         | Runs the Roslyn code-style checker without modifying files.                                                     |
 
-Use `payeredi-db-truncate` to quickly clear all data from user tables while preserving the database schema and migration
-history. Use `payeredi-db-stop` for a normal shutdown. Use `payeredi-db-reset --yes` only when the local database should
-be recreated from scratch; it deletes all data in the named volume.
+Use `db-truncate` to quickly clear all data from user tables while preserving the database schema and migration history.
+Use `db-stop` for a normal shutdown. Use `db-reset --yes` only when the local database should be recreated from scratch;
+it deletes all data in the named volume.
 
 ## Formatting
 
-To format the code consistently using the .Net default run
+To format the code consistently using CSharpier, run
 
 ### The Easy Way
 
