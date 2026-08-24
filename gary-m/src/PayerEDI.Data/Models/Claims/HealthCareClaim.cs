@@ -1,71 +1,45 @@
-using EdiFabric.Templates.Hipaa5010;
-
 namespace PayerEDI.Data.Models.Claims;
 
 /// <summary>
 /// Generic EDI 837 - https://www.stedi.com/edi/x12-005010/837
 /// </summary>
-/// <param name="TransactionDate">Date that the 837 was submitted. I question what this actually is</param>
-/// <param name="TransactionTime">Time that the 837 was submitted. I also question what this actually is</param>
+/// <param name="TransactionDateTime">Date and time that the 837 was submitted. I question what this actually is</param>
 /// <param name="Submitter">1000A Loop & PER Segment - Entity submitting the claim AKA Doctor's office or their Billing Service</param>
 /// <param name="Receiver">1000B Loop - The final destination or clearinghouse receiving the professional claim</param>
 public abstract record HealthCareClaim(
-    DateOnly TransactionDate,
-    TimeOnly TransactionTime,
+    DateTime TransactionDateTime,
     ClaimSubmitter Submitter,
     IndividualOrOrganization Receiver
 );
-
-// /// <summary>
-// /// Placeholder for an unknown claim as yet TBD, use wisely
-// /// </summary>
-// /// <param name="WrappedClaim">The claim we haven't handled yet</param>
-// public sealed record UnknownClaim(HealthCareClaim WrappedClaim)
-//     : HealthCareClaim(
-//         TransactionDate: WrappedClaim.TransactionDate,
-//         TransactionTime: WrappedClaim.TransactionTime,
-//         Submitter: WrappedClaim.Submitter,
-//         Receiver: WrappedClaim.Receiver
-//     )
-// {
-//     /// <summary>The claim we haven't handled yet</summary>
-//     public HealthCareClaim WrappedClaim { get; init; } = WrappedClaim;
-// }
 
 /// <summary>
 /// 837P - Professional Health Care Claim
 /// </summary>
 /// <param name="Id">Our Unique ID or Primary Key - I don't know how I would make that work though</param>
-/// <param name="TransactionDate">Date that the 837 was submitted. I question what this actually is</param>
-/// <param name="TransactionTime">Time that the 837 was submitted. I also question what this actually is</param>
+/// <param name="TransactionDateTime">Date and time that the 837 was submitted. I question what this actually is</param>
 /// <param name="Submitter">1000A Loop & PER Segment - Entity submitting the claim AKA Doctor's office or their Billing Service</param>
 /// <param name="Receiver">1000B Loop - The final destination or clearinghouse receiving the professional claim</param>
-public record ProfessionalCareClaim(
-    DateOnly TransactionDate,
-    TimeOnly TransactionTime,
+public sealed record ProfessionalCareClaim(
+    DateTime TransactionDateTime,
     ClaimSubmitter Submitter,
     IndividualOrOrganization Receiver,
     IList<Subscriber> Subscribers,
     IList<HealthcareProvider> HealthcareProviders,
     IList<Procedure> Procedures
-// Providers - Doctors or similar medical operators doing medical work
-) : HealthCareClaim(TransactionDate, TransactionTime, Submitter, Receiver);
+) : HealthCareClaim(TransactionDateTime, Submitter, Receiver);
 
 /// <summary>
 /// 837D - Dental Health Care Claim
 /// </summary>
 /// <param name="Id">Our Unique ID or Primary Key - I don't know how I would make that work though</param>
-/// <param name="TransactionDate">Date that the 837 was submitted. I question what this actually is</param>
-/// <param name="TransactionTime">Time that the 837 was submitted. I also question what this actually is</param>
+/// <param name="TransactionDateTime">Date and time that the 837 was submitted. I question what this actually is</param>
 /// <param name="Submitter">1000A Loop & PER Segment - Entity submitting the claim AKA Doctor's office or their Billing Service</param>
 /// <param name="Receiver">1000B Loop - The final destination or clearinghouse receiving the professional claim</param>
 public sealed record DentalCareClaim(
-    DateOnly TransactionDate,
-    TimeOnly TransactionTime,
+    DateTime TransactionDateTime,
     ClaimSubmitter Submitter,
     IndividualOrOrganization Receiver,
     IList<Subscriber> Subscribers,
     IList<HealthcareProvider> HealthcareProviders,
     IList<Procedure> Procedures
-// Providers - Doctors or similar medical operators doing medical work
-) : HealthCareClaim(TransactionDate, TransactionTime, Submitter, Receiver);
+) : HealthCareClaim(TransactionDateTime, Submitter, Receiver);

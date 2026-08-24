@@ -45,8 +45,10 @@ public class Process837ProfessionalTests
             firstClaim
         );
 
-        Assert.Equal(DateOnly.Parse("2006-10-15"), professionalCareClaim.TransactionDate);
-        Assert.Equal(TimeOnly.Parse("17:05"), professionalCareClaim.TransactionTime);
+        Assert.Equal(
+            new DateTime(2006, 10, 15, 17, 5, 0),
+            professionalCareClaim.TransactionDateTime
+        );
 
         // test submitter
         Assert.Equal("41", professionalCareClaim.Submitter.Submitter.EntityIdentifierCode);

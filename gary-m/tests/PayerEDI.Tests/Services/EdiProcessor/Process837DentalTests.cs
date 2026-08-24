@@ -40,8 +40,7 @@ public class Process837Dental
         Assert.IsType<TS837D>(edi);
         DentalCareClaim dentalCareClaim = Assert.IsType<DentalCareClaim>(firstClaim);
 
-        Assert.Equal(DateOnly.Parse("2008-05-03"), dentalCareClaim.TransactionDate);
-        Assert.Equal(TimeOnly.Parse("17:05"), dentalCareClaim.TransactionTime);
+        Assert.Equal(new DateTime(2008, 5, 3, 17, 5, 0), dentalCareClaim.TransactionDateTime);
 
         // test submitter
         Assert.Equal("41", dentalCareClaim.Submitter.Submitter.EntityIdentifierCode);

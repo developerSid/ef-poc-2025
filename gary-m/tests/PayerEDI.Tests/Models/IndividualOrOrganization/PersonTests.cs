@@ -1,5 +1,7 @@
 using Bogus;
 using EdiFabric.Templates.Hipaa5010;
+
+using PayerEDI.Data.Exceptions;
 using PayerEDI.Data.Models;
 using PayerEDI.Data.Models.Factory;
 using Person = PayerEDI.Data.Models.Person;

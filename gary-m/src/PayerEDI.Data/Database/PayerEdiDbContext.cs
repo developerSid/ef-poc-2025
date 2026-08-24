@@ -22,6 +22,7 @@ public class PayerEdiDbContext(DbContextOptions<PayerEdiDbContext> options) : Db
         document.HasKey(item => item.Id);
         document.Property(item => item.Id).HasColumnType("uniqueidentifier").ValueGeneratedNever();
         document.Property(item => item.EdiMessageType).HasMaxLength(128).IsRequired();
+        document.Property(item => item.TransactionDateTime).HasColumnType("datetime2").IsRequired();
         document.Property(item => item.Xml).HasColumnType("xml").IsRequired();
 
         var ediError = modelBuilder.Entity<EdiErrorTable>();

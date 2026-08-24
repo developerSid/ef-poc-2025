@@ -50,13 +50,10 @@ Developer status checklist
 * [tests/PayerEDI.Tests]
     * Unit tests for small parts of the Data project
 * [.github/skills/map-837-to-domain](./.github/skills/map-837-to-domain/SKILL.md)
-    * Guidance for mapping EdiFabric transactions to the existing domain factories without assuming a fixed service-line segment
+    * Guidance for mapping EdiFabric transactions to the existing domain factories without assuming a fixed service-line
+      segment
 
 ## Setup
-
-I'm running on Fedora Linux 44 (Workstation), and I have Podman installed for rootless containers. If you use a
-configuration that requires elevated privileges, you may need to prepend `sudo` to the commands below.
-Note most of this should work on Windows with minor changes, but it is all untested for now.
 
 1. Install .Net 10
     1. Using [dotnet-install](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-install-script) and assuming
@@ -182,18 +179,18 @@ I had AI generate a bunch of shell scripts to make some this easier
 
 Bellow is a breakdown of all the available scripts.
 
-| Script                     | Purpose                                                                                                  |
-|----------------------------|----------------------------------------------------------------------------------------------------------|
-| `payeredi-db-start`        | Starts SQL Server, waits for health, and reruns the idempotent database bootstrap.                       |
-| `payeredi-db-migrate`      | Applies pending EF Core migrations with the administrative connection.                                   |
-| `payeredi-db-truncate`     | Truncates / empties all user tables in the `PayerEdi` database.                                          |
-| `payeredi-db-stop`         | Stops the Podman Compose services while preserving the `vadb` volume.                                    |
+| Script                     | Purpose                                                                                                         |
+|----------------------------|-----------------------------------------------------------------------------------------------------------------|
+| `payeredi-db-start`        | Starts SQL Server, waits for health, and reruns the idempotent database bootstrap.                              |
+| `payeredi-db-migrate`      | Applies pending EF Core migrations with the administrative connection.                                          |
+| `payeredi-db-truncate`     | Truncates / empties all user tables in the `PayerEdi` database.                                                 |
+| `payeredi-db-stop`         | Stops the Podman Compose services while preserving the `vadb` volume.                                           |
 | `payeredi-db-reset --yes`  | Destructively removes the Podman Compose services and `vadb` volume. Without `--yes`, it asks for confirmation. |
-| `payeredi-dental`          | Runs the console with the `dental` launch profile.                                                       |
-| `payeredi-professional`    | Runs the console with the `professional` launch profile.                                                 |
-| `payeredi-professionalall` | Runs the console with the `professionalall` launch profile.                                              |
-| `payeredi-down`            | Stops and removes all Podman Compose containers while preserving named volumes.                         |
-| `pretty-code`              | Runs csharpier against _src/_ and _tests/_                                                               |
+| `payeredi-dental`          | Runs the console with the `dental` launch profile.                                                              |
+| `payeredi-professional`    | Runs the console with the `professional` launch profile.                                                        |
+| `payeredi-professionalall` | Runs the console with the `professionalall` launch profile.                                                     |
+| `payeredi-down`            | Stops and removes all Podman Compose containers while preserving named volumes.                                 |
+| `pretty-code`              | Runs csharpier against _src/_ and _tests/_                                                                      |
 
 Use `payeredi-db-truncate` to quickly clear all data from user tables while preserving the database schema and migration
 history. Use `payeredi-db-stop` for a normal shutdown. Use `payeredi-db-reset --yes` only when the local database should

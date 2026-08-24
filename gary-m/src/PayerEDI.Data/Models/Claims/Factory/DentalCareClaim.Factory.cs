@@ -46,8 +46,7 @@ public static class DentalCareClaimFactory
                 var procedures = Procedure.New(claim);
 
                 return new DentalCareClaim(
-                    TransactionDate: date,
-                    TransactionTime: time,
+                    TransactionDateTime: date.ToDateTime(time),
                     Submitter: submitter,
                     Receiver: receiver,
                     Subscribers: subscribers,

@@ -1,5 +1,8 @@
 using EdiFabric.Templates.Hipaa5010;
 
+using PayerEDI.Data.Exceptions;
+using PayerEDI.Data.Helpers;
+
 namespace PayerEDI.Data.Models.Factory;
 
 public static class PersonFactory
@@ -91,17 +94,4 @@ public static class IndividualOrOrganizationFactory
         public static IndividualOrOrganization NewDependent(Loop_2010CA_837D dependent) =>
             IndividualOrOrganization.NewNm1(dependent.NM1_PatientName);
     }
-}
-
-/// <summary>
-/// AI generated validation.  I can't say that I like it much, but at least the ternary code is duped all over the place
-/// I do feel like there is a more robust rules way of handling a field, and it's related fields being handled to get a
-/// richer set of errors
-/// </summary>
-internal static class Nm1ValidationExtensions
-{
-    public static string RequireNm1(this string? value, string element) => // this is a very naive implementation
-        string.IsNullOrWhiteSpace(value)
-            ? throw new InvalidNm1Exception($"{element} is required for an NM1 identity.")
-            : value.Trim();
 }

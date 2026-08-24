@@ -1,16 +1,17 @@
 using EdiFabric.Core.Model.Edi.ErrorContexts;
 using EdiFabric.Templates.Hipaa5010;
 using FastEnumUtility;
+using Microsoft.Extensions.Logging;
 using PayerEDI.Data.Database;
 using PayerEDI.Data.Database.Repositories;
 using PayerEDI.Data.Database.Tables;
-using PayerEDI.Data.Helpers;
 using PayerEDI.Data.Models;
 using PayerEDI.Data.Models.Claims;
 
 namespace PayerEDI.Data.Services;
 
 public class PersistenceService(
+    Logger<PersistenceService> logger,
     PayerEdiDbContext context,
     IDocumentTableRepository documentTableRepository,
     IPatientRepository patientRepository
@@ -22,7 +23,7 @@ public class PersistenceService(
         CancellationToken cancellationToken = default
     ) =>
         SaveClaimAsync(
-            ts837P.CreateDocument(),
+            ts837P.CreateDocument(professionalCareClaim.TransactionDateTime),
             GetPatients(professionalCareClaim.Subscribers),
             ts837P.ErrorContext,
             cancellationToken
@@ -34,33 +35,11 @@ public class PersistenceService(
         CancellationToken cancellationToken = default
     ) =>
         SaveClaimAsync(
-            ts837D.CreateDocument(),
+            ts837D.CreateDocument(dentalCareClaim.TransactionDateTime),
             GetPatients(dentalCareClaim.Subscribers),
             ts837D.ErrorContext,
             cancellationToken
         );
-
-    public async Task<DocumentTable> Save(
-        TS837P ts837P,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var documentTable = ts837P.CreateDocument();
-
-        await documentTableRepository.SaveAsync(documentTable, cancellationToken);
-        return documentTable;
-    }
-
-    public async Task<DocumentTable> Save(
-        TS837D ts837D,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var documentTable = ts837D.CreateDocument();
-
-        await documentTableRepository.SaveAsync(documentTable, cancellationToken);
-        return documentTable;
-    }
 
     public async Task<IReadOnlyCollection<PatientTable>> Save(
         ProfessionalCareClaim professionalCareClaim,

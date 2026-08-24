@@ -100,5 +100,3 @@ public sealed record NonPerson(
         IdentificationCodeQualifier,
         ResponseContactIdentifier
     );
-
-public sealed class InvalidNm1Exception(string message) : InvalidOperationException(message);

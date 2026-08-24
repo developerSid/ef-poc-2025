@@ -47,8 +47,7 @@ public static class ProfessionalCareClaimFactory
                 var procedures = Procedure.New(claim);
 
                 return new ProfessionalCareClaim(
-                    TransactionDate: date,
-                    TransactionTime: time,
+                    TransactionDateTime: date.ToDateTime(time),
                     Submitter: submitter,
                     Receiver: receiver,
                     Subscribers: subscribers,
