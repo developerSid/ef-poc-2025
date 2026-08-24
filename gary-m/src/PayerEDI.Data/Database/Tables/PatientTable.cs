@@ -1,3 +1,4 @@
+using FastEnumUtility;
 using PayerEDI.Data.Models;
 
 namespace PayerEDI.Data.Database.Tables;
@@ -35,6 +36,40 @@ public static class PatientTableExtensions
                 MiddleName = person.MiddleName,
                 Prefix = person.Prefix,
                 Suffix = person.Suffix,
+            };
+
+        public static PatientTable ToPatientTable(IndividualOrOrganization entity) =>
+            entity switch
+            {
+                Person person => new PatientTable
+                {
+                    EntityType = nameof(Person),
+                    EntityIdentifierCode = person.EntityIdentifierCode,
+                    IdentificationCodeQualifier = person.IdentificationCodeQualifier,
+                    ResponseContactIdentifier = person.ResponseContactIdentifier,
+                    LastName = person.LastName,
+                    SecondLastName = person.SecondLastName,
+                    FirstName = person.FirstName,
+                    MiddleName = person.MiddleName,
+                    Prefix = person.Prefix,
+                    Suffix = person.Suffix,
+                    Relationship = person.Relationship?.GetEnumMemberValue(),
+                },
+                NonPerson nonPerson => new PatientTable
+                {
+                    EntityType = nameof(NonPerson),
+                    EntityIdentifierCode = nonPerson.EntityIdentifierCode,
+                    IdentificationCodeQualifier = nonPerson.IdentificationCodeQualifier,
+                    ResponseContactIdentifier = nonPerson.ResponseContactIdentifier,
+                    OrganizationName = nonPerson.OrganizationName,
+                    AdditionalOrganizationName = nonPerson.AdditionalOrganizationName,
+                    Relationship = nonPerson.Relationship?.GetEnumMemberValue(),
+                },
+                _ => throw new ArgumentOutOfRangeException(
+                    nameof(entity),
+                    entity,
+                    "Unsupported entity type."
+                ),
             };
     }
 }

@@ -1,5 +1,4 @@
 using EdiFabric.Templates.Hipaa5010;
-
 using PayerEDI.Data.Exceptions;
 using PayerEDI.Data.Helpers;
 
@@ -11,12 +10,14 @@ public static class PersonFactory
     {
         public static Person New(NM1 receiverName) =>
             new(
-                EntityIdentifierCode: receiverName
-                    .EntityIdentifierCode_01.RequireNm1("NM101")
-                    .Trim(),
-                LastName: receiverName
-                    .ResponseContactLastorOrganizationName_03.RequireNm1("NM103")
-                    .Trim(),
+                EntityIdentifierCode: receiverName.RequireNm1(
+                    x => x.EntityIdentifierCode_01,
+                    "NM101"
+                ),
+                LastName: receiverName.RequireNm1(
+                    x => x.ResponseContactLastorOrganizationName_03,
+                    "NM103"
+                ),
                 SecondLastName: receiverName.NameLastorOrganizationName_12?.Trim(),
                 FirstName: receiverName.ResponseContactFirstName_04?.Trim(),
                 MiddleName: receiverName.ResponseContactMiddleName_05?.Trim(),
@@ -43,15 +44,21 @@ public static class NonPersonFactory
     {
         public static NonPerson New(NM1 receiverName) =>
             new(
-                EntityIdentifierCode: receiverName.EntityIdentifierCode_01.RequireNm1("NM101"),
-                OrganizationName: receiverName.ResponseContactLastorOrganizationName_03.RequireNm1(
+                EntityIdentifierCode: receiverName.RequireNm1(
+                    x => x.EntityIdentifierCode_01,
+                    "NM101"
+                ),
+                OrganizationName: receiverName.RequireNm1(
+                    x => x.ResponseContactLastorOrganizationName_03,
                     "NM103"
                 ), // Individual last name or organizational name, NM112 is present then NM103 is required
                 AdditionalOrganizationName: receiverName.NameLastorOrganizationName_12, // C1203: If NM1-12 is present, then NM1-03 is required, NM112 can identify a second surname.
-                IdentificationCodeQualifier: receiverName.IdentificationCodeQualifier_08.RequireNm1(
+                IdentificationCodeQualifier: receiverName.RequireNm1(
+                    x => x.IdentificationCodeQualifier_08,
                     "NM108"
                 ), // P0809: If either NM1-08 or NM1-09 is present, then the other is required
-                ResponseContactIdentifier: receiverName.ResponseContactIdentifier_09.RequireNm1(
+                ResponseContactIdentifier: receiverName.RequireNm1(
+                    x => x.ResponseContactIdentifier_09,
                     "NM109"
                 ), // NM109 - Code identifying a party or other code
                 Relationship: EntityRelationshipCode.FromCode(
@@ -66,7 +73,7 @@ public static class IndividualOrOrganizationFactory
     extension(IndividualOrOrganization)
     {
         private static IndividualOrOrganization NewNm1(NM1 nm1) => // keeping this private for now to make a more readable API call
-            nm1.EntityTypeQualifier_02.RequireNm1("NM102").Trim() switch // Note: there are 16 codes, 1 and 2 are for my naive implementation. See: https://www.stedi.com/edi/x12-005010/segment/NM1#NM1-02
+            nm1.RequireNm1(x => x.EntityTypeQualifier_02, "NM102") switch // Note: there are 16 codes, 1 and 2 are for my naive implementation. See: https://www.stedi.com/edi/x12-005010/segment/NM1#NM1-02
             {
                 "1" => Person.New(nm1),
                 "2" => NonPerson.New(nm1),

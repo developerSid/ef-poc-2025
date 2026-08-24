@@ -1,6 +1,5 @@
 using EdiFabric.Core.Model.Edi.ErrorContexts;
 using EdiFabric.Templates.Hipaa5010;
-using FastEnumUtility;
 using Microsoft.Extensions.Logging;
 using PayerEDI.Data.Database;
 using PayerEDI.Data.Database.Repositories;
@@ -21,52 +20,40 @@ public class PersistenceService(
         TS837P ts837P,
         ProfessionalCareClaim professionalCareClaim,
         CancellationToken cancellationToken = default
-    ) =>
-        SaveClaimAsync(
+    )
+    {
+        logger.LogTrace("Saving professional care claim {Claim}", professionalCareClaim);
+
+        return SaveClaimAsync(
             ts837P.CreateDocument(professionalCareClaim.TransactionDateTime),
             GetPatients(professionalCareClaim.Subscribers),
             ts837P.ErrorContext,
             cancellationToken
         );
+    }
 
     public Task Save(
         TS837D ts837D,
         DentalCareClaim dentalCareClaim,
         CancellationToken cancellationToken = default
-    ) =>
-        SaveClaimAsync(
+    )
+    {
+        logger.LogTrace("Saving dental care claim {Claim}", dentalCareClaim);
+
+        return SaveClaimAsync(
             ts837D.CreateDocument(dentalCareClaim.TransactionDateTime),
             GetPatients(dentalCareClaim.Subscribers),
             ts837D.ErrorContext,
             cancellationToken
         );
-
-    public async Task<IReadOnlyCollection<PatientTable>> Save(
-        ProfessionalCareClaim professionalCareClaim,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var patients = GetPatients(professionalCareClaim.Subscribers);
-        await patientRepository.SaveAsync(patients, cancellationToken);
-        return patients;
     }
 
-    public async Task<IReadOnlyCollection<PatientTable>> Save(
-        DentalCareClaim dentalCareClaim,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var patients = GetPatients(dentalCareClaim.Subscribers);
-        await patientRepository.SaveAsync(patients, cancellationToken);
-        return patients;
-    }
-
-    private static IReadOnlyCollection<PatientTable> GetPatients(
+    private static PatientTable[] GetPatients( // TODO: page this somehow
         IEnumerable<Subscriber> subscribers
     ) =>
         subscribers
             .SelectMany(subscriber => new[] { subscriber.Primary }.Concat(subscriber.Dependents))
-            .Select(ToPatientTable)
+            .Select(PatientTable.ToPatientTable)
             .ToArray();
 
     private async Task SaveClaimAsync(
@@ -93,38 +80,4 @@ public class PersistenceService(
         await context.SaveChangesAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
     }
-
-    private static PatientTable ToPatientTable(IndividualOrOrganization entity) =>
-        entity switch
-        {
-            Person person => new PatientTable
-            {
-                EntityType = nameof(Person),
-                EntityIdentifierCode = person.EntityIdentifierCode,
-                IdentificationCodeQualifier = person.IdentificationCodeQualifier,
-                ResponseContactIdentifier = person.ResponseContactIdentifier,
-                LastName = person.LastName,
-                SecondLastName = person.SecondLastName,
-                FirstName = person.FirstName,
-                MiddleName = person.MiddleName,
-                Prefix = person.Prefix,
-                Suffix = person.Suffix,
-                Relationship = person.Relationship?.GetEnumMemberValue(),
-            },
-            NonPerson nonPerson => new PatientTable
-            {
-                EntityType = nameof(NonPerson),
-                EntityIdentifierCode = nonPerson.EntityIdentifierCode,
-                IdentificationCodeQualifier = nonPerson.IdentificationCodeQualifier,
-                ResponseContactIdentifier = nonPerson.ResponseContactIdentifier,
-                OrganizationName = nonPerson.OrganizationName,
-                AdditionalOrganizationName = nonPerson.AdditionalOrganizationName,
-                Relationship = nonPerson.Relationship?.GetEnumMemberValue(),
-            },
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(entity),
-                entity,
-                "Unsupported entity type."
-            ),
-        };
 }
