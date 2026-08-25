@@ -36,5 +36,5 @@ public sealed record ProcessedDentalClaim(TS837D EdiMessage, DentalCareClaim Cla
 /// <param name="Mapping">Mapped metadata and extraction errors.</param>
 public sealed record ProcessedAttachmentTransaction(
     TS275 EdiMessage,
-    AttachmentMappingResult Mapping
+    AttachmentMapping Mapping
 ) : ProcessedEdiTransaction(EdiMessage);

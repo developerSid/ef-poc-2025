@@ -1,22 +1,17 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-
 using CommandLine;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-
-using PayerEDI.Data;
 using PayerEDI.Data.Database;
 using PayerEDI.Data.Database.Repositories;
 using PayerEDI.Data.Helpers;
 using PayerEDI.Data.Models;
 using PayerEDI.Data.Services;
 using PayerEDI.Processor.Console.Command;
-
 using Serilog;
 
 await Parser
@@ -100,7 +95,7 @@ await Parser
             await using var ediStream = File.OpenRead(ediFile);
             var transactions = app
                 .Services.GetRequiredService<IEdiProcessor>()
-                .ProcessEdi(ediStream);
+                .ProcessEdi(ediStream); // Process the EDI file
             var jsonOptions = new JsonSerializerOptions
             {
                 WriteIndented = true,
@@ -109,7 +104,7 @@ await Parser
 
             logger.LogInformation("Transactions found in {file}", ediFile);
 
-            foreach (var transaction in transactions)
+            foreach (var transaction in transactions) // EDI File can have multiple messages, so need to process each
             {
                 if (options.Save)
                 {
@@ -196,7 +191,8 @@ await Parser
                     case ProcessedAttachmentTransaction attachment
                         when logger.IsEnabled(LogLevel.Trace):
                         logger.LogTrace(
-                            "TS275 XML available; attachment content is omitted from structured logs."
+                            "TS275 XML:\n{Attachment:l}.",
+                            attachment.EdiMessage.ToXml()
                         );
                         break;
                 }

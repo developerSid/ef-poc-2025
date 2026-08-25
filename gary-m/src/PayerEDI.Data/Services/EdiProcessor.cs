@@ -1,4 +1,3 @@
-using System.Globalization;
 using EdiFabric.Core.Model.Edi;
 using EdiFabric.Core.Model.Edi.ErrorContexts;
 using EdiFabric.Core.Model.Edi.X12;
@@ -23,7 +22,7 @@ public class EdiFabricEdiProcessor(ILogger<EdiFabricEdiProcessor> logger) : IEdi
         var transactions = edi.ReadToEnd().ToList();
         // Keep this interface-typed so nested processors share one boxed enumerator instead of advancing copied struct enumerators.
 #pragma warning disable CA1859
-        IEnumerator<IEdiItem> transactionEnumerator = transactions.GetEnumerator();
+        IEnumerator<IEdiItem> transactionEnumerator = transactions.GetEnumerator(); // there has to be a better .Net way of handling this than to just tell the compiler to shutup
 #pragma warning restore CA1859
 
         while (transactionEnumerator.MoveNext()) // maybe use a stack with push and pop semantics instead of this advance with the enumerator
@@ -36,6 +35,7 @@ public class EdiFabricEdiProcessor(ILogger<EdiFabricEdiProcessor> logger) : IEdi
                     ProcessInterchange(claims, transactionEnumerator, isa);
                     break;
                 case null:
+                    logger.LogTrace("Null detected while processing transaction");
                     continue;
                 default:
                     logger.LogInformation(
@@ -119,14 +119,11 @@ public class EdiFabricEdiProcessor(ILogger<EdiFabricEdiProcessor> logger) : IEdi
                     claims.Add(
                         new ProcessedAttachmentTransaction(
                             ts275,
-                            AttachmentTransactionFactory.New(
-                                ParseGroupDateTime(gs.Date_4, gs.Time_5),
-                                ts275
-                            )
+                            AttachmentFactory.New(gs.GroupDateTime(), ts275)
                         )
                     );
                     break;
-                case ReaderErrorContext errorContext: // TODO: aggregate and pass back to caller, or stop processing and throw exception?
+                case ReaderErrorContext errorContext: // FIXME: aggregate and pass back to caller, or stop processing and throw exception?
                     logger.LogError(
                         errorContext.Exception,
                         "Reader error at {ReaderErrorCode}: {ErrorMessage}",
@@ -147,12 +144,4 @@ public class EdiFabricEdiProcessor(ILogger<EdiFabricEdiProcessor> logger) : IEdi
             }
         }
     }
-
-    private static DateTime ParseGroupDateTime(string date, string time) =>
-        DateTime.ParseExact(
-            $"{date}{time}",
-            ["yyyyMMddHHmm", "yyMMddHHmm", "yyyyMMddHHmmss", "yyMMddHHmmss"],
-            CultureInfo.InvariantCulture,
-            DateTimeStyles.None
-        );
 }

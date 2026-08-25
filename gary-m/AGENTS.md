@@ -14,7 +14,27 @@ Use `./.helpers/db-start` and `./.helpers/db-migrate` to start the local SQL Ser
 
 Use nullable-enabled C# with four-space indentation, file-scoped namespaces, records for database table entities, and primary constructors where they improve clarity. Use PascalCase for types and members, camelCase for locals and parameters, and descriptive `*Table`, `*Repository`, `*Service`, and `*Extensions` names. Keep EF configuration in `PayerEdiDbContext` and use async database operations with cancellation tokens.
 
-Before adding an extension method, first grep the entire codebase for an existing method that provides the same behavior or targets the same type; reuse or extend the existing implementation when appropriate instead of creating a duplicate. Extension methods for standard-library classes belong under `src/PayerEDI.Data/Helpers/` and must be placed in a file named `{StdlibClassName}Extensions.cs` (for example, `StringExtensions.cs`).
+### Shared Extensions and Helper Methods
+
+Before adding an extension method or utility method:
+
+1. Inspect all files under `src/PayerEDI.Data/Helpers/`; this directory is the canonical inventory of shared extensions and utilities.
+2. Search the repository using the proposed method name, target type, and relevant domain terms. Keep the search targeted; do not load or enumerate the entire codebase into context.
+3. If a similar method is found, call it out to the developer and explain whether it should be reused, extended, consolidated, or left separate.
+4. Prefer an extension method when the behavior naturally belongs to an existing type.
+5. Place all shared extensions and utilities under `src/PayerEDI.Data/Helpers/`. Use an existing file when the responsibility and target type fit; otherwise create a clearly named file such as `{TargetType}Extensions.cs` or `{DomainConcept}Helper.cs`.
+6. Use a utility method only when an extension method would misrepresent ownership or create a confusing API.
+7. Do not add a reusable-looking method as a private method beside its first call site without considering whether it belongs in the shared Helpers directory. Private methods are appropriate for behavior genuinely specific to one class or workflow.
+8. Before implementation, show the developer the proposed method shape, extension-versus-utility choice, and target helper file so they can weigh in.
+9. Report any similar methods found and every new shared extension or utility added.
+
+Typical discovery searches should include:
+
+- `rg -n "proposedMethodName|relatedTerm" src tests`
+- `rg -n "this TargetType|TargetType" src/PayerEDI.Data/Helpers src tests`
+- `rg --files src/PayerEDI.Data/Helpers`
+
+Extensions for standard-library classes must use a file named `{StdlibClassName}Extensions.cs` (for example, `StringExtensions.cs`). Extensions for domain or third-party types should use a clearly corresponding target-type or domain name.
 
 ### C# and .NET Version
 

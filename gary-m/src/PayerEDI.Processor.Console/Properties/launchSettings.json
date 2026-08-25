@@ -43,7 +43,7 @@
     "x12275": {
       "commandName": "Project",
       "dotnetRunMessages": true,
-      "commandLineArgs": "../../samples/EDI/sample_275_pdf_attachment.edi",
+      "commandLineArgs": "../../samples/EDI/sample_275_pdf_attachment.edi --save",
       "workingDirectory": "./",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development",

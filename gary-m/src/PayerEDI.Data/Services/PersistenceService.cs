@@ -36,7 +36,7 @@ public class PersistenceService(
 
     public Task Save(
         TS275 ts275,
-        AttachmentMappingResult mapping,
+        AttachmentMapping mapping,
         DateTime transactionDateTime,
         CancellationToken cancellationToken = default
     )

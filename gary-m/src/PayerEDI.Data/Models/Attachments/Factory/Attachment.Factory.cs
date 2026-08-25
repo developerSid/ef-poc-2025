@@ -4,9 +4,9 @@ using PayerEDI.Data.Helpers;
 namespace PayerEDI.Data.Models.Attachments.Factory;
 
 /// <summary>Maps EdiFabric 275 structures to attachment domain records.</summary>
-public static class AttachmentTransactionFactory
+public static class AttachmentFactory
 {
-    public static AttachmentMappingResult New(DateTime transactionDateTime, TS275 transaction)
+    public static AttachmentMapping New(DateTime transactionDateTime, TS275 transaction)
     {
         var subjects = transaction
             .NM1Loop.Select(MapSubject)
@@ -27,6 +27,7 @@ public static class AttachmentTransactionFactory
 
         var errors = new List<AttachmentMappingError>();
         var subject = subjects.Count == 1 ? subjects[0] : null;
+        
         if (subjects.Count > 1)
         {
             errors.Add(
@@ -70,7 +71,7 @@ public static class AttachmentTransactionFactory
             );
         }
 
-        return new AttachmentMappingResult(
+        return new AttachmentMapping(
             new AttachmentTransaction(
                 transactionDateTime,
                 transaction.ST.TransactionSetControlNumber_02.EdiValue(),
