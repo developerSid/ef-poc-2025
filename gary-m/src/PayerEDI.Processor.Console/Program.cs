@@ -1,20 +1,22 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 using CommandLine;
-using EdiFabric.Core.Model.Edi;
-using EdiFabric.Templates.Hipaa5010;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+
 using PayerEDI.Data;
 using PayerEDI.Data.Database;
 using PayerEDI.Data.Database.Repositories;
 using PayerEDI.Data.Helpers;
-using PayerEDI.Data.Models.Claims;
+using PayerEDI.Data.Models;
 using PayerEDI.Data.Services;
 using PayerEDI.Processor.Console.Command;
+
 using Serilog;
 
 await Parser
@@ -96,16 +98,18 @@ await Parser
         if (File.Exists(ediFile))
         {
             await using var ediStream = File.OpenRead(ediFile);
-            var claims = app.Services.GetRequiredService<IEdiProcessor>().ProcessEdi(ediStream);
+            var transactions = app
+                .Services.GetRequiredService<IEdiProcessor>()
+                .ProcessEdi(ediStream);
             var jsonOptions = new JsonSerializerOptions
             {
                 WriteIndented = true,
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             };
 
-            logger.LogInformation("Claims found in {file}", ediFile);
+            logger.LogInformation("Transactions found in {file}", ediFile);
 
-            foreach ((EdiMessage, HealthCareClaim) claim in claims) // These files can be batches, how to handle something that doesn't fit the HealthCareClaim hierarchy at some point?
+            foreach (var transaction in transactions)
             {
                 if (options.Save)
                 {
@@ -115,56 +119,85 @@ await Parser
                     var persistenceService =
                         scope.ServiceProvider.GetRequiredService<IPersistenceService>();
 
-                    switch (claim)
+                    switch (transaction)
                     {
-                        case (TS837P edi, ProfessionalCareClaim pro):
-                            await persistenceService.Save(edi, pro);
+                        case ProcessedProfessionalClaim professional:
+                            await persistenceService.Save(
+                                professional.EdiMessage,
+                                professional.Claim
+                            );
                             break;
-                        case (TS837D edi, DentalCareClaim dental):
-                            await persistenceService.Save(edi, dental);
+                        case ProcessedDentalClaim dental:
+                            await persistenceService.Save(dental.EdiMessage, dental.Claim);
+                            break;
+                        case ProcessedAttachmentTransaction attachment:
+                            await persistenceService.Save(
+                                attachment.EdiMessage,
+                                attachment.Mapping,
+                                attachment.Mapping.Transaction.TransactedAt
+                            );
                             break;
                         default:
-                            logger.LogWarning("Unknown claim: {Claim}", claim);
+                            logger.LogWarning("Unknown transaction: {Transaction}", transaction);
                             break;
                     }
                 }
 
-                switch (claim.Item2)
+                switch (transaction)
                 {
-                    case ProfessionalCareClaim pro:
-
+                    case ProcessedProfessionalClaim professional:
                         if (logger.IsEnabled(LogLevel.Debug))
                         {
                             logger.LogDebug(
                                 "TS837P:\n{ProClaim:l}",
-                                JsonSerializer.Serialize(pro, jsonOptions)
+                                JsonSerializer.Serialize(professional.Claim, jsonOptions)
                             );
                         }
 
                         break;
-                    case DentalCareClaim dental:
+                    case ProcessedDentalClaim dental:
                         if (logger.IsEnabled(LogLevel.Debug))
                         {
                             logger.LogDebug(
                                 "TS837D:\n{DentalClaim:l}",
-                                JsonSerializer.Serialize(dental, jsonOptions)
+                                JsonSerializer.Serialize(dental.Claim, jsonOptions)
                             );
                         }
 
                         break;
+                    case ProcessedAttachmentTransaction attachment:
+                        logger.LogDebug(
+                            "TS275 attachment metadata: subjects={SubjectCount}, attachments={AttachmentCount}, errors={ErrorCount}",
+                            attachment.Mapping.Transaction.Subjects.Count,
+                            attachment.Mapping.Transaction.Attachments.Count,
+                            attachment.Mapping.Errors.Count
+                        );
+                        break;
                     default:
-                        logger.LogWarning("Unknown claim: {Claim}", claim);
+                        logger.LogWarning("Unknown transaction: {Transaction}", transaction);
                         break;
                 }
 
-                switch (claim)
+                switch (transaction)
                 {
-                    case (TS837P edi, ProfessionalCareClaim _)
+                    case ProcessedProfessionalClaim professional
                         when logger.IsEnabled(LogLevel.Trace):
-                        logger.LogTrace("TS837P XML:\n{ProClaimXml:l}", edi.ToXml());
+                        logger.LogTrace(
+                            "TS837P XML:\n{ProClaimXml:l}",
+                            professional.EdiMessage.ToXml()
+                        );
                         break;
-                    case (TS837D edi, DentalCareClaim _) when logger.IsEnabled(LogLevel.Trace):
-                        logger.LogTrace("TS837D XML:\n{DentalClaimXml:l}", edi.ToXml());
+                    case ProcessedDentalClaim dental when logger.IsEnabled(LogLevel.Trace):
+                        logger.LogTrace(
+                            "TS837D XML:\n{DentalClaimXml:l}",
+                            dental.EdiMessage.ToXml()
+                        );
+                        break;
+                    case ProcessedAttachmentTransaction attachment
+                        when logger.IsEnabled(LogLevel.Trace):
+                        logger.LogTrace(
+                            "TS275 XML available; attachment content is omitted from structured logs."
+                        );
                         break;
                 }
             }

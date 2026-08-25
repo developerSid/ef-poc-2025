@@ -32,6 +32,16 @@
       Link="samples/EDI/837P-all-fields.edi"
       CopyToOutputDirectory="PreserveNewest"
     />
+    <None
+      Include="../../samples/EDI/sample_275_with_attachment.edi"
+      Link="samples/EDI/sample_275_with_attachment.edi"
+      CopyToOutputDirectory="PreserveNewest"
+    />
+    <None
+      Include="../../samples/EDI/sample_275_pdf_attachment.edi"
+      Link="samples/EDI/sample_275_pdf_attachment.edi"
+      CopyToOutputDirectory="PreserveNewest"
+    />
   </ItemGroup>
 
   <ItemGroup>

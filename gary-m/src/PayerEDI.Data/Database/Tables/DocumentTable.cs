@@ -1,4 +1,5 @@
 using EdiFabric.Templates.Hipaa5010;
+using EdiFabric.Templates.X12004010;
 using PayerEDI.Data.Helpers;
 using PayerEDI.Data.Models.Claims;
 
@@ -28,5 +29,13 @@ public static class DocumentTableExtensions
             EdiMessageType = nameof(TS837D),
             TransactionDateTime = transactionDateTime,
             Xml = ts837D.ToXml(),
+        };
+
+    public static DocumentTable CreateDocument(this TS275 ts275, DateTime transactionDateTime) =>
+        new()
+        {
+            EdiMessageType = nameof(TS275),
+            TransactionDateTime = transactionDateTime,
+            Xml = ts275.ToXml(),
         };
 }

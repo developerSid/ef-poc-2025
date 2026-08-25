@@ -13,6 +13,7 @@ public class PayerEdiDbContext(DbContextOptions<PayerEdiDbContext> options) : Db
     public DbSet<EdiErrorTable> EdiErrors => Set<EdiErrorTable>();
     public DbSet<EdiSegmentErrorTable> EdiSegmentErrors => Set<EdiSegmentErrorTable>();
     public DbSet<PatientTable> Patients => Set<PatientTable>();
+    public DbSet<DocumentAttachmentTable> DocumentAttachments => Set<DocumentAttachmentTable>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -24,6 +25,33 @@ public class PayerEdiDbContext(DbContextOptions<PayerEdiDbContext> options) : Db
         document.Property(item => item.EdiMessageType).HasMaxLength(128).IsRequired();
         document.Property(item => item.TransactionDateTime).HasColumnType("datetime2").IsRequired();
         document.Property(item => item.Xml).HasColumnType("xml").IsRequired();
+
+        var attachment = modelBuilder.Entity<DocumentAttachmentTable>();
+
+        attachment.ToTable("document_attachment");
+        attachment.HasKey(item => item.Id);
+        attachment
+            .Property(item => item.Id)
+            .HasColumnType("uniqueidentifier")
+            .ValueGeneratedNever();
+        attachment.Property(item => item.DocumentId).HasColumnType("uniqueidentifier");
+        attachment.Property(item => item.PatientMemberId).HasMaxLength(80);
+        attachment.Property(item => item.PatientMemberIdQualifier).HasMaxLength(3);
+        attachment.Property(item => item.ClaimReference).HasMaxLength(80);
+        attachment.Property(item => item.ClaimReferenceQualifier).HasMaxLength(3);
+        attachment.Property(item => item.SequenceNumber).HasMaxLength(20);
+        attachment.Property(item => item.FileName).HasMaxLength(255);
+        attachment.Property(item => item.ContentType).HasMaxLength(128);
+        attachment.Property(item => item.DeclaredLength).HasMaxLength(32);
+        attachment.Property(item => item.StorageLocation).HasMaxLength(2048);
+        attachment.Property(item => item.Status).HasMaxLength(32).IsRequired();
+        attachment.HasIndex(item => item.PatientMemberId);
+        attachment.HasIndex(item => item.ClaimReference);
+        attachment
+            .HasOne<DocumentTable>()
+            .WithMany()
+            .HasForeignKey(item => item.DocumentId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         var ediError = modelBuilder.Entity<EdiErrorTable>();
 

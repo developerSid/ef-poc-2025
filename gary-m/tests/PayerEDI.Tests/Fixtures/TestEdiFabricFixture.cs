@@ -1,4 +1,5 @@
 using PayerEDI.Data;
+using PayerEDI.Data.Helpers;
 
 namespace PayerEDI.Tests.Fixtures;
 

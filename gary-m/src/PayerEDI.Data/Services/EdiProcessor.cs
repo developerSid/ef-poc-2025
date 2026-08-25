@@ -1,10 +1,14 @@
+using System.Globalization;
 using EdiFabric.Core.Model.Edi;
 using EdiFabric.Core.Model.Edi.ErrorContexts;
 using EdiFabric.Core.Model.Edi.X12;
 using EdiFabric.Framework.Readers;
 using EdiFabric.Templates.Hipaa5010;
+using EdiFabric.Templates.X12004010;
 using Microsoft.Extensions.Logging;
 using PayerEDI.Data.Helpers;
+using PayerEDI.Data.Models;
+using PayerEDI.Data.Models.Attachments.Factory;
 using PayerEDI.Data.Models.Claims;
 using PayerEDI.Data.Models.Claims.Factory;
 
@@ -12,9 +16,9 @@ namespace PayerEDI.Data.Services;
 
 public class EdiFabricEdiProcessor(ILogger<EdiFabricEdiProcessor> logger) : IEdiProcessor
 {
-    public List<(EdiMessage, HealthCareClaim)> ProcessEdi(Stream ediStream)
+    public List<ProcessedEdiTransaction> ProcessEdi(Stream ediStream)
     {
-        var claims = new List<(EdiMessage, HealthCareClaim)>();
+        var claims = new List<ProcessedEdiTransaction>();
         using var edi = new X12Reader(ediStream, X12TypeFactory.GetTypeInfo);
         var transactions = edi.ReadToEnd().ToList();
         // Keep this interface-typed so nested processors share one boxed enumerator instead of advancing copied struct enumerators.
@@ -46,7 +50,7 @@ public class EdiFabricEdiProcessor(ILogger<EdiFabricEdiProcessor> logger) : IEdi
     }
 
     private void ProcessInterchange(
-        List<(EdiMessage, HealthCareClaim)> claims,
+        List<ProcessedEdiTransaction> claims,
         IEnumerator<IEdiItem> transactionEnumerator,
         ISA isa
     )
@@ -77,7 +81,7 @@ public class EdiFabricEdiProcessor(ILogger<EdiFabricEdiProcessor> logger) : IEdi
     }
 
     private void ProcessFunctionalGroup(
-        List<(EdiMessage, HealthCareClaim)> claims,
+        List<ProcessedEdiTransaction> claims,
         IEnumerator<IEdiItem> transactionEnumerator,
         GS gs
     )
@@ -94,11 +98,33 @@ public class EdiFabricEdiProcessor(ILogger<EdiFabricEdiProcessor> logger) : IEdi
             {
                 case TS837P ts837P:
                     logger.LogDebug("837P transaction {Transaction}", ts837P);
-                    claims.Add((ts837P, ProfessionalCareClaim.New(gs.Date_4, gs.Time_5, ts837P)));
+                    claims.Add(
+                        new ProcessedProfessionalClaim(
+                            ts837P,
+                            ProfessionalCareClaim.New(gs.Date_4, gs.Time_5, ts837P)
+                        )
+                    );
                     break;
                 case TS837D ts837D:
                     logger.LogDebug("837D transaction {Transaction}", ts837D);
-                    claims.Add((ts837D, DentalCareClaim.New(gs.Date_4, gs.Time_5, ts837D)));
+                    claims.Add(
+                        new ProcessedDentalClaim(
+                            ts837D,
+                            DentalCareClaim.New(gs.Date_4, gs.Time_5, ts837D)
+                        )
+                    );
+                    break;
+                case TS275 ts275:
+                    logger.LogDebug("275 transaction {Transaction}", ts275);
+                    claims.Add(
+                        new ProcessedAttachmentTransaction(
+                            ts275,
+                            AttachmentTransactionFactory.New(
+                                ParseGroupDateTime(gs.Date_4, gs.Time_5),
+                                ts275
+                            )
+                        )
+                    );
                     break;
                 case ReaderErrorContext errorContext: // TODO: aggregate and pass back to caller, or stop processing and throw exception?
                     logger.LogError(
@@ -121,4 +147,12 @@ public class EdiFabricEdiProcessor(ILogger<EdiFabricEdiProcessor> logger) : IEdi
             }
         }
     }
+
+    private static DateTime ParseGroupDateTime(string date, string time) =>
+        DateTime.ParseExact(
+            $"{date}{time}",
+            ["yyyyMMddHHmm", "yyMMddHHmm", "yyyyMMddHHmmss", "yyMMddHHmmss"],
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.None
+        );
 }
