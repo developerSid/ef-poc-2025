@@ -72,3 +72,9 @@ services:
       - "3000:3000"
     environment:
       MOTO_PORT: "3000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.create_connection(('127.0.0.1', 3000), 2).close()"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
