@@ -7,6 +7,14 @@ cd ..
 repo_root="$PWD"
 local_bin_dir="$repo_root/.helpers"
 
+if command -v podman >/dev/null 2>&1; then
+    container_runtime=podman
+elif command -v docker >/dev/null 2>&1; then
+    container_runtime=docker
+else
+    container_runtime=
+fi
+
 if [[ -f "$repo_root/.env" ]]; then
     set -a
     source "$repo_root/.env"
@@ -22,8 +30,15 @@ require_command() {
     }
 }
 
+require_container_runtime() {
+    [[ -n "$container_runtime" ]] || {
+        printf 'Required container runtime not found: podman or docker\n' >&2
+        exit 1
+    }
+}
+
 compose() {
-    podman compose --project-directory "$repo_root" "$@"
+    "$container_runtime" compose --project-directory "$repo_root" "$@"
 }
 
 wait_for_database() {
@@ -36,7 +51,7 @@ wait_for_database() {
     fi
 
     for attempt in {1..60}; do
-        health_status="$(podman inspect --format '{{.State.Health.Status}}' "$container_id" 2>/dev/null || true)"
+        health_status="$("$container_runtime" inspect --format '{{.State.Health.Status}}' "$container_id" 2>/dev/null || true)"
         case "$health_status" in
             healthy)
                 return 0

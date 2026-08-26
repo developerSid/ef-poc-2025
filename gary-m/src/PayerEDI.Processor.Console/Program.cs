@@ -25,7 +25,6 @@ await Parser
     })
     .WithParsedAsync(async options =>
     {
-        var ediFile = Path.GetFullPath(options.EdiFile, Directory.GetCurrentDirectory());
         using var app = Host.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration(
                 (hostingContext, config) =>
@@ -90,6 +89,8 @@ await Parser
 
         logger.LogDebug("EdiFabric token configuration: {TokenLoadedVia}", tokenLoadedVia);
 
+        var ediFile = Path.GetFullPath(options.EdiFile, Directory.GetCurrentDirectory());
+        
         if (File.Exists(ediFile))
         {
             await using var ediStream = File.OpenRead(ediFile);

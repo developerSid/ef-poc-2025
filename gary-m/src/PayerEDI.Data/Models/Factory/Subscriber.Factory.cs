@@ -13,7 +13,6 @@ public static class SubscriberFactory
                     Primary: IndividualOrOrganization.NewSubscriber(
                         subscriber.AllNM1.Loop2010BA.NM1_SubscriberName
                     ),
-                    //Dependents: new List<Person>()
                     Dependents: subscriber
                         .Loop2000C.Select(single2000C =>
                             IndividualOrOrganization.NewDependent(single2000C.Loop2010CA)

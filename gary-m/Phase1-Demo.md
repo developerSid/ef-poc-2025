@@ -32,6 +32,7 @@ When using `--save`, set the application connection string; replace the placehol
 
 ```shell
 export EDI_PROCESSOR_CONNECTIONSTRINGS__DEFAULT="Server=localhost,1433;Database=PayerEdi;User Id=payeredi_app;Password=payeredi_app_password;TrustServerCertificate=True"
+export AWS_ENDPOINT_URL="http://localhost:3000"
 ```
 
 ## 4. Process a professional claim without saving

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 source "$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/_payeredi_common.sh"
 
-require_command podman
+require_container_runtime
 
 wait_for_database
 

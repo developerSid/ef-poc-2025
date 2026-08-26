@@ -8,9 +8,7 @@ namespace PayerEDI.Data.Models;
 
 /// <summary>Base result for a transaction processed from an X12 interchange.</summary>
 /// <param name="Message">The parsed EdiFabric transaction.</param>
-public abstract partial record ProcessedEdiTransaction(EdiMessage Message);
-
-public abstract partial record ProcessedEdiTransaction
+public abstract record ProcessedEdiTransaction(EdiMessage Message)
 {
     public void Deconstruct(out EdiMessage message, out HealthCareClaim claim)
     {

@@ -57,3 +57,18 @@ services:
       - -i
       - /scripts/bootstrap.sql
       - -b
+
+  motoserver:
+    image: docker.io/motoserver/moto:5.2.3
+    container_name: motoserver
+    networks:
+      - vanet
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "2"
+        max-size: "5m"
+    ports:
+      - "3000:3000"
+    environment:
+      MOTO_PORT: "3000"
