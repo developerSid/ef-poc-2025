@@ -2,12 +2,12 @@
 
 Run these commands from the repository root, one at a time.
 
-## 1. Start the database
+## 1. Start the development stack
 
-Start the local SQL Server container and wait for it to become healthy.
+Start the local SQL Server and MotoServer containers, wait for SQL Server to become healthy, and initialize the database.
 
 ```shell
-./.helpers/db-start
+./.helpers/dev-start
 ```
 
 ## 2. Apply database migrations
@@ -147,7 +147,7 @@ The domain models are converted into persistence records rather than being persi
 
 `PayerEdiDbContext` maps those table records to SQL Server tables in `OnModelCreating`, including keys, column types, required fields, lengths, indexes, relationships, cascade deletes, and JSON conversion for error-code arrays.
 
-Each migration under `src/PayerEDI.Data/Database/Migrations` is a versioned schema change with `Up` and `Down` operations; `./.helpers/db-migrate` runs `dotnet ef database update` using the migration connection string and applies any migrations not yet recorded in the database.
+Each migration under `src/PayerEDI.Data/Database/Migrations` is a versioned schema change with `Up` and `Down` operations; `./.helpers/dev-migrate` runs `dotnet ef database update` using the migration connection string and applies any migrations not yet recorded in the database.
 
 ## Notes
 I tried my hand at having AI generate teh 275 Attachment mining.  What it came up with I do not like it doesn't match

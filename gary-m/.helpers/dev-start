@@ -3,8 +3,8 @@ source "$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/_payeredi_co
 
 require_container_runtime
 
-compose up -d vadb
+compose up -d vadb motoserver
 wait_for_database
 compose run --rm --no-deps db-init
 
-printf 'PayerEdi database is ready.\n'
+printf 'PayerEDI development stack is ready.\n'

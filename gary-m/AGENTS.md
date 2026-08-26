@@ -8,7 +8,7 @@
 - `samples/EDI/` contains sample 837 input files; `docs/` contains onboarding and EDI/EF Core notes.
 - `.helpers/` contains scripts for database lifecycle, profiles, and formatting.
 
-Use `./.helpers/db-start` and `./.helpers/db-migrate` to start the local SQL Server and apply EF migrations. Use `./.helpers/pretty-code` to format `src/` and `tests/`. Database reset and truncate helpers are destructive; review their confirmation flags before use.
+Use `./.helpers/dev-start` and `./.helpers/dev-migrate` to start the local development stack and apply EF migrations. Use `./.helpers/pretty-code` to format `src/` and `tests/`. Database reset and truncate helpers are destructive; review their confirmation prompts and flags before use.
 
 ## Coding Style & Naming Conventions
 
