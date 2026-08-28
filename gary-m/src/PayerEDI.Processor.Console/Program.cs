@@ -14,6 +14,8 @@ using PayerEDI.Data.Services;
 using PayerEDI.Processor.Console.Command;
 using Serilog;
 
+DotNetEnv.Env.Load(); // look for a .env file and if it exists load environment variables from that.  Good for local dev
+
 await Parser
     .Default.ParseArguments<CliOptions>(args)
     .WithNotParsed(errors =>

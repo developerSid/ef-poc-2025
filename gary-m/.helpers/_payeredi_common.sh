@@ -7,13 +7,7 @@ cd ..
 repo_root="$PWD"
 local_bin_dir="$repo_root/.helpers"
 
-if command -v podman >/dev/null 2>&1; then
-    container_runtime=podman
-elif command -v docker >/dev/null 2>&1; then
-    container_runtime=docker
-else
-    container_runtime=
-fi
+container_runtime=podman
 
 if [[ -f "$repo_root/.env" ]]; then
     set -a
@@ -32,19 +26,21 @@ require_command() {
 
 require_container_runtime() {
     [[ -n "$container_runtime" ]] || {
-        printf 'Required container runtime not found: podman or docker\n' >&2
+        printf 'Required container runtime not found: podman\n' >&2
         exit 1
     }
+
+    require_command "$container_runtime"
 }
 
 compose() {
-    "$container_runtime" compose --project-directory "$repo_root" "$@"
+    "$container_runtime" compose -f "$repo_root/docker-compose.yaml" "$@"
 }
 
 wait_for_database() {
     local container_id health_status attempt
 
-    container_id="$(compose ps -q vadb)"
+    container_id="$("$container_runtime" inspect --format '{{.Id}}' vadb 2>/dev/null || true)"
     if [[ -z "$container_id" ]]; then
         printf 'SQL Server container was not created.\n' >&2
         exit 1
