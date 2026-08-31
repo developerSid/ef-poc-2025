@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Amazon.S3;
 using CommandLine;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -12,6 +13,7 @@ using PayerEDI.Data.Helpers;
 using PayerEDI.Data.Models;
 using PayerEDI.Data.Services;
 using PayerEDI.Processor.Console.Command;
+using PayerEDI.Processor.Console.Services;
 using Serilog;
 
 DotNetEnv.Env.Load(); // look for a .env file and if it exists load environment variables from that.  Good for local dev
@@ -48,6 +50,9 @@ await Parser
             .ConfigureServices(
                 (context, services) =>
                 {
+                    services.AddSingleton<IAmazonS3, AmazonS3Client>(); // will use the default constructor and follow the credential resolution rules of env vars and then ~/.aws
+                    services.AddSingleton<IEdiFileLoader, LocalSystemFileLoader>();
+                    services.AddSingleton<IEdiFileLoader, S3FileLoader>();
                     services.AddSingleton<IEdiProcessor, EdiFabricEdiProcessor>();
 
                     if (!options.Save)
@@ -92,7 +97,7 @@ await Parser
         logger.LogDebug("EdiFabric token configuration: {TokenLoadedVia}", tokenLoadedVia);
 
         var ediFile = Path.GetFullPath(options.EdiFile, Directory.GetCurrentDirectory());
-        
+
         if (File.Exists(ediFile))
         {
             await using var ediStream = File.OpenRead(ediFile);

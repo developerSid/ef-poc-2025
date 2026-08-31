@@ -27,7 +27,7 @@ public static class AttachmentFactory
 
         var errors = new List<AttachmentMappingError>();
         var subject = subjects.Count == 1 ? subjects[0] : null;
-        
+
         if (subjects.Count > 1)
         {
             errors.Add(
