@@ -21,15 +21,15 @@ Developer status checklist
 | 🟩 Phase 1 | Deliverables     | Unit test coverage                             |   ✅   |
 | 🟩 Phase 1 | Deliverables     | README with setup instructions                 |   ✅   |
 | 🟩 Phase 1 | Deliverables     | Phase 1 demo                                   |   ✅   |
-| 🟦 Phase 2 | S3 Integration   | Use moto.py for S3                             |   🟨   |
-| 🟦 Phase 2 | S3 Integration   | Read EDI file from S3 bucket                   |   🟨   |
-| 🟦 Phase 2 | S3 Integration   | Process files asynchronously                   |   ⬛   |
-| 🟦 Phase 2 | Success Criteria | Application successfully parses 837 EDI file   |   ⬛   |
-| 🟦 Phase 2 | Success Criteria | Data is correctly stored in SQL Server Express |   ⬛   |
-| 🟦 Phase 2 | Success Criteria | At least one unit test passes                  |   ⬛   |
+| 🟦 Phase 2 | S3 Integration   | Use moto.py for S3                             |   ✅   |
+| 🟦 Phase 2 | S3 Integration   | Read EDI file from S3 bucket                   |   ✅   |
+| 🟦 Phase 2 | S3 Integration   | Process files asynchronously                   |   ✅   |
+| 🟦 Phase 2 | Success Criteria | Application successfully parses 837 EDI file   |   ✅   |
+| 🟦 Phase 2 | Success Criteria | Data is correctly stored in SQL Server Express |   ✅   |
+| 🟦 Phase 2 | Success Criteria | At least one unit test passes                  |   ✅   |
 | 🟦 Phase 2 | Success Criteria | Code is properly documented                    |   ⬛   |
-| 🟦 Phase 2 | Success Criteria | Peer review completed                          |   ⬛   |
-| 🟦 Phase 2 | Success Criteria | Phase 2 demo                                   |   ⬛   |
+| 🟦 Phase 2 | Success Criteria | Peer review completed                          |   ✅   |
+| 🟦 Phase 2 | Success Criteria | Phase 2 demo                                   |   🟨   |
 | 🟥 Phase 3 | SNIP Validation  | Add SNIP Validation Level                      |   ⬛   |
 
 **Status Key**
